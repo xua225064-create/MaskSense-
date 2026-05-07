@@ -38,14 +38,7 @@ export default function PricingScreen({ user, credits, setScreen, goCheckout }) 
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        {/* Hero Image */}
-        <View style={s.heroWrap}>
-          <Image 
-            source={{ uri: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&q=80&w=800' }} 
-            style={s.heroImg} 
-          />
 
-        </View>
 
         {/* Title */}
         <Text style={s.title}>Mở Khóa Truy Cập{'\n'}Không Giới Hạn</Text>
@@ -137,9 +130,7 @@ const s = StyleSheet.create({
   closeBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#f5f5f4', justifyContent: 'center', alignItems: 'center' },
   restoreText: { fontSize: 13, color: '#78716c', fontWeight: '600' },
 
-  // Hero
-  heroWrap: { height: 200, borderRadius: 24, overflow: 'hidden', marginBottom: 28 },
-  heroImg: { width: '100%', height: '100%', resizeMode: 'cover' },
+
 
   // Title
   title: { fontSize: 28, fontFamily: 'serif', color: '#1c1917', fontWeight: 'bold', textAlign: 'center', lineHeight: 36, marginBottom: 8 },

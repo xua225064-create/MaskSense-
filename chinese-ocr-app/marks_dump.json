@@ -1,0 +1,1311 @@
+[
+  {
+    "id": 1,
+    "chu_han": "大明洪武年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Hồng Vũ (Zhu Yuanzhang)",
+    "nien_dai": "1368 - 1398"
+  },
+  {
+    "id": 2,
+    "chu_han": "大明建文年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Kiến Văn (Zhu Yunwen)",
+    "nien_dai": "1399 - 1402"
+  },
+  {
+    "id": 3,
+    "chu_han": "大明永樂年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Vĩnh Lạc (Zhu Di)",
+    "nien_dai": "1403 - 1424"
+  },
+  {
+    "id": 4,
+    "chu_han": "大明洪熙年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Hồng Hy (Zhu Gaochi)",
+    "nien_dai": "1424 - 1425"
+  },
+  {
+    "id": 5,
+    "chu_han": "大明宣德年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Tuyên Đức (Zhu Zhanji)",
+    "nien_dai": "1426 - 1435"
+  },
+  {
+    "id": 6,
+    "chu_han": "大明正統年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Chính Thống (Zhu Qizhen)",
+    "nien_dai": "1436 - 1449"
+  },
+  {
+    "id": 7,
+    "chu_han": "大明景泰年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Cảnh Thái (Zhu Qiyu)",
+    "nien_dai": "1450 - 1457"
+  },
+  {
+    "id": 8,
+    "chu_han": "大明天順年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Thiên Thuận (Zhu Qizhen lần 2)",
+    "nien_dai": "1457 - 1464"
+  },
+  {
+    "id": 9,
+    "chu_han": "大明成化年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Thành Hóa (Zhu Jianshen)",
+    "nien_dai": "1465 - 1487"
+  },
+  {
+    "id": 10,
+    "chu_han": "大明弘治年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Hoằng Trị (Zhu Youtang)",
+    "nien_dai": "1488 - 1505"
+  },
+  {
+    "id": 11,
+    "chu_han": "大明正德年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Chính Đức (Zhu Houzhao)",
+    "nien_dai": "1506 - 1521"
+  },
+  {
+    "id": 12,
+    "chu_han": "大明嘉靖年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Gia Tĩnh (Zhu Houcong)",
+    "nien_dai": "1522 - 1566"
+  },
+  {
+    "id": 13,
+    "chu_han": "大明隆慶年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Long Khánh (Zhu Zaiji)",
+    "nien_dai": "1567 - 1572"
+  },
+  {
+    "id": 14,
+    "chu_han": "大明萬曆年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Vạn Lịch (Zhu Yijun)",
+    "nien_dai": "1573 - 1620"
+  },
+  {
+    "id": 15,
+    "chu_han": "大明泰昌年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Thái Xương (Zhu Changluo)",
+    "nien_dai": "1620 - 1620"
+  },
+  {
+    "id": 16,
+    "chu_han": "大明天啟年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Thiên Khải (Zhu Youjiao)",
+    "nien_dai": "1621 - 1627"
+  },
+  {
+    "id": 17,
+    "chu_han": "大明崇禎年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Sùng Trinh (Zhu Youjian)",
+    "nien_dai": "1628 - 1644"
+  },
+  {
+    "id": 18,
+    "chu_han": "大清順治年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Thuận Trị (Fulin)",
+    "nien_dai": "1644 - 1661"
+  },
+  {
+    "id": 19,
+    "chu_han": "大清康熙年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Khang Hy (Xuanye)",
+    "nien_dai": "1662 - 1722"
+  },
+  {
+    "id": 20,
+    "chu_han": "大清雍正年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Ung Chính (Yinzhen)",
+    "nien_dai": "1723 - 1735"
+  },
+  {
+    "id": 21,
+    "chu_han": "大清乾隆年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Càn Long (Hongli)",
+    "nien_dai": "1736 - 1795"
+  },
+  {
+    "id": 22,
+    "chu_han": "大清嘉慶年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Gia Khánh (Yongyan)",
+    "nien_dai": "1796 - 1820"
+  },
+  {
+    "id": 23,
+    "chu_han": "大清道光年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Đạo Quang (Minning)",
+    "nien_dai": "1821 - 1850"
+  },
+  {
+    "id": 24,
+    "chu_han": "大清咸豐年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Hàm Phong (Yizhu)",
+    "nien_dai": "1851 - 1861"
+  },
+  {
+    "id": 25,
+    "chu_han": "大清同治年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Đồng Trị (Zaichun)",
+    "nien_dai": "1862 - 1874"
+  },
+  {
+    "id": 26,
+    "chu_han": "大清光緒年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Quang Tự (Zaitian)",
+    "nien_dai": "1875 - 1908"
+  },
+  {
+    "id": 27,
+    "chu_han": "大清宣統年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Tuyên Thống (Puyi)",
+    "nien_dai": "1909 - 1912"
+  },
+  {
+    "id": 28,
+    "chu_han": "嘉隆年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Gia Long (Nguyễn Phúc Ánh)",
+    "nien_dai": "1802 - 1820"
+  },
+  {
+    "id": 29,
+    "chu_han": "明命年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Minh Mạng (Nguyễn Phúc Đảm)",
+    "nien_dai": "1820 - 1841"
+  },
+  {
+    "id": 30,
+    "chu_han": "紹治年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Thiệu Trị (Nguyễn Phúc Miên Tông)",
+    "nien_dai": "1841 - 1847"
+  },
+  {
+    "id": 31,
+    "chu_han": "嗣德年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Tự Đức (Nguyễn Phúc Hồng Nhậm)",
+    "nien_dai": "1847 - 1883"
+  },
+  {
+    "id": 32,
+    "chu_han": "建福年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Kiến Phúc (Nguyễn Phúc Ưng Đăng)",
+    "nien_dai": "1883 - 1884"
+  },
+  {
+    "id": 33,
+    "chu_han": "咸宜年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Hàm Nghi (Nguyễn Phúc Ưng Lịch)",
+    "nien_dai": "1884 - 1885"
+  },
+  {
+    "id": 34,
+    "chu_han": "同慶年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Đồng Khánh (Nguyễn Phúc Ưng Kỷ)",
+    "nien_dai": "1885 - 1889"
+  },
+  {
+    "id": 35,
+    "chu_han": "成泰年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Thành Thái (Nguyễn Phúc Bửu Lân)",
+    "nien_dai": "1889 - 1907"
+  },
+  {
+    "id": 36,
+    "chu_han": "維新年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Duy Tân (Nguyễn Phúc Vĩnh San)",
+    "nien_dai": "1907 - 1916"
+  },
+  {
+    "id": 37,
+    "chu_han": "啟定年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Khải Định (Nguyễn Phúc Bửu Đảo)",
+    "nien_dai": "1916 - 1925"
+  },
+  {
+    "id": 38,
+    "chu_han": "保大年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Bảo Đại (Nguyễn Phúc Vĩnh Thụy)",
+    "nien_dai": "1926 - 1945"
+  },
+  {
+    "id": 39,
+    "chu_han": "內府",
+    "trieu_dai": "Đặc biệt - Cung đình",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 40,
+    "chu_han": "內府侍從",
+    "trieu_dai": "Đặc biệt - Cung đình",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 41,
+    "chu_han": "御製",
+    "trieu_dai": "Đặc biệt - Cung đình",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 42,
+    "chu_han": "御用",
+    "trieu_dai": "Đặc biệt - Cung đình",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 43,
+    "chu_han": "官窯",
+    "trieu_dai": "Đặc biệt - Cung đình",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 44,
+    "chu_han": "天下太平",
+    "trieu_dai": "Đặc biệt - Cung đình",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 45,
+    "chu_han": "清玩",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 46,
+    "chu_han": "珍玩",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 47,
+    "chu_han": "雅玉",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 48,
+    "chu_han": "若深珍藏",
+    "trieu_dai": "Đặc biệt - Nghệ nhân",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 49,
+    "chu_han": "萬壽無疆",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 50,
+    "chu_han": "福壽康寧",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 51,
+    "chu_han": "長春",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 52,
+    "chu_han": "萬福攸同",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 53,
+    "chu_han": "芳傳萬古",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 54,
+    "chu_han": "景德鎮製",
+    "trieu_dai": "Đặc biệt - Địa danh",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 55,
+    "chu_han": "江西瓷器",
+    "trieu_dai": "Đặc biệt - Địa danh",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 56,
+    "chu_han": "德化製",
+    "trieu_dai": "Đặc biệt - Địa danh",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 57,
+    "chu_han": "大雅齋",
+    "trieu_dai": "Đặc biệt - Cung đình Thanh",
+    "hoang_de": "Từ Hi Thái Hậu",
+    "nien_dai": "1875 - 1908"
+  },
+  {
+    "id": 58,
+    "chu_han": "天地一家春",
+    "trieu_dai": "Đặc biệt - Cung đình Thanh",
+    "hoang_de": "Từ Hi Thái Hậu",
+    "nien_dai": "1875 - 1908"
+  },
+  {
+    "id": 59,
+    "chu_han": "永慶長春",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 60,
+    "chu_han": "慎德堂製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": "Đạo Quang",
+    "nien_dai": "1821 - 1850"
+  },
+  {
+    "id": 61,
+    "chu_han": "養和堂製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 62,
+    "chu_han": "陳國治造",
+    "trieu_dai": "Đặc biệt - Nghệ nhân",
+    "hoang_de": null,
+    "nien_dai": "1821 - 1850"
+  },
+  {
+    "id": 63,
+    "chu_han": "宣化年製",
+    "trieu_dai": "Đặc biệt - Giả/Kết hợp",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 64,
+    "chu_han": "阮",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": null,
+    "nien_dai": "1780 - 1820"
+  },
+  {
+    "id": 65,
+    "chu_han": "大明",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": null,
+    "nien_dai": "1368 - 1644"
+  },
+  {
+    "id": 66,
+    "chu_han": "大清",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": null,
+    "nien_dai": "1644 - 1912"
+  },
+  {
+    "id": 67,
+    "chu_han": "大南",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": null,
+    "nien_dai": "1820 - 1945"
+  },
+  {
+    "id": 68,
+    "chu_han": "康熙年玩",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Khang Hy",
+    "nien_dai": "1662 - 1722"
+  },
+  {
+    "id": 69,
+    "chu_han": "乾隆年玩",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Càn Long",
+    "nien_dai": "1736 - 1795"
+  },
+  {
+    "id": 70,
+    "chu_han": "嘉靖年造",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Gia Tĩnh",
+    "nien_dai": "1522 - 1566"
+  },
+  {
+    "id": 71,
+    "chu_han": "萬曆年造",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Vạn Lịch",
+    "nien_dai": "1573 - 1620"
+  },
+  {
+    "id": 72,
+    "chu_han": "成化年造",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Thành Hóa",
+    "nien_dai": "1465 - 1487"
+  },
+  {
+    "id": 73,
+    "chu_han": "乾隆年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Càn Long",
+    "nien_dai": "1736 - 1795"
+  },
+  {
+    "id": 74,
+    "chu_han": "康熙年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Khang Hy",
+    "nien_dai": "1662 - 1722"
+  },
+  {
+    "id": 75,
+    "chu_han": "雍正年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Ung Chính",
+    "nien_dai": "1723 - 1735"
+  },
+  {
+    "id": 76,
+    "chu_han": "宣德年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Tuyên Đức",
+    "nien_dai": "1426 - 1435"
+  },
+  {
+    "id": 77,
+    "chu_han": "成化年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Thành Hóa",
+    "nien_dai": "1465 - 1487"
+  },
+  {
+    "id": 78,
+    "chu_han": "嘉靖年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Gia Tĩnh",
+    "nien_dai": "1522 - 1566"
+  },
+  {
+    "id": 79,
+    "chu_han": "萬曆年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": "Vạn Lịch",
+    "nien_dai": "1573 - 1620"
+  },
+  {
+    "id": 80,
+    "chu_han": "大明年製",
+    "trieu_dai": "Minh Triều",
+    "hoang_de": null,
+    "nien_dai": "1368 - 1644"
+  },
+  {
+    "id": 81,
+    "chu_han": "大清年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": null,
+    "nien_dai": "1644 - 1912"
+  },
+  {
+    "id": 82,
+    "chu_han": "嘉慶年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Gia Khánh",
+    "nien_dai": "1796 - 1820"
+  },
+  {
+    "id": 83,
+    "chu_han": "道光年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Đạo Quang",
+    "nien_dai": "1821 - 1850"
+  },
+  {
+    "id": 84,
+    "chu_han": "光緒年製",
+    "trieu_dai": "Thanh Triều",
+    "hoang_de": "Quang Tự",
+    "nien_dai": "1875 - 1908"
+  },
+  {
+    "id": 85,
+    "chu_han": "內府侍旨",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "TK17 - 1802"
+  },
+  {
+    "id": 86,
+    "chu_han": "內府侍中",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "TK17 - 1802"
+  },
+  {
+    "id": 87,
+    "chu_han": "內府侍右",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "TK17 - 1802"
+  },
+  {
+    "id": 88,
+    "chu_han": "內府侍東",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "TK17 - 1802"
+  },
+  {
+    "id": 89,
+    "chu_han": "內府侍南",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "TK17 - 1802"
+  },
+  {
+    "id": 90,
+    "chu_han": "內府侍北",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "TK17 - 1802"
+  },
+  {
+    "id": 91,
+    "chu_han": "內府侍兌",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "TK17 - 1802"
+  },
+  {
+    "id": 92,
+    "chu_han": "甲子年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 93,
+    "chu_han": "乙丑年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 94,
+    "chu_han": "丙寅年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 95,
+    "chu_han": "丁卯年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 96,
+    "chu_han": "戊辰年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 97,
+    "chu_han": "己巳年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 98,
+    "chu_han": "庚午年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 99,
+    "chu_han": "辛未年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 100,
+    "chu_han": "壬申年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 101,
+    "chu_han": "癸酉年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 102,
+    "chu_han": "甲戌年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 103,
+    "chu_han": "乙亥年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 104,
+    "chu_han": "丙子年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 105,
+    "chu_han": "丁丑年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 106,
+    "chu_han": "戊寅年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 107,
+    "chu_han": "己卯年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 108,
+    "chu_han": "庚辰年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 109,
+    "chu_han": "辛巳年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 110,
+    "chu_han": "壬午年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 111,
+    "chu_han": "癸未年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 112,
+    "chu_han": "甲申年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 113,
+    "chu_han": "乙酉年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 114,
+    "chu_han": "丙戌年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 115,
+    "chu_han": "丁亥年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 116,
+    "chu_han": "戊子年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 117,
+    "chu_han": "己丑年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 118,
+    "chu_han": "庚寅年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 119,
+    "chu_han": "辛卯年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 120,
+    "chu_han": "壬辰年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 121,
+    "chu_han": "癸巳年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 122,
+    "chu_han": "甲午年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 123,
+    "chu_han": "乙未年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 124,
+    "chu_han": "丙申年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 125,
+    "chu_han": "丁酉年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 126,
+    "chu_han": "戊戌年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 127,
+    "chu_han": "己亥年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 128,
+    "chu_han": "庚子年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 129,
+    "chu_han": "辛丑年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 130,
+    "chu_han": "壬寅年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 131,
+    "chu_han": "癸卯年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 132,
+    "chu_han": "甲辰年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 133,
+    "chu_han": "乙巳年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 134,
+    "chu_han": "丙午年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 135,
+    "chu_han": "丁未年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 136,
+    "chu_han": "戊申年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 137,
+    "chu_han": "己酉年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 138,
+    "chu_han": "庚戌年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 139,
+    "chu_han": "辛亥年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 140,
+    "chu_han": "壬子年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 141,
+    "chu_han": "癸丑年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 142,
+    "chu_han": "甲寅年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 143,
+    "chu_han": "乙卯年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 144,
+    "chu_han": "丙辰年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 145,
+    "chu_han": "丁巳年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 146,
+    "chu_han": "戊午年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 147,
+    "chu_han": "己未年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 148,
+    "chu_han": "庚申年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 149,
+    "chu_han": "辛酉年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 150,
+    "chu_han": "壬戌年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 151,
+    "chu_han": "癸亥年製",
+    "trieu_dai": "Can Chi - Đặc biệt",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 152,
+    "chu_han": "體和殿製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": "Từ Hi Thái Hậu",
+    "nien_dai": "1875 - 1908"
+  },
+  {
+    "id": 153,
+    "chu_han": "儲秀宮製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": "Từ Hi Thái Hậu",
+    "nien_dai": "1875 - 1908"
+  },
+  {
+    "id": 154,
+    "chu_han": "坤寧宮製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": null,
+    "nien_dai": "1644 - 1912"
+  },
+  {
+    "id": 155,
+    "chu_han": "長春宮製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": null,
+    "nien_dai": "1644 - 1912"
+  },
+  {
+    "id": 156,
+    "chu_han": "重華宮製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": "Càn Long",
+    "nien_dai": "1736 - 1795"
+  },
+  {
+    "id": 157,
+    "chu_han": "漱芳齋製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": "Càn Long",
+    "nien_dai": "1736 - 1795"
+  },
+  {
+    "id": 158,
+    "chu_han": "靜怡軒製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 159,
+    "chu_han": "浴德堂製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 160,
+    "chu_han": "樂道堂製",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 161,
+    "chu_han": "協和年製",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+    "hoang_de": "Hiệp Hòa (Nguyễn Phúc Hồng Dật)",
+    "nien_dai": "1883 - 1883"
+  },
+  {
+    "id": 162,
+    "chu_han": "光中年製",
+    "trieu_dai": "Tây Sơn (Việt Nam)",
+    "hoang_de": "Quang Trung (Nguyễn Huệ)",
+    "nien_dai": "1788 - 1792"
+  },
+  {
+    "id": 163,
+    "chu_han": "泰德年製",
+    "trieu_dai": "Tây Sơn (Việt Nam)",
+    "hoang_de": "Thái Đức (Nguyễn Nhạc)",
+    "nien_dai": "1778 - 1793"
+  },
+  {
+    "id": 164,
+    "chu_han": "景盛年製",
+    "trieu_dai": "Tây Sơn (Việt Nam)",
+    "hoang_de": "Cảnh Thịnh (Nguyễn Quang Toản)",
+    "nien_dai": "1793 - 1802"
+  },
+  {
+    "id": 165,
+    "chu_han": "永樂長春",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 166,
+    "chu_han": "壽山福海",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 167,
+    "chu_han": "福壽雙全",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 168,
+    "chu_han": "吉祥如意",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 169,
+    "chu_han": "富貴長春",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 170,
+    "chu_han": "玉堂佳器",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 171,
+    "chu_han": "奇玉寶鼎之珍",
+    "trieu_dai": "Đặc biệt - Chúc tụng",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 172,
+    "chu_han": "王炳榮製",
+    "trieu_dai": "Đặc biệt - Nghệ nhân",
+    "hoang_de": null,
+    "nien_dai": "1875 - 1908"
+  },
+  {
+    "id": 173,
+    "chu_han": "王少林製",
+    "trieu_dai": "Đặc biệt - Nghệ nhân",
+    "hoang_de": null,
+    "nien_dai": "1875 - 1908"
+  },
+  {
+    "id": 174,
+    "chu_han": "程門製",
+    "trieu_dai": "Đặc biệt - Nghệ nhân",
+    "hoang_de": null,
+    "nien_dai": "1821 - 1875"
+  },
+  {
+    "id": 175,
+    "chu_han": "許之衡製",
+    "trieu_dai": "Đặc biệt - Nghệ nhân",
+    "hoang_de": null,
+    "nien_dai": "1875 - 1912"
+  },
+  {
+    "id": 176,
+    "chu_han": "宜興製",
+    "trieu_dai": "Đặc biệt - Địa danh",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 177,
+    "chu_han": "石灣製",
+    "trieu_dai": "Đặc biệt - Địa danh",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 178,
+    "chu_han": "潮州製",
+    "trieu_dai": "Đặc biệt - Địa danh",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 179,
+    "chu_han": "福建製",
+    "trieu_dai": "Đặc biệt - Địa danh",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 180,
+    "chu_han": "大日本製",
+    "trieu_dai": "Nhật Bản",
+    "hoang_de": null,
+    "nien_dai": "1868 - 1945"
+  },
+  {
+    "id": 181,
+    "chu_han": "大日本帝國製",
+    "trieu_dai": "Nhật Bản",
+    "hoang_de": null,
+    "nien_dai": "1868 - 1945"
+  },
+  {
+    "id": 182,
+    "chu_han": "鳴海製",
+    "trieu_dai": "Nhật Bản",
+    "hoang_de": null,
+    "nien_dai": "1904 - nay"
+  },
+  {
+    "id": 183,
+    "chu_han": "內府侍右",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "1600 - 1802"
+  },
+  {
+    "id": 184,
+    "chu_han": "內府侍旨",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "1600 - 1802"
+  },
+  {
+    "id": 185,
+    "chu_han": "內府侍左",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "TK17 - 1802"
+  },
+  {
+    "id": 186,
+    "chu_han": "滿福堂記",
+    "trieu_dai": "Đặc biệt - Hall mark",
+    "hoang_de": null,
+    "nien_dai": ""
+  },
+  {
+    "id": 187,
+    "chu_han": "慶春侍左",
+    "trieu_dai": "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn",
+    "hoang_de": null,
+    "nien_dai": "TK17 - 1802"
+  }
+]

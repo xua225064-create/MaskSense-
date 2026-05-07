@@ -253,6 +253,20 @@ def get_payment(payment_id: int):
     finally:
         if conn: conn.close()
 
+def get_user_payments(user_id: int):
+    conn = get_db_connection()
+    if not conn: return []
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM payments WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
+            rows = cursor.fetchall()
+            for r in rows:
+                if r.get('created_at'):
+                    r['created_at'] = r['created_at'].strftime("%Y-%m-%d %H:%M:%S")
+            return rows
+    finally:
+        if conn: conn.close()
+
 def complete_payment(payment_id: int, sepay_tx_id: int):
     conn = get_db_connection()
     if not conn: return False

@@ -40,7 +40,7 @@ _last_analyzed_images: Dict[str, bytes] = {}
 
 from db import (fetch_all_marks, create_user, get_user_by_username, add_scan_history, 
     get_scan_history, get_or_create_social_user, ensure_credits_column, get_user_credits, 
-    deduct_credit, add_credits, create_payment, get_payment, complete_payment,
+    deduct_credit, add_credits, create_payment, get_payment, get_user_payments, complete_payment,
     ensure_admin_columns, create_admin_account, admin_login, get_all_users_admin,
     toggle_user_lock, admin_update_credits, admin_reset_password, get_all_payments_admin, 
     admin_approve_payment, get_all_scan_history_admin, get_dashboard_stats,
@@ -1727,6 +1727,16 @@ async def mock_payment(payment_id: int):
             return {"status": "completed", "message": "Giả lập thanh toán thành công!"}
     
     return {"status": payment['status']}
+
+@app.get("/api/v1/user/payments")
+def user_payments_api(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return JSONResponse(status_code=401, content={"error": "Not authenticated"})
+    
+    user_id = auth_header.split("Bearer ")[1]
+    payments = get_user_payments(user_id)
+    return {"success": True, "payments": payments}
 
 @app.post("/api/buy-credits")
 def buy_credits(data: BuyCreditsRequest, request: Request):
