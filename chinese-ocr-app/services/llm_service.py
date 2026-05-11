@@ -9,9 +9,18 @@ Hỗ trợ:
 - Prompt template cho phân tích hiệu đề
 """
 import json
+import sys
 import asyncio
 import traceback
 from typing import Any, Dict, Optional
+
+# Fix Windows console encoding
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 # Lazy imports — chỉ import khi thật sự cần dùng
 _gemini_client = None
