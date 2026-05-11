@@ -20,6 +20,13 @@ __pycache__/
 .vscode/
 .idea/
 
+# Environment (API keys)
+.env
+
+# Debug & uploads
+chinese-ocr-app/debug/
+chinese-ocr-app/uploads/
+
 # OS
 .DS_Store
 Thumbs.db
