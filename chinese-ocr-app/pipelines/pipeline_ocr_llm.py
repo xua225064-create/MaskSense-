@@ -166,20 +166,14 @@ class PipelineOcrLlm(BasePipeline):
         
         def _ocr_sync():
             from ocr_engine import read_chinese_mark
-            result = read_chinese_mark(image_bytes, deep_mode=False)
+            result = read_chinese_mark(image_bytes, deep_mode=True)
             
             if result.get("error"):
                 return "", []
             
-            primary = result.get("primary_text", "")
+            # read_chinese_mark trả về: {"text": "...", "candidates": [...], "confidence": ..., "all_results": [...]}
+            primary = result.get("text", "")
             candidates = result.get("candidates", [])
-            
-            # Nếu ocr_engine trả về dict khác format, lấy text chính
-            if not primary and "all_texts" in result:
-                texts = result["all_texts"]
-                if texts:
-                    primary = texts[0] if isinstance(texts[0], str) else str(texts[0])
-                    candidates = texts[1:] if len(texts) > 1 else []
             
             return primary, candidates
         

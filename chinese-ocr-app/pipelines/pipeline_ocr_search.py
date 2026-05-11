@@ -232,16 +232,11 @@ class PipelineOcrSearch(BasePipeline):
         
         def _ocr_sync():
             from ocr_engine import read_chinese_mark
-            result = read_chinese_mark(image_bytes, deep_mode=False)
+            result = read_chinese_mark(image_bytes, deep_mode=True)
             if result.get("error"):
                 return "", []
-            primary = result.get("primary_text", "")
+            primary = result.get("text", "")
             candidates = result.get("candidates", [])
-            if not primary and "all_texts" in result:
-                texts = result["all_texts"]
-                if texts:
-                    primary = texts[0] if isinstance(texts[0], str) else str(texts[0])
-                    candidates = texts[1:] if len(texts) > 1 else []
             return primary, candidates
         
         loop = asyncio.get_event_loop()

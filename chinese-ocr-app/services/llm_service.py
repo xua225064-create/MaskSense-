@@ -74,55 +74,62 @@ def _get_openai_client():
 
 async def call_gemini(prompt: str, temperature: float = 0.3, max_tokens: int = 2048, timeout: int = 30) -> Optional[str]:
     """
-    Gọi Gemini API (google-genai SDK mới).
-    
-    Args:
-        prompt: Nội dung prompt
-        temperature: Nhiệt độ (0.0 = chính xác, 1.0 = sáng tạo)
-        max_tokens: Số token tối đa trả về
-        timeout: Timeout giây (mặc định 30s)
-        
-    Returns:
-        Text response hoặc None nếu lỗi
+    Gọi Gemini API (google-genai SDK mới) với retry cho lỗi 503.
     """
     client = _get_gemini_client()
     if client is None:
         return None
     
-    try:
-        from google.genai import types
-        from config import GEMINI_MODEL
-        
-        config = types.GenerateContentConfig(
-            temperature=temperature,
-            max_output_tokens=max_tokens,
-            thinking_config=types.ThinkingConfig(thinking_budget=0),
-        )
-        
-        # Chạy blocking call trong thread pool với timeout
-        loop = asyncio.get_event_loop()
-        response = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: client.models.generate_content(
+    from google.genai import types
+    from config import GEMINI_MODEL
+    import time as _time
+    
+    config = types.GenerateContentConfig(
+        temperature=temperature,
+        max_output_tokens=max_tokens,
+        thinking_config=types.ThinkingConfig(thinking_budget=0),
+    )
+    
+    def _call_with_retry():
+        """Blocking call với retry cho 503/429."""
+        last_err = None
+        for attempt in range(4):  # max 4 attempts
+            try:
+                resp = client.models.generate_content(
                     model=GEMINI_MODEL,
                     contents=prompt,
                     config=config,
                 )
-            ),
-            timeout=timeout,
-        )
-        
-        if response and response.text:
-            return response.text.strip()
+                if resp and resp.text:
+                    return resp.text.strip()
+                return None
+            except Exception as e:
+                last_err = e
+                err_str = str(e)
+                if "503" in err_str or "429" in err_str or "UNAVAILABLE" in err_str:
+                    wait = 3 * (attempt + 1)  # 3s, 6s, 9s, 12s
+                    print(f"[LLM/Gemini] Retry {attempt+1}/3 sau {wait}s...")
+                    _time.sleep(wait)
+                    continue
+                else:
+                    print(f"[LLM/Gemini] Error: {e}")
+                    return None
+        print(f"[LLM/Gemini] Failed after 4 attempts: {last_err}")
         return None
     
+    try:
+        loop = asyncio.get_event_loop()
+        result = await asyncio.wait_for(
+            loop.run_in_executor(None, _call_with_retry),
+            timeout=timeout,
+        )
+        return result
+    
     except asyncio.TimeoutError:
-        print(f"[LLM/Gemini] ⏱️ Timeout sau {timeout}s")
+        print(f"[LLM/Gemini] Timeout sau {timeout}s")
         return None
     except Exception as e:
-        print(f"[LLM/Gemini] ❌ Error: {e}")
-        traceback.print_exc()
+        print(f"[LLM/Gemini] Error: {e}")
         return None
 
 
@@ -215,15 +222,15 @@ async def call_llm(
             result = await call_fn(prompt, temperature=_temp, max_tokens=_max)
             if result:
                 if name != _provider:
-                    print(f"[LLM] ℹ Fallback sang {name} thành công")
+                    print(f"[LLM] Fallback sang {name} thanh cong")
                 return result
             
             if attempt < retry:
-                wait = 2 ** attempt  # exponential backoff: 1s, 2s, 4s...
-                print(f"[LLM/{name}] ⏳ Retry sau {wait}s...")
+                wait = 3 * (attempt + 1)  # 3s, 6s...
+                print(f"[LLM/{name}] Retry sau {wait}s...")
                 await asyncio.sleep(wait)
     
-    print("[LLM] ❌ Tất cả provider đều lỗi!")
+    print("[LLM] Tat ca provider deu loi!")
     return None
 
 
