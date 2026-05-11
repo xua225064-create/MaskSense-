@@ -1995,3 +1995,93 @@ def admin_update_settings(data: AdminSettingUpdate, request: Request):
         return JSONResponse(status_code=401, content={"success": False, "message": "Unauthorized"})
     success = update_system_setting(data.key, data.value)
     return {"success": success, "message": "Đã cập nhật cài đặt" if success else "Lỗi"}
+
+
+# ============================================================
+# NCKH Multi-Pipeline API Endpoints
+# ============================================================
+
+@app.post("/api/nckh/analyze")
+async def nckh_analyze_endpoint(
+    request: Request,
+    file: UploadFile = File(...),
+    mode: Optional[str] = Form("quick"),
+    pipelines: Optional[str] = Form(None),
+):
+    """
+    API phân tích hiệu đề bằng Multi-Pipeline (NCKH).
+    
+    Args:
+        file: Ảnh hiệu đề
+        mode: "quick" (P1+P4, ~10s) hoặc "deep" (tất cả 4 pipeline, ~30-60s)
+        pipelines: Danh sách pipeline cụ thể, phân cách bởi dấu phẩy
+                   Ví dụ: "ocr_llm,ml_match" hoặc "ocr_llm,ocr_search,img_search,ml_match"
+    """
+    try:
+        # Validate file
+        ext = os.path.splitext(file.filename or "")[1].lower()
+        if ext not in ALLOWED_EXTENSIONS:
+            return JSONResponse(
+                status_code=400,
+                content={"error": f"File không hợp lệ. Chấp nhận: {ALLOWED_EXTENSIONS}"}
+            )
+        
+        image_bytes = await file.read()
+        if not image_bytes:
+            return JSONResponse(status_code=400, content={"error": "File rỗng"})
+        
+        # Crop nếu có tham số
+        # (tương thích với frontend hiện tại)
+        
+        # Import orchestrator
+        from pipelines.orchestrator import analyze_image, analyze_quick, analyze_deep
+        
+        # Xác định pipeline cần chạy
+        if pipelines:
+            pipeline_list = [p.strip() for p in pipelines.split(",") if p.strip()]
+            result = await analyze_image(
+                image_bytes,
+                database=REIGN_DATABASE,
+                pipelines=pipeline_list,
+            )
+        elif mode == "deep":
+            result = await analyze_deep(image_bytes, database=REIGN_DATABASE)
+        else:
+            result = await analyze_quick(image_bytes, database=REIGN_DATABASE)
+        
+        return JSONResponse(content=result)
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Lỗi phân tích: {str(e)}"}
+        )
+
+
+@app.get("/api/nckh/status")
+async def nckh_status():
+    """Kiểm tra trạng thái hệ thống Multi-Pipeline."""
+    from config import GEMINI_API_KEY, OPENAI_API_KEY, GOOGLE_CSE_API_KEY, PRIMARY_LLM
+    
+    status = {
+        "system": "NCKH Multi-Pipeline",
+        "version": "1.0.0",
+        "primary_llm": PRIMARY_LLM,
+        "gemini_configured": bool(GEMINI_API_KEY and GEMINI_API_KEY != "your_gemini_api_key_here"),
+        "openai_configured": bool(OPENAI_API_KEY and OPENAI_API_KEY != "your_openai_api_key_here"),
+        "google_cse_configured": bool(GOOGLE_CSE_API_KEY and GOOGLE_CSE_API_KEY != "your_google_cse_api_key_here"),
+        "pipelines": ["ocr_llm", "ocr_search", "img_search", "ml_match"],
+        "database_size": len(REIGN_DATABASE),
+    }
+    
+    # Kiểm tra Selenium
+    try:
+        from selenium import webdriver
+        status["selenium_available"] = True
+    except ImportError:
+        status["selenium_available"] = False
+    
+    return status
+
