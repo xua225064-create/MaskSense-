@@ -8,7 +8,8 @@ DB_CONFIG = {
     'password': '',
     'database': 'hieude_ai_db',
     'charset': 'utf8mb4',
-    'cursorclass': pymysql.cursors.DictCursor
+    'cursorclass': pymysql.cursors.DictCursor,
+    'connect_timeout': 2
 }
 
 def get_db_connection():

@@ -2913,7 +2913,15 @@
           <div class="u-foot" id="u-foot"
             style="display:none; align-items:center; justify-content:space-between; margin-top:10px; padding-top:20px; border-top:1px dashed rgba(255,255,255,0.1);">
             <span class="u-status" id="us" style="color:#94a3b8; font-size:0.9rem; font-weight:600;"></span>
-            <div style="display:flex; gap:12px;">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.8rem;color:#94a3b8;user-select:none;" title="Bật chế độ Multi-Pipeline AI (NCKH)">
+                <input type="checkbox" id="nckhToggle" onchange="document.getElementById('nckhMode').style.display=this.checked?'inline-block':'none'" style="accent-color:#7B68EE;width:16px;height:16px;">
+                <span>🔬 NCKH</span>
+              </label>
+              <select id="nckhMode" style="display:none;background:rgba(15,23,42,0.8);color:#94a3b8;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:4px 8px;font-size:0.78rem;">
+                <option value="quick">Nhanh (P1+P4)</option>
+                <option value="deep">Sâu (4 Pipeline)</option>
+              </select>
               <button class="btn-uc btn-uc-dark" onclick="event.stopPropagation(); resetUpload()">Hủy</button>
               <button class="btn-uc btn-uc-primary" id="baz" disabled
                 onclick="event.stopPropagation(); doAnalyze()">Phân tích ảnh này</button>
@@ -4741,6 +4749,102 @@
     let ocrAbortController = null;
 
     async function doAnalyze() {
+      var nckhToggle = document.getElementById('nckhToggle');
+      if (nckhToggle && nckhToggle.checked) return doAnalyzeNCKH();
+      return doAnalyzeOriginal();
+    }
+
+    async function doAnalyzeNCKH() {
+      if (!selF) return;
+      document.getElementById('sb').style.display = 'block';
+      document.getElementById('rw').style.display = 'none';
+      document.getElementById('baz').disabled = true;
+      document.getElementById('sb').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      var ring = document.getElementById('progress-ring');
+      var pctEl = document.getElementById('progress-pct');
+      var barEl = document.getElementById('progress-bar');
+      var statusEl = document.getElementById('progress-status');
+      var circumference = 2 * Math.PI * 42;
+
+      function setProgress(pct, msg) {
+        pct = Math.min(pct, 99);
+        if (ring) ring.style.strokeDashoffset = circumference - (circumference * pct / 100);
+        if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+        if (barEl) barEl.style.width = pct + '%';
+        if (msg && statusEl) statusEl.textContent = msg;
+      }
+
+      var steps = [
+        { pct: 10, msg: 'Khởi tạo Multi-Pipeline...', delay: 500 },
+        { pct: 25, msg: 'Pipeline OCR đang xử lý...', delay: 2000 },
+        { pct: 40, msg: 'LLM đang phân tích...', delay: 5000 },
+        { pct: 55, msg: 'Tìm kiếm Google...', delay: 10000 },
+        { pct: 70, msg: 'Đọc bài viết tham khảo...', delay: 20000 },
+        { pct: 85, msg: 'Voting tổng hợp kết quả...', delay: 30000 },
+        { pct: 95, msg: 'Hoàn thiện...', delay: 45000 },
+      ];
+      var timers = steps.map(function(s) { return setTimeout(function() { setProgress(s.pct, s.msg); }, s.delay); });
+      setProgress(5, 'Bắt đầu phân tích NCKH...');
+
+      try {
+        var mode = document.getElementById('nckhMode').value || 'quick';
+        var formData = new FormData();
+        formData.append('file', selF);
+        formData.append('mode', mode);
+
+        var reqHeaders = {};
+        if (curU && curU.token) reqHeaders['Authorization'] = 'Bearer ' + curU.token;
+
+        var resp = await fetch('/api/nckh/analyze', { method: 'POST', headers: reqHeaders, body: formData });
+        var result = await resp.json();
+        if (result.error) throw new Error(result.error);
+
+        var mappedR = {
+          hieude: result.nien_hieu || result.chu_han || 'Không rõ',
+          hanzi: result.chu_han || '?',
+          trieudai: result.trieu_dai || result.voted_dynasty || 'Không rõ',
+          nienhieu: result.nien_hieu || 'Không rõ',
+          niendai: (result.nam_bat_dau && result.nam_ket_thuc) ? result.nam_bat_dau + ' - ' + result.nam_ket_thuc : 'Chưa xác định',
+          hieude_en: result.phien_am || 'Unknown',
+          dotincay: Math.round((result.confidence || 0) * 100),
+          boicanh: result.y_nghia || 'Đang cập nhật...',
+          thuphapdacbiet: result.llm_explanation || 'Đang cập nhật...',
+          dacdiemnghethuat: _buildPipelineInfo(result),
+          match_type: result.primary_pipeline || 'nckh'
+        };
+
+        curR = result;
+        showResult(mappedR);
+        hist.unshift({ r: mappedR, src: document.getElementById('pi').src, date: new Date().toLocaleString('vi-VN') });
+        saveHist();
+      } catch (e) {
+        showToast(e.message || 'Lỗi phân tích NCKH');
+      } finally {
+        timers.forEach(function(t) { clearTimeout(t); });
+        setProgress(100, 'Hoàn tất!');
+        setTimeout(function() {
+          document.getElementById('sb').style.display = 'none';
+          document.getElementById('baz').disabled = false;
+          setProgress(0, '');
+        }, 400);
+      }
+    }
+
+    function _buildPipelineInfo(result) {
+      if (!result.pipeline_details) return 'Multi-Pipeline AI';
+      var lines = ['<b>Pipeline Details:</b>'];
+      result.pipeline_details.forEach(function(p) {
+        var icon = p.status === 'success' ? '✅' : (p.status === 'timeout' ? '⏱' : '❌');
+        var conf = p.confidence > 0 ? ' (' + Math.round(p.confidence * 100) + '%)' : '';
+        var time = p.execution_time > 0 ? ' — ' + p.execution_time.toFixed(1) + 's' : '';
+        lines.push(icon + ' <b>' + p.pipeline_name + '</b>' + conf + time);
+      });
+      if (result.voted_dynasty) lines.push('🗳 Voted: <b>' + result.voted_dynasty + '</b>');
+      return '<div style="font-size:0.85rem;">' + lines.join('<br>') + '</div>';
+    }
+
+    async function doAnalyzeOriginal() {
       if (!selF) return;
       document.getElementById('sb').style.display = 'block';
       document.getElementById('rw').style.display = 'none';
