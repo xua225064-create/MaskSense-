@@ -60,7 +60,7 @@ PIPELINE_WEIGHTS = {
 }
 
 # Timeout cho mỗi pipeline (giây)
-PIPELINE_TIMEOUT = int(os.getenv("PIPELINE_TIMEOUT", "30"))
+PIPELINE_TIMEOUT = int(os.getenv("PIPELINE_TIMEOUT", "90"))
 
 # Số pipeline tối thiểu phải trả về kết quả để voting hợp lệ
 MIN_PIPELINE_RESPONSES = int(os.getenv("MIN_PIPELINE_RESPONSES", "2"))

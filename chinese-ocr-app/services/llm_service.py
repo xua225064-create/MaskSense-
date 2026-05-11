@@ -72,7 +72,7 @@ def _get_openai_client():
 # Core LLM Calls
 # ============================================================
 
-async def call_gemini(prompt: str, temperature: float = 0.3, max_tokens: int = 2048) -> Optional[str]:
+async def call_gemini(prompt: str, temperature: float = 0.3, max_tokens: int = 2048, timeout: int = 30) -> Optional[str]:
     """
     Gọi Gemini API (google-genai SDK mới).
     
@@ -80,6 +80,7 @@ async def call_gemini(prompt: str, temperature: float = 0.3, max_tokens: int = 2
         prompt: Nội dung prompt
         temperature: Nhiệt độ (0.0 = chính xác, 1.0 = sáng tạo)
         max_tokens: Số token tối đa trả về
+        timeout: Timeout giây (mặc định 30s)
         
     Returns:
         Text response hoặc None nếu lỗi
@@ -95,23 +96,30 @@ async def call_gemini(prompt: str, temperature: float = 0.3, max_tokens: int = 2
         config = types.GenerateContentConfig(
             temperature=temperature,
             max_output_tokens=max_tokens,
+            thinking_config=types.ThinkingConfig(thinking_budget=0),
         )
         
-        # Chạy blocking call trong thread pool để không block async event loop
+        # Chạy blocking call trong thread pool với timeout
         loop = asyncio.get_event_loop()
-        response = await loop.run_in_executor(
-            None,
-            lambda: client.models.generate_content(
-                model=GEMINI_MODEL,
-                contents=prompt,
-                config=config,
-            )
+        response = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: client.models.generate_content(
+                    model=GEMINI_MODEL,
+                    contents=prompt,
+                    config=config,
+                )
+            ),
+            timeout=timeout,
         )
         
         if response and response.text:
             return response.text.strip()
         return None
-        
+    
+    except asyncio.TimeoutError:
+        print(f"[LLM/Gemini] ⏱️ Timeout sau {timeout}s")
+        return None
     except Exception as e:
         print(f"[LLM/Gemini] ❌ Error: {e}")
         traceback.print_exc()

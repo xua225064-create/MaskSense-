@@ -154,7 +154,7 @@ async def analyze_quick(
         image_bytes,
         database=database,
         pipelines=["ocr_llm", "ml_match"],
-        timeout=20,
+        timeout=60,
     )
 
 
@@ -170,5 +170,5 @@ async def analyze_deep(
         image_bytes,
         database=database,
         pipelines=["ocr_llm", "ocr_search", "img_search", "ml_match"],
-        timeout=60,
+        timeout=120,
     )
