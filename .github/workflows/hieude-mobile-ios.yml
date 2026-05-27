@@ -48,16 +48,21 @@ jobs:
         run: |
           set -euo pipefail
           WORKSPACE="$(find ios -maxdepth 1 -name '*.xcworkspace' -print -quit)"
-          SCHEME="$(xcodebuild -list -json -workspace "$WORKSPACE" | ruby -rjson -e 'data=JSON.parse(STDIN.read); puts data.dig("workspace","schemes").find { |s| s != "Pods" }')"
+          SCHEME_FILE="$(find ios -path '*/xcshareddata/xcschemes/*.xcscheme' ! -path '*/Pods/*' -print -quit)"
+          SCHEME="$(basename "$SCHEME_FILE" .xcscheme)"
+          echo "Using workspace: $WORKSPACE"
+          echo "Using app scheme: $SCHEME"
           xcodebuild \
             -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
             -configuration Release \
             -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
             -derivedDataPath build/ios-derived \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            SKIP_INSTALL=NO \
             build
 
       - name: Package unsigned IPA
