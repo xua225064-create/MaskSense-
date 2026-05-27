@@ -88,3 +88,26 @@ jobs:
         with:
           name: marksense-unsigned-ipa
           path: hieude_mobile/marksense-unsigned.ipa
+
+      - name: Write build summary
+        working-directory: hieude_mobile
+        run: |
+          {
+            echo "## Build Thanh Cong!"
+            echo ""
+            echo "| Thong tin | Gia tri |"
+            echo "| --- | --- |"
+            echo "| App | MarkSense |"
+            echo "| IPA | marksense-unsigned.ipa |"
+            echo "| Build Number | $GITHUB_RUN_NUMBER |"
+            echo "| Thoi gian | $(date '+%Y-%m-%d %H:%M:%S') |"
+            echo "| Branch | ${GITHUB_REF_NAME} |"
+            echo ""
+            echo "## Tai file IPA"
+            echo ""
+            echo "Vao tab Actions -> chon workflow nay -> phan Artifacts de tai marksense-unsigned-ipa."
+            echo ""
+            echo "## Luu y"
+            echo ""
+            echo "File IPA nay la ban unsigned/no-codesign, dung de nop file hoac kiem tra artifact. Neu can cai len iPhone that thi van can ky bang Apple Developer."
+          } >> "$GITHUB_STEP_SUMMARY"
