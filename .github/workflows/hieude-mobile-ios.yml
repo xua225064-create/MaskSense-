@@ -48,6 +48,10 @@ jobs:
         working-directory: hieude_mobile
         run: npm ci
 
+      - name: Configure EAS project
+        working-directory: hieude_mobile
+        run: npx --yes eas-cli@latest init --non-interactive
+
       - name: Build IPA on EAS cloud
         working-directory: hieude_mobile
         run: npx --yes eas-cli@latest build --platform ios --profile "$PROFILE" --non-interactive
