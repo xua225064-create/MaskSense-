@@ -1,24 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform, SafeAreaView, StatusBar } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { LANGUAGES, normalizeLanguage, t } from '../i18n';
 
-const LANGUAGES = [
-  { flag: '🇩🇪', code: 'Deutsch' },
-  { flag: '🇪🇸', code: 'Español' },
-  { flag: '🇫🇷', code: 'Français' },
-  { flag: '🇮🇹', code: 'Italian' },
-  { flag: '🇹🇷', code: 'Türkçe' },
-  { flag: '🇯🇵', code: '日本語' },
-  { flag: '🇵🇹', code: 'Português' },
-  { flag: '🇨🇳', code: '中文' },
-  { flag: '🇷🇺', code: 'Русский' },
-  { flag: '🇦🇪', code: 'العربية' },
-  { flag: '🇺🇸', code: 'English' },
-  { flag: '🇻🇳', code: 'Tiếng Việt' },
-];
+const SUPPORTED_LANGUAGES = LANGUAGES.filter((item) => item.id === 'vi' || item.id === 'en');
 
 export default function LanguageScreen({ setScreen, language, setLanguage }) {
   const goBack = () => setScreen('Settings');
+  const activeLanguage = normalizeLanguage(language || 'vi');
 
   const onSelect = (lang) => {
     if (setLanguage) {
@@ -36,23 +25,31 @@ export default function LanguageScreen({ setScreen, language, setLanguage }) {
         <TouchableOpacity style={s.backBtn} onPress={goBack} hitSlop={{top: 15, bottom:15, left:15, right:15}}>
           <Feather name="chevron-left" size={28} color="#064e3b" />
         </TouchableOpacity>
-        <Text style={s.headerTitle}>Language</Text>
+        <Text style={s.headerTitle}>{t(activeLanguage, 'language')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        {LANGUAGES.map((item, index) => {
-          const isSelected = language === item.code;
+        {SUPPORTED_LANGUAGES.map((item, index) => {
+          const isSelected = activeLanguage === item.id;
           return (
             <TouchableOpacity 
               key={index} 
               style={[s.langCard, isSelected && s.langCardActive]} 
               activeOpacity={0.7} 
-              onPress={() => onSelect(item.code)}
+              onPress={() => onSelect(item.id)}
             >
               <Text style={s.flagIcon}>{item.flag}</Text>
-              <Text style={[s.langName, isSelected && s.langNameActive]}>{item.code}</Text>
-              {isSelected && <Feather name="check" size={20} color="#059669" style={{marginLeft: 'auto'}} />}
+              <View style={s.langTextWrap}>
+                <Text style={[s.langName, isSelected && s.langNameActive]}>{item.nativeName}</Text>
+                <Text style={s.langCode}>{item.code}</Text>
+              </View>
+              {isSelected && (
+                <View style={s.selectedWrap}>
+                  <Text style={s.selectedText}>{t(activeLanguage, 'selected')}</Text>
+                  <Feather name="check" size={20} color="#059669" />
+                </View>
+              )}
             </TouchableOpacity>
           );
         })}
@@ -97,7 +94,11 @@ const s = StyleSheet.create({
     color: '#374151',
     fontWeight: '600'
   },
+  langTextWrap: { flex: 1 },
+  langCode: { fontSize: 12, color: '#9ca3af', marginTop: 3, fontWeight: '600' },
   langNameActive: {
     color: '#064e3b',
-  }
+  },
+  selectedWrap: { marginLeft: 12, flexDirection: 'row', alignItems: 'center', gap: 6 },
+  selectedText: { color: '#059669', fontSize: 11, fontWeight: '800' }
 });

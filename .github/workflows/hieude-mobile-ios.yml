@@ -1,0 +1,53 @@
+name: Build HieuDe Mobile iOS IPA
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: EAS build profile
+        required: true
+        default: preview
+        type: choice
+        options:
+          - preview
+          - production
+          - development
+  push:
+    branches:
+      - nckh
+      - main
+      - master
+    paths:
+      - hieude_mobile/**
+      - .github/workflows/hieude-mobile-ios.yml
+
+concurrency:
+  group: hieude-mobile-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-ios:
+    name: Build iOS IPA with EAS
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      PROFILE: ${{ github.event.inputs.profile || 'preview' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: hieude_mobile/package-lock.json
+
+      - name: Install dependencies
+        working-directory: hieude_mobile
+        run: npm ci
+
+      - name: Build IPA on EAS cloud
+        working-directory: hieude_mobile
+        run: npx --yes eas-cli@latest build --platform ios --profile "$PROFILE" --non-interactive

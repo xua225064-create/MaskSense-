@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "hieude_mobile",
+    "name": "MarkSense",
     "slug": "hieude_mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hieude.marksense"
     },
     "android": {
       "adaptiveIcon": {

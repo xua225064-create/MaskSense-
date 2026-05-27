@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Platform, SafeAreaView, StatusBar, Share, Linking, Alert } from 'react-native';
 import { Feather, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { getLanguageLabel, t } from '../i18n';
+
+const SOCIAL_LINKS = {
+  instagram: 'https://www.instagram.com/marksense.ai',
+  facebook: 'https://www.facebook.com/marksense.ai',
+  tiktok: 'https://www.tiktok.com/@marksense.ai',
+  website: 'https://marksense.ai',
+};
 
 export default function SettingsScreen({ setScreen, language }) {
   const goBack = () => setScreen('Profile');
@@ -11,22 +19,30 @@ export default function SettingsScreen({ setScreen, language }) {
 
   const handleShare = async () => {
     try {
-      const msg = 'Discover ancient ceramic marks with MarkSense AI! The Evergreen Intelligence for art collectors. Check it out at https://marksense.ai';
+      const msg = 'Discover ancient ceramic marks with MarkSense! The Evergreen Intelligence for art collectors. Check it out at https://marksense.ai';
       if (Platform.OS === 'web' && navigator.share) {
-        await navigator.share({ title: 'MarkSense AI', text: msg, url: 'https://marksense.ai' });
+        await navigator.share({ title: 'MarkSense', text: msg, url: 'https://marksense.ai' });
       } else {
         await Share.share({ message: msg });
       }
     } catch (error) {
-      alert('Đường dẫn tải ứng dụng: https://marksense.ai'); // Fallback an toàn cho web
+      alert(`${t(language, 'appName')}: https://marksense.ai`);
     }
   };
 
-  const handleOpenLink = (url) => {
-    if (Platform.OS === 'web') {
-      window.open(url, '_blank');
-    } else {
-      Linking.openURL(url).catch((err) => Alert.alert('Error', 'Cannot open this link right now.'));
+  const handleOpenLink = async (url, label) => {
+    try {
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        const opened = window.open(url, '_blank', 'noopener,noreferrer');
+        if (!opened) window.location.href = url;
+        return;
+      }
+
+      const supported = await Linking.canOpenURL(url);
+      if (!supported) throw new Error('Unsupported URL');
+      await Linking.openURL(url);
+    } catch (err) {
+      Alert.alert(label || 'Open link', `${t(language, 'cannotOpen')}\n${url}`);
     }
   };
 
@@ -77,56 +93,53 @@ export default function SettingsScreen({ setScreen, language }) {
         {/* App Info Badge */}
         <View style={s.appInfoCard}>
           <View style={s.appLogoWrap}>
-             <MaterialCommunityIcons name="magnify-scan" size={32} color="#059669" />
-             <View style={s.appLogoBadge}>
-               <MaterialCommunityIcons name="star-four-points" size={12} color="#fff" />
-             </View>
+             <Feather name="box" size={24} color="#059669" />
           </View>
           <View>
-            <Text style={s.appName}>MarkSense AI</Text>
+            <Text style={s.appName}>MarkSense</Text>
           </View>
         </View>
 
-        <BlockHeader title="PREFERENCES" />
+        <BlockHeader title={t(language, 'preferences').toUpperCase()} />
         <View style={s.card}>
           <SettItem 
             iconLib="MaterialCommunityIcons" iconName="translate" bgType="green"
-            title="Language selection" subtitle="Choose your preferred language"
-            rightText={language} rightIcon="chevron" noBorder
+            title={t(language, 'languageSelection')} subtitle={t(language, 'languageSubtitle')}
+            rightText={getLanguageLabel(language)} rightIcon="chevron" noBorder
             onPress={handleLanguage}
           />
         </View>
 
-        <BlockHeader title="SOCIAL HUB" />
+        <BlockHeader title={t(language, 'socialHub').toUpperCase()} />
         <View style={s.card}>
           <SettItem 
             iconLib="Feather" iconName="share-2" bgType="green"
-            title="Share MarkSense" subtitle="Spread the intelligence"
+            title={t(language, 'shareMarkSense')} subtitle={t(language, 'shareSubtitle')}
             rightIcon="chevron" noBorder
             onPress={handleShare}
           />
         </View>
 
-        <BlockHeader title="CONNECT & INFORMATION" />
+        <BlockHeader title={t(language, 'connectInfo').toUpperCase()} />
         <View style={s.card}>
           <SettItem 
             iconLib="Feather" iconName="camera" bgType="gray"
-            title="Follow on Instagram" rightIcon="external"
-            onPress={() => handleOpenLink('https://instagram.com/marksense.ai')}
+            title={t(language, 'instagram')} rightIcon="external"
+            onPress={() => handleOpenLink(SOCIAL_LINKS.instagram, 'Instagram')}
           />
           <SettItem 
             iconLib="Feather" iconName="globe" bgType="gray"
-            title="Follow on Facebook" rightIcon="external"
-            onPress={() => handleOpenLink('https://facebook.com/marksense.ai')}
+            title={t(language, 'facebook')} rightIcon="external"
+            onPress={() => handleOpenLink(SOCIAL_LINKS.facebook, 'Facebook')}
           />
           <SettItem 
             iconLib="MaterialCommunityIcons" iconName="play-box-multiple-outline" bgType="gray"
-            title="Follow on TikTok" rightIcon="external"
-            onPress={() => handleOpenLink('https://tiktok.com/@marksense.ai')}
+            title={t(language, 'tiktok')} rightIcon="external"
+            onPress={() => handleOpenLink(SOCIAL_LINKS.tiktok, 'TikTok')}
           />
           <SettItem 
             iconLib="Feather" iconName="info" bgType="gray"
-            title="About MarkSense" subtitle="Terms, Privacy & Team"
+            title={t(language, 'aboutHeader')} subtitle={t(language, 'termsPrivacyTeam')}
             rightIcon="chevron" onPress={() => setScreen('About')} noBorder
           />
         </View>
@@ -144,21 +157,16 @@ const s = StyleSheet.create({
   scroll: { paddingHorizontal: 20, paddingTop: 8 },
   
   appInfoCard: {
-    backgroundColor: '#fff', borderRadius: 20, padding: 24, paddingVertical: 28,
-    flexDirection: 'row', alignItems: 'center', marginBottom: 32, gap: 16,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 12, elevation: 2,
+    backgroundColor: '#fff', borderRadius: 18, paddingHorizontal: 18, paddingVertical: 18,
+    flexDirection: 'row', alignItems: 'center', marginBottom: 24, gap: 14,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.035, shadowRadius: 10, elevation: 2,
   },
   appLogoWrap: {
-    width: 64, height: 64, borderRadius: 32, backgroundColor: '#fdfbf7',
+    width: 50, height: 50, borderRadius: 25, backgroundColor: '#ecfdf5',
     borderWidth: 1, borderColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center',
     position: 'relative'
   },
-  appLogoBadge: {
-    position: 'absolute', bottom: -2, right: -2,
-    backgroundColor: '#059669', width: 22, height: 22, borderRadius: 11,
-    justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#fff'
-  },
-  appName: { fontSize: 22, fontWeight: '800', color: '#064e3b', marginBottom: 4 },
+  appName: { fontSize: 20, fontWeight: '800', color: '#064e3b', marginBottom: 0 },
   appVersion: { fontSize: 13, color: '#6b7280', fontWeight: '500' },
   
   blockHeader: { fontSize: 12, color: '#4b5563', fontWeight: '800', marginBottom: 12, marginLeft: 8, letterSpacing: 1.2 },

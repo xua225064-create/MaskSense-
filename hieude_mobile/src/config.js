@@ -3,10 +3,11 @@ import { Platform } from 'react-native';
 // Đối với Android Emulator: dùng 10.0.2.2
 // Đối với thiết bị thật: thay bằng IP LAN máy tính (vd: 192.168.1.X)
 // Đối với Web: dùng localhost
+const DEV_LAN_BASE_URL = 'http://192.168.100.2:8000';
+
 const getBaseUrl = () => {
-  if (Platform.OS === 'web') return 'http://127.0.0.1:8000';
-  if (Platform.OS === 'android') return 'http://10.0.2.2:8000';
-  return 'http://127.0.0.1:8000'; // iOS simulator
+  if (Platform.OS === 'web') return 'http://localhost:8000';
+  return DEV_LAN_BASE_URL;
 };
 
 export const BASE_URL = getBaseUrl();

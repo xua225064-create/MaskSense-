@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Platform } from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { COLORS } from './src/config';
 import { getStoredUser, storeUser, clearUser, apiGetCredits } from './src/api';
 
@@ -16,19 +17,21 @@ import TermsScreen from './src/screens/TermsScreen';
 import PrivacyScreen from './src/screens/PrivacyScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import LanguageScreen from './src/screens/LanguageScreen';
+import ChatScreen from './src/screens/ChatScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { normalizeLanguage } from './src/i18n';
 
 export default function App() {
   const [screen, setScreen] = useState('Home');
   const [user, setUser] = useState(null);
   const [credits, setCredits] = useState(null);
   const [checkoutPkg, setCheckoutPkg] = useState(null);
-  const [language, setLanguage] = useState('English');
+  const [language, setLanguage] = useState('vi');
 
   // Restore session
   useEffect(() => {
     getStoredUser().then((u) => { if (u) { setUser(u); } });
-    AsyncStorage.getItem('appLang').then(l => { if (l) setLanguage(l); });
+    AsyncStorage.getItem('appLang').then(l => { if (l) setLanguage(normalizeLanguage(l)); });
   }, []);
 
   // Fetch credits on user change
@@ -67,8 +70,9 @@ export default function App() {
   };
 
   const changeLanguage = async (val) => {
-    setLanguage(val);
-    await AsyncStorage.setItem('appLang', val);
+    const normalized = normalizeLanguage(val);
+    setLanguage(normalized);
+    await AsyncStorage.setItem('appLang', normalized);
   };
 
   const props = { user, credits, setScreen, handleLogin, handleLogout, refreshCredits, goCheckout, checkoutPkg, language, setLanguage: changeLanguage };
@@ -76,6 +80,7 @@ export default function App() {
   const renderScreen = () => {
     switch (screen) {
       case 'Home':      return <HomeScreen {...props} />;
+      case 'Scan':      return <HomeScreen {...props} startScanner />;
       case 'Login':     return <LoginScreen {...props} />;
       case 'Register':  return <RegisterScreen {...props} />;
       case 'History':   return <HistoryScreen {...props} />;
@@ -88,6 +93,7 @@ export default function App() {
       case 'Privacy':   return <PrivacyScreen {...props} />;
       case 'Settings':  return <SettingsScreen {...props} />;
       case 'Language':  return <LanguageScreen {...props} />;
+      case 'Chat':      return <ChatScreen {...props} />;
       default:          return <HomeScreen {...props} />;
     }
   };
@@ -96,10 +102,31 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.paper} />
       {renderScreen()}
+      {screen !== 'Chat' && (
+        <TouchableOpacity style={styles.chatFab} onPress={() => setScreen('Chat')} activeOpacity={0.86}>
+          <Feather name="message-circle" size={26} color="#ffffff" />
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.paper, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+  chatFab: {
+    position: 'absolute',
+    right: 18,
+    bottom: 104,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#065f46',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#065f46',
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 10,
+  },
 });

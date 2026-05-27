@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { BASE_URL } from './config';
+import fallbackLibrary from '../assets/data/hieu_de_database.json';
 
 const STORAGE_KEY = 'marksense_user';
 
@@ -57,34 +59,69 @@ export async function apiSocialLogin(email, name, provider) {
   return resp.json();
 }
 
-export async function apiOcr(imageUri, token) {
+export async function apiOcr(imageUri, token, signal) {
   const formData = new FormData();
   const uriParts = imageUri.split('.');
   const fileType = uriParts[uriParts.length - 1] || 'jpg';
-  formData.append('file', { uri: imageUri, name: `photo.${fileType}`, type: `image/${fileType}` });
+  const imageType = fileType === 'png' ? 'png' : 'jpeg';
 
-  const resp = await fetch(`${BASE_URL}/ocr`, {
-    method: 'POST',
-    headers: authHeaders(token),
-    body: formData,
-  });
+  if (Platform.OS === 'web') {
+    const imageResp = await fetch(imageUri);
+    const blob = await imageResp.blob();
+    formData.append('file', blob, `photo.${imageType === 'png' ? 'png' : 'jpg'}`);
+  } else {
+    formData.append('file', { uri: imageUri, name: `photo.${imageType === 'png' ? 'png' : 'jpg'}`, type: `image/${imageType}` });
+  }
+  formData.append('mode', 'deep');
+
+  let resp;
+  try {
+    resp = await fetch(`${BASE_URL}/api/nckh/analyze`, {
+      method: 'POST',
+      headers: authHeaders(token),
+      body: formData,
+      signal,
+    });
+  } catch (e) {
+    throw new Error(`Không kết nối được backend tại ${BASE_URL}. Hãy chạy server API rồi thử lại.`);
+  }
   const status = resp.status;
-  const data = await resp.json();
+  const text = await resp.text();
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch (e) {
+    data = {
+      success: false,
+      message: text || `Server returned HTTP ${status}`,
+    };
+  }
   return { status, data };
 }
 
 export async function apiGetHistory(token) {
-  const resp = await fetch(`${BASE_URL}/history`, { headers: authHeaders(token) });
+  const resp = await fetch(`${BASE_URL}/api/history`, { headers: authHeaders(token) });
   return resp.json();
 }
 
 export async function apiGetLibrary() {
-  const resp = await fetch(`${BASE_URL}/api/library`);
-  return resp.json();
+  try {
+    const resp = await fetch(`${BASE_URL}/api/library`);
+    const data = await resp.json();
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.marks)) return data.marks;
+    if (Array.isArray(data?.library)) return data.library;
+  } catch (e) {}
+  return fallbackLibrary;
 }
 
 export async function apiGetCredits(token) {
   const resp = await fetch(`${BASE_URL}/api/credits`, { headers: authHeaders(token) });
+  return resp.json();
+}
+
+export async function apiGetPackages() {
+  const resp = await fetch(`${BASE_URL}/api/v1/packages`);
   return resp.json();
 }
 
@@ -107,5 +144,18 @@ export async function apiMockPayment(paymentId, token) {
     method: 'POST',
     headers: authHeaders(token),
   });
+  return resp.json();
+}
+
+export async function apiChat(message, language = 'en') {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  const resp = await fetch(`${BASE_URL}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, language }),
+    signal: controller.signal,
+  });
+  clearTimeout(timer);
   return resp.json();
 }

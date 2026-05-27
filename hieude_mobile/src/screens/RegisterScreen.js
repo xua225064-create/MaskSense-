@@ -1,11 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { COLORS } from '../config';
-import { apiRegister, apiLogin, apiSocialLogin } from '../api';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { apiLogin, apiRegister, apiSocialLogin } from '../api';
+import { uiText } from '../i18n';
+
+const GOOGLE_CLIENT_ID = '166557696887-000bmp74q6m90gr0sv84ct7e6s21mdq0.apps.googleusercontent.com';
 
 function loadGoogleScript() {
   if (Platform.OS !== 'web') return Promise.resolve();
   if (document.getElementById('google-gsi-script')) return Promise.resolve();
+
   return new Promise((resolve) => {
     const script = document.createElement('script');
     script.id = 'google-gsi-script';
@@ -17,216 +32,224 @@ function loadGoogleScript() {
   });
 }
 
-function loadFacebookScript() {
-  if (Platform.OS !== 'web') return Promise.resolve();
-  if (document.getElementById('facebook-jssdk')) return Promise.resolve();
-  return new Promise((resolve) => {
-    window.fbAsyncInit = function() {
-      if (window.FB) {
-        window.FB.init({
-          appId: '1661000791513498', // App ID FB
-          cookie: true,
-          xfbml: true,
-          version: 'v19.0'
-        });
-        resolve();
-      }
-    };
-    const script = document.createElement('script');
-    script.id = 'facebook-jssdk';
-    script.src = 'https://connect.facebook.net/vi_VN/sdk.js';
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-  });
-}
-
-const GOOGLE_CLIENT_ID = '166557696887-000bmp74q6m90gr0sv84ct7e6s21mdq0.apps.googleusercontent.com';
-
-export default function RegisterScreen({ handleLogin, setScreen }) {
+export default function RegisterScreen({ handleLogin, setScreen, language }) {
+  const L = (en, vi) => uiText(language, en, vi);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
   const [pw2, setPw2] = useState('');
+  const [showPw, setShowPw] = useState(false);
+  const [showPw2, setShowPw2] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState('');
   const googleClientRef = useRef(null);
 
-  const showAlert = (title, msg) => {
-    if (Platform.OS === 'web') { window.alert(`${title}\n${msg}`); }
-    else { Alert.alert(title, msg); }
+  const showAlert = (title, message) => {
+    if (Platform.OS === 'web') {
+      window.alert(`${title}\n${message}`);
+      return;
+    }
+    Alert.alert(title, message);
   };
 
   useEffect(() => {
-    if (Platform.OS === 'web') {
-      loadGoogleScript().then(() => {
-        const checkGoogle = setInterval(() => {
-          if (window.google && window.google.accounts) {
-            clearInterval(checkGoogle);
-            googleClientRef.current = window.google.accounts.oauth2.initTokenClient({
-              client_id: GOOGLE_CLIENT_ID,
-              scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
-              callback: handleGoogleCallback,
-            });
-          }
-        }, 200);
-      });
-      loadFacebookScript();
-    }
+    if (Platform.OS !== 'web') return undefined;
+
+    let timer;
+    loadGoogleScript().then(() => {
+      timer = setInterval(() => {
+        if (window.google?.accounts) {
+          clearInterval(timer);
+          googleClientRef.current = window.google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+            callback: handleGoogleCallback,
+          });
+        }
+      }, 200);
+    });
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, []);
 
   const handleGoogleCallback = async (tokenResponse) => {
-    if (!tokenResponse || !tokenResponse.access_token) return;
+    if (!tokenResponse?.access_token) return;
     setSocialLoading('Google');
+
     try {
       const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+        headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
       });
       const payload = await res.json();
       const data = await apiSocialLogin(payload.email, payload.name, 'Google');
+
       if (data.success) {
-        handleLogin({ name: payload.name, email: payload.email, picture: payload.picture, token: data.token });
-        showAlert('Thành công', `Đăng ký thành công! Xin chào ${payload.name}`);
+        handleLogin({
+          name: payload.name,
+          email: payload.email,
+          picture: payload.picture,
+          token: data.token,
+        });
       } else {
-        handleLogin({ name: payload.name, email: payload.email, picture: payload.picture });
+        showAlert(L('Notice', 'Thông báo'), data.message || L('Registration failed', 'Đăng ký thất bại'));
       }
     } catch (e) {
-      showAlert('Lỗi', 'Không thể kết nối.');
+      showAlert(L('Error', 'Lỗi'), L('Cannot connect.', 'Không thể kết nối.'));
+    } finally {
+      setSocialLoading('');
     }
-    finally { setSocialLoading(''); }
   };
 
   const doGoogleLogin = () => {
     if (Platform.OS === 'web' && googleClientRef.current) {
       googleClientRef.current.requestAccessToken();
-    } else {
-      showAlert('Lỗi', 'Google SDK chưa sẵn sàng.');
+      return;
     }
-  };
 
-  const doFacebookLogin = () => {
-    if (Platform.OS === 'web') {
-      if (!window.FB) {
-        showAlert('Lỗi', 'Facebook SDK chưa sẵn sàng.');
-        return;
-      }
-      window.FB.login(function(response) {
-        if (response.authResponse) {
-          window.FB.api('/me', {fields: 'name,email,picture'}, async function(profile) {
-            setSocialLoading('Facebook');
-            try {
-              const email = profile.email || `fb_${profile.id}@facebook.com`;
-              const name = profile.name || 'Facebook User';
-              const data = await apiSocialLogin(email, name, 'Facebook');
-              if (data.success) {
-                handleLogin({ name: data.username || name, email, token: data.token });
-                showAlert('Thành công', `Xin chào ${name}`);
-              } else {
-                showAlert('Thông báo', data.message || 'Đăng nhập thất bại');
-              }
-            } catch(e) {
-              showAlert('Lỗi', 'Không thể kết nối.');
-            } finally {
-              setSocialLoading('');
-            }
-          });
-        }
-      }, {scope: 'public_profile,email'});
-    } else {
-      // Fallback
-      setSocialLoading('Facebook');
-      const fakeEmail = `fb_user_${Date.now()}@facebook.com`;
-      apiSocialLogin(fakeEmail, 'Facebook User', 'Facebook')
-        .then(data => {
-          if (data.success) handleLogin({ name: data.username || 'Facebook User', email: fakeEmail, token: data.token });
-        }).finally(() => setSocialLoading(''));
-    }
+    showAlert(
+      L('Google sign-in', 'Đăng nhập Google'),
+      L('Google sign-in is only available on web in this build.', 'Đăng nhập Google chỉ khả dụng trên bản web hiện tại.')
+    );
   };
 
   const doRegister = async () => {
-    if (!name || !email || !pw) { showAlert('Lỗi', 'Vui lòng nhập đầy đủ thông tin'); return; }
-    if (pw !== pw2) { showAlert('Lỗi', 'Mật khẩu không khớp'); return; }
-    if (pw.length < 8) { showAlert('Lỗi', 'Mật khẩu tối thiểu 8 ký tự'); return; }
+    if (!name || !email || !pw) {
+      showAlert(L('Error', 'Lỗi'), L('Please enter all required information', 'Vui lòng nhập đầy đủ thông tin'));
+      return;
+    }
+    if (pw !== pw2) {
+      showAlert(L('Error', 'Lỗi'), L('Passwords do not match', 'Mật khẩu không khớp'));
+      return;
+    }
+    if (pw.length < 8) {
+      showAlert(L('Error', 'Lỗi'), L('Password must be at least 8 characters', 'Mật khẩu tối thiểu 8 ký tự'));
+      return;
+    }
+
     setLoading(true);
     try {
       const data = await apiRegister(email, pw);
       if (data.success) {
         const loginData = await apiLogin(email, pw);
         if (loginData.success) {
-          handleLogin({ name: loginData.username, email, token: loginData.token });
-          showAlert('Thành công', 'Đăng ký thành công!');
-        } else { setScreen('Login'); }
+          handleLogin({ name: loginData.username || name, email, token: loginData.token });
+        } else {
+          setScreen('Login');
+        }
       } else {
-        showAlert('Lỗi', data.message || 'Đăng ký thất bại');
+        showAlert(L('Error', 'Lỗi'), data.message || L('Registration failed', 'Đăng ký thất bại'));
       }
-    } catch (e) { showAlert('Lỗi', 'Lỗi kết nối'); }
-    finally { setLoading(false); }
+    } catch (e) {
+      showAlert(L('Error', 'Lỗi'), L('Connection error', 'Lỗi kết nối'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <KeyboardAvoidingView style={s.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={s.inner} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={s.inner} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <TouchableOpacity style={s.backBtn} onPress={() => setScreen('Home')}>
-          <Text style={s.backText}>← Trang chủ</Text>
+          <Feather name="chevron-left" size={20} color="#1c1917" />
         </TouchableOpacity>
 
-        <View style={s.authCard}>
-          <View style={s.iconWrap}><Text style={s.iconText}>◇</Text></View>
-          <Text style={s.title}>Tạo tài khoản</Text>
-          <Text style={s.subtitle}>Bắt đầu hành trình giám định cổ vật cùng AI</Text>
+        <View style={s.brandBlock}>
+          <View style={s.logoMark}>
+            <Feather name="layers" size={24} color="#065f46" />
+          </View>
+          <Text style={s.brand}>MarkSense</Text>
+          <Text style={s.title}>{L('Create account', 'Tạo tài khoản')}</Text>
+        </View>
+
+        <View style={s.form}>
 
           <View style={s.field}>
-            <Text style={s.label}>HỌ VÀ TÊN</Text>
+            <Text style={s.label}>{L('FULL NAME', 'HỌ VÀ TÊN')}</Text>
             <View style={s.inputWrap}>
-              <TextInput style={s.input} placeholder="Nguyễn Văn A" placeholderTextColor="rgba(255,255,255,0.25)" value={name} onChangeText={setName} />
-              <Text style={s.inputIcon}>👤</Text>
+              <Feather name="user" size={18} color="#78716c" />
+              <TextInput
+                style={s.input}
+                placeholder={L('Your name', 'Tên của bạn')}
+                placeholderTextColor="#a8a29e"
+                value={name}
+                onChangeText={setName}
+              />
             </View>
           </View>
+
           <View style={s.field}>
             <Text style={s.label}>EMAIL</Text>
             <View style={s.inputWrap}>
-              <TextInput style={s.input} placeholder="name@company.com" placeholderTextColor="rgba(255,255,255,0.25)" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
-              <Text style={s.inputIcon}>✉</Text>
-            </View>
-          </View>
-          <View style={s.pwRow}>
-            <View style={[s.field, { flex: 1, marginRight: 6 }]}>
-              <Text style={s.label}>MẬT KHẨU</Text>
-              <TextInput style={s.input} placeholder="Tối thiểu 8 ký tự" placeholderTextColor="rgba(255,255,255,0.25)" value={pw} onChangeText={setPw} secureTextEntry />
-            </View>
-            <View style={[s.field, { flex: 1, marginLeft: 6 }]}>
-              <Text style={s.label}>XÁC NHẬN</Text>
-              <TextInput style={s.input} placeholder="Nhập lại" placeholderTextColor="rgba(255,255,255,0.25)" value={pw2} onChangeText={setPw2} secureTextEntry />
+              <Feather name="mail" size={18} color="#78716c" />
+              <TextInput
+                style={s.input}
+                placeholder="name@company.com"
+                placeholderTextColor="#a8a29e"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
             </View>
           </View>
 
-          <TouchableOpacity style={s.btn} onPress={doRegister} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.btnText}>Tạo tài khoản →</Text>}
+          <View style={s.field}>
+            <Text style={s.label}>{L('PASSWORD', 'MẬT KHẨU')}</Text>
+            <View style={s.inputWrap}>
+              <Feather name="lock" size={18} color="#78716c" />
+              <TextInput
+                style={s.input}
+                placeholder={L('Minimum 8 characters', 'Tối thiểu 8 ký tự')}
+                placeholderTextColor="#a8a29e"
+                value={pw}
+                onChangeText={setPw}
+                secureTextEntry={!showPw}
+              />
+              <TouchableOpacity onPress={() => setShowPw((value) => !value)} hitSlop={10}>
+                <Feather name={showPw ? 'eye-off' : 'eye'} size={18} color="#78716c" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={s.field}>
+            <Text style={s.label}>{L('CONFIRM PASSWORD', 'XÁC NHẬN MẬT KHẨU')}</Text>
+            <View style={s.inputWrap}>
+              <Feather name="check-circle" size={18} color="#78716c" />
+              <TextInput
+                style={s.input}
+                placeholder={L('Repeat password', 'Nhập lại mật khẩu')}
+                placeholderTextColor="#a8a29e"
+                value={pw2}
+                onChangeText={setPw2}
+                secureTextEntry={!showPw2}
+              />
+              <TouchableOpacity onPress={() => setShowPw2((value) => !value)} hitSlop={10}>
+                <Feather name={showPw2 ? 'eye-off' : 'eye'} size={18} color="#78716c" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <TouchableOpacity style={[s.btn, loading && s.disabledBtn]} onPress={doRegister} disabled={loading}>
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.btnText}>{L('Create account', 'Tạo tài khoản')}</Text>}
           </TouchableOpacity>
 
-          <View style={s.divider}>
-            <View style={s.dividerLine} />
-            <Text style={s.dividerText}>Hoặc đăng ký với</Text>
-            <View style={s.dividerLine} />
-          </View>
-
-          <View style={s.socialRow}>
-            <TouchableOpacity style={s.socialBtn} onPress={doGoogleLogin} disabled={!!socialLoading}>
-              {socialLoading === 'Google' ? <ActivityIndicator size="small" color="#60a5fa" /> : (
-                <><Text style={s.googleIcon}>G</Text><Text style={s.socialBtnText}>Google</Text></>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity style={[s.socialBtn, s.fbBtn]} onPress={doFacebookLogin} disabled={!!socialLoading}>
-              {socialLoading === 'Facebook' ? <ActivityIndicator size="small" color="#fff" /> : (
-                <><Text style={s.fbIcon}>f</Text><Text style={[s.socialBtnText, { color: '#fff' }]}>Facebook</Text></>
-              )}
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={s.googleBtn} onPress={doGoogleLogin} disabled={!!socialLoading}>
+            {socialLoading === 'Google' ? (
+              <ActivityIndicator size="small" color="#065f46" />
+            ) : (
+              <>
+                <Text style={s.googleIcon}>G</Text>
+                <Text style={s.googleText}>{L('Continue with Google', 'Tiếp tục với Google')}</Text>
+              </>
+            )}
+          </TouchableOpacity>
 
           <View style={s.switchRow}>
-            <Text style={s.switchText}>Đã có tài khoản? </Text>
+            <Text style={s.switchText}>{L('Already have an account?', 'Đã có tài khoản?')}</Text>
             <TouchableOpacity onPress={() => setScreen('Login')}>
-              <Text style={s.switchLink}>Đăng nhập</Text>
+              <Text style={s.switchLink}>{L('Sign in', 'Đăng nhập')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -236,33 +259,75 @@ export default function RegisterScreen({ handleLogin, setScreen }) {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.paper },
-  inner: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  backBtn: { position: 'absolute', top: 20, left: 20, zIndex: 10 },
-  backText: { color: COLORS.ink30, fontSize: 14, fontWeight: '500' },
-  authCard: { width: '100%', maxWidth: 420, backgroundColor: COLORS.cardBg, borderColor: COLORS.cardBorder, borderWidth: 1, borderRadius: 16, padding: 28, alignItems: 'center' },
-  iconWrap: { width: 52, height: 52, borderRadius: 14, backgroundColor: 'rgba(96,165,250,0.12)', justifyContent: 'center', alignItems: 'center', marginBottom: 18, borderWidth: 1, borderColor: 'rgba(96,165,250,0.25)' },
-  iconText: { color: '#60a5fa', fontSize: 22, fontWeight: 'bold' },
-  title: { fontSize: 22, fontWeight: '800', color: '#fff', marginBottom: 4 },
-  subtitle: { fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 24, textAlign: 'center' },
-  field: { width: '100%', marginBottom: 14 },
-  label: { fontSize: 11, fontWeight: '700', color: COLORS.ink30, marginBottom: 8, letterSpacing: 1 },
-  inputWrap: { position: 'relative', width: '100%' },
-  input: { width: '100%', padding: 14, paddingRight: 44, backgroundColor: 'rgba(15,23,42,0.8)', borderColor: COLORS.cardBorder, borderWidth: 1, borderBottomColor: 'rgba(255,255,255,0.12)', borderBottomWidth: 2, borderRadius: 8, color: '#e2e8f0', fontSize: 15 },
-  inputIcon: { position: 'absolute', right: 14, top: 14, fontSize: 16, opacity: 0.3 },
-  pwRow: { flexDirection: 'row', width: '100%' },
-  btn: { width: '100%', padding: 16, backgroundColor: COLORS.cobalt, borderRadius: 10, alignItems: 'center', marginTop: 10 },
-  btnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  divider: { flexDirection: 'row', alignItems: 'center', width: '100%', marginVertical: 20 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
-  dividerText: { color: 'rgba(255,255,255,0.35)', fontSize: 12, marginHorizontal: 12, fontWeight: '500' },
-  socialRow: { flexDirection: 'row', width: '100%', gap: 10 },
-  socialBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 13, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  fbBtn: { backgroundColor: '#1877F2', borderColor: '#1877F2' },
-  googleIcon: { fontSize: 18, fontWeight: '800', color: '#4285F4' },
-  fbIcon: { fontSize: 18, fontWeight: '800', color: '#fff' },
-  socialBtnText: { color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: '600' },
-  switchRow: { flexDirection: 'row', marginTop: 18 },
-  switchText: { color: 'rgba(255,255,255,0.45)', fontSize: 13 },
-  switchLink: { color: '#60a5fa', fontWeight: '700', fontSize: 13 },
+  container: { flex: 1, backgroundColor: '#fdfbf7' },
+  inner: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 28 },
+  backBtn: {
+    position: 'absolute',
+    top: 22,
+    left: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#eee8df',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandBlock: { alignItems: 'center', marginBottom: 26 },
+  logoMark: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#ecfdf5',
+    borderWidth: 1,
+    borderColor: '#bbf7d0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  brand: { color: '#065f46', fontSize: 24, fontFamily: 'serif', fontWeight: '900', marginBottom: 12 },
+  title: { color: '#1c1917', fontSize: 30, fontWeight: '900' },
+  form: { width: '100%', maxWidth: 420, alignSelf: 'center' },
+  field: { marginBottom: 14 },
+  label: { color: '#57534e', fontSize: 11, fontWeight: '900', letterSpacing: 0.5, marginBottom: 8, marginLeft: 2 },
+  inputWrap: {
+    minHeight: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e7e5e4',
+    borderRadius: 16,
+    paddingHorizontal: 15,
+  },
+  input: { flex: 1, color: '#1c1917', fontSize: 15, fontWeight: '700', paddingVertical: 15 },
+  btn: {
+    minHeight: 58,
+    borderRadius: 16,
+    backgroundColor: '#065f46',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 6,
+  },
+  disabledBtn: { opacity: 0.72 },
+  btnText: { color: '#fff', fontSize: 16, fontWeight: '900' },
+  googleBtn: {
+    minHeight: 54,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e7e5e4',
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 12,
+  },
+  googleIcon: { color: '#4285F4', fontSize: 18, fontWeight: '900' },
+  googleText: { color: '#1c1917', fontSize: 14, fontWeight: '900' },
+  switchRow: { flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: 20, flexWrap: 'wrap' },
+  switchText: { color: '#78716c', fontSize: 13, fontWeight: '700' },
+  switchLink: { color: '#065f46', fontSize: 13, fontWeight: '900' },
 });
