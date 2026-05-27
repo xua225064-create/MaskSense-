@@ -1,17 +1,7 @@
-name: Build HieuDe Mobile iOS IPA
+name: Build HieuDe Mobile Unsigned iOS IPA
 
 on:
   workflow_dispatch:
-    inputs:
-      profile:
-        description: EAS build profile
-        required: true
-        default: preview
-        type: choice
-        options:
-          - preview
-          - production
-          - development
   push:
     branches:
       - nckh
@@ -27,11 +17,8 @@ concurrency:
 
 jobs:
   build-ios:
-    name: Build iOS IPA with EAS
-    runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      PROFILE: ${{ github.event.inputs.profile || 'preview' }}
+    name: Build unsigned iOS IPA
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
@@ -48,10 +35,44 @@ jobs:
         working-directory: hieude_mobile
         run: npm ci
 
-      - name: Configure EAS project
+      - name: Generate native iOS project
         working-directory: hieude_mobile
-        run: npx --yes eas-cli@latest init --non-interactive --force
+        run: npx --yes expo prebuild --platform ios --non-interactive
 
-      - name: Build IPA on EAS cloud
+      - name: Install CocoaPods
+        working-directory: hieude_mobile/ios
+        run: pod install
+
+      - name: Build iOS app without code signing
         working-directory: hieude_mobile
-        run: npx --yes eas-cli@latest build --platform ios --profile "$PROFILE" --non-interactive
+        run: |
+          set -euo pipefail
+          WORKSPACE="$(find ios -maxdepth 1 -name '*.xcworkspace' -print -quit)"
+          SCHEME="$(xcodebuild -list -json -workspace "$WORKSPACE" | ruby -rjson -e 'data=JSON.parse(STDIN.read); puts data.dig("workspace","schemes").find { |s| s != "Pods" }')"
+          xcodebuild \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build/ios-derived \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package unsigned IPA
+        working-directory: hieude_mobile
+        run: |
+          set -euo pipefail
+          APP_PATH="$(find build/ios-derived/Build/Products/Release-iphoneos -type d -name '*.app' -print -quit)"
+          test -n "$APP_PATH"
+          rm -rf unsigned-ipa
+          mkdir -p unsigned-ipa/Payload
+          cp -R "$APP_PATH" unsigned-ipa/Payload/
+          (cd unsigned-ipa && zip -qry ../marksense-unsigned.ipa Payload)
+
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: marksense-unsigned-ipa
+          path: hieude_mobile/marksense-unsigned.ipa
