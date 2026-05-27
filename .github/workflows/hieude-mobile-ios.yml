@@ -50,7 +50,7 @@ jobs:
 
       - name: Configure EAS project
         working-directory: hieude_mobile
-        run: npx --yes eas-cli@latest init --non-interactive
+        run: npx --yes eas-cli@latest init --non-interactive --force
 
       - name: Build IPA on EAS cloud
         working-directory: hieude_mobile
