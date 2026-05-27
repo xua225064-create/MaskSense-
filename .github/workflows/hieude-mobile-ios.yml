@@ -64,8 +64,15 @@ jobs:
         working-directory: hieude_mobile
         run: |
           set -euo pipefail
-          APP_PATH="$(find build/ios-derived/Build/Products/Release-iphoneos -type d -name '*.app' -print -quit)"
-          test -n "$APP_PATH"
+          echo "Looking for built .app bundle..."
+          find build ios -name '*.app' -print || true
+          APP_PATH="$(find build ios -name '*.app' -print -quit)"
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found. Build output directories:"
+            find build -maxdepth 5 -type d -print || true
+            exit 1
+          fi
+          echo "Packaging $APP_PATH"
           rm -rf unsigned-ipa
           mkdir -p unsigned-ipa/Payload
           cp -R "$APP_PATH" unsigned-ipa/Payload/
