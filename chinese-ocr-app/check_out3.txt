@@ -1,0 +1,66 @@
+12: appId: '1458748152636138', // Thay bằng ID ứng dụng Facebook của bạn
+1404: /* Tăng padding trái để chữ xích qua phải */
+2993: /* Ẩn hoàn toàn popup One Tap thả xuống của Google */
+2998: /* Custom Modal cho báo lỗi/xác nhận */
+3129: /* Nút đăng nhập Social tùy chỉnh (Google + Facebook) */
+3166: /* Footer cho trang đăng nhập / đăng ký */
+3423: <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6;">Ứng dụng công nghệ thị giác máy
+3424: tính và học sâu tối tân để nhận diện với độ chính xác cao.</p>
+3437: <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6;">Hàng ngàn mẫu hiệu đề được thu
+3438: thập và số hóa từ nhiều triều đại khác nhau.</p>
+3452: <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6;">Kết quả được trả về chỉ trong
+3453: vài giây. Tiết kiệm thời gian so với tra cứu thủ công.</p>
+3952: const subject = encodeURIComponent('[MarkSense AI] Contact từ ' + name);
+3953: const body = encodeURIComponent('Họ và Tên: ' + name + '\n\nNội dung cần hỗ trợ:\n' + msg);
+3955: showToast('Đang chuyển hướng sang ứng dụng Email...');
+4068: <div class="sp-faq-a-inner">Hệ thống hiện cung cấp tính năng tra cứu cơ sở dữ liệu và 5 lượt analyze đầu
+4069: tiên miễn phí cho tất cả tài khoản. Với nhu cầu lưu trữ và nhận dạng khối lượng lớn, người dùng có thể tham
+4070: khảo bảng giá dịch vụ cao cấp.</div>
+4080: <div class="sp-faq-a-inner">Lõi OCR của hệ thống có khả năng khôi phục một phần nét mờ dựa trên ngữ cảnh cấu
+4081: trúc chữ Hán. Tuy nhiên, hình ảnh cần được chụp rõ ràng, đủ ánh sáng, góc chụp vuông góc để tối đa hóa xác
+4082: suất trùng khớp.</div>
+4092: <div class="sp-faq-a-inner">Toàn bộ tác vụ nhận dạng được ghi nhận và lưu trong bộ nhớ tạm theo phiên làm
+4093: việc. Chúng tôi đang hoàn thiện cơ sở dữ liệu vĩnh viễn (cùng chức năng xóa thủ công) ở bản cập nhật tiếp
+4104: <div class="sp-faq-a-inner">Bộ dữ liệu tập trung mạnh nhất vào các mẫu gốm sứ thuộc đại triều nhà Thanh, nhà
+4105: Minh và nhà Nguyễn. Các niên đại khác (Tống, Nguyên) đang trong quá trình số hóa và credits hợp dần.</div>
+4137: <!-- GÓI FREE -->
+4203: <!-- GÓI PRO -->
+4293: <!-- GÓI ENTERPRISE -->
+4630: style="font-size: 1.05rem; font-weight: 600; color: #fff; letter-spacing: 0.5px;">Ngân hàng TMCP
+4631: Phương Đông (OCB)</div>
+4725: <!-- Cột 1 -->
+4772: <!-- Cột 2 -->
+4787: <!-- Cột 3 -->
+4802: <!-- Cột 4 -->
+4888: // Bắt buộc re-login nếu tài khoản từ phiên cũ chưa có token DB
+4924: console.error("Lỗi khi tải thư viện:", e);
+4930: if (d.includes('nguyễn')) return 'nguyen';
+4933: if (d.includes('tống')) return 'tong';
+5270: // 7 bước xử lý theo diagram:
+5271: // 1. Tiền xử lý ảnh
+5273: // 6. Tổng hợp & hợp nhất
+5274: // 7. Output chi tiết
+5301: formData.append("mode", "deep"); // Chạy toàn bộ 4 pipeline
+5306: // Gọi /api/nckh/analyze thay vì /ocr để chạy 4 pipeline song song
+5336: let shortVietnameseName = result.ten_viet || result['tên_việt'] || '';
+5341: hieude: displayVietnameseName || result.nien_hieu || result['niên_hiệu'] || hanziText || 'Unknown',
+5343: trieudai: result.trieu_dai || result.triều_đại || result.voted_dynasty || 'Unknown',
+5344: nienhieu: result.nien_hieu || result.niên_hiệu || 'Unknown',
+5345: niendai: result.nien_dai || result.niên_đại || ((result.nam_bat_dau && result.nam_ket_thuc) ? result.nam_bat_dau + ' - ' + result.nam_ket_thuc : (result.nam_ket_thuc_vn || 'Unknown')),
+5346: hieude_en: result.hieu_de_en || result.phien_am || result.phiên_âm || 'Unknown Period',
+5411: // Auto-Learning button đã được bỏ theo yêu cầu
+5607: return n.toLocaleString('vi-VN') + 'đ';
+5666: // Cập nhật chi tiết mã QR và thanh toán
+5674: // Chuyển giao diện sang Bước 3
+5690: // Polling chờ thanh toán thành công
+5695: // Bắt chi tiết lỗi từ API trả về để dễ debug
+5717: // Cập nhật thẻ credit hiển thị trên giao diện (cả Topbar + Pricing page)
+5747: // Hàm này không còn dùng overlay nữa, đã chuyển vào Bước 3 của trang Thanh toán
+5756: // Gọi check trạng thái ngay lập tức thay vì chờ 5s logic polling tự động sẽ chạy
+5800: // Kiểm tra nếu là admin → chuyển hướng sang trang Admin Panel
+5854: // Lưu vào MySQL
+5885: // Giả lập cho các mạng xã hội khác (nếu còn)
+6105: var isDanger = title.toLowerCase().includes('đăng xuất') || title.toLowerCase().includes('xóa');
+6369: <div class="chat-msg bot">Xin chào! 👋 Mình là trợ lý AI của MarkSense. Bạn cần giúp đỡ về cách dùng quét hiệu đề
+6370: hay thông tin nâng cấp tài khoản?</div>
+7041: 'Bạn cần hỗ trợ gì?': 'How can we help you?',

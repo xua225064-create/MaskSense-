@@ -1,5 +1,0 @@
-```json
-{
-  "corrected_chinese_mark": "大清康熙"
-}
-```

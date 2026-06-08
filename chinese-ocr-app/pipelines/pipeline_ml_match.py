@@ -55,6 +55,9 @@ class PipelineMlMatch(BasePipeline):
         # =============================================
         # Bước 2: Rule-based matching từ OCR text
         # =============================================
+        if not ocr_text:
+            ocr_text = await self._run_ocr_text(image_bytes)
+
         if ocr_text and database:
             print(f"[{self.name}] 📊 Bước 2: Rule-based matching...")
             
@@ -89,6 +92,24 @@ class PipelineMlMatch(BasePipeline):
         
         return await loop.run_in_executor(None, _orb_sync)
 
+    async def _run_ocr_text(self, image_bytes: bytes) -> str:
+        """Read text for rule matching when OCR text was not provided."""
+        loop = asyncio.get_event_loop()
+
+        def _ocr_sync():
+            try:
+                from ocr_engine import read_chinese_mark
+                result = read_chinese_mark(image_bytes, deep_mode=True)
+                if result.get("error"):
+                    print(f"[{self.name}/OCR] Skip rule OCR: {result.get('error')}")
+                    return ""
+                return result.get("text", "") or ""
+            except Exception as e:
+                print(f"[{self.name}/OCR] Error: {e}")
+                return ""
+
+        return await loop.run_in_executor(None, _ocr_sync)
+
     async def _run_rule_matching(
         self, ocr_text: str, database: List[Dict[str, Any]]
     ) -> Optional[Dict[str, Any]]:
@@ -106,6 +127,20 @@ class PipelineMlMatch(BasePipeline):
                 match, match_type = _find_match(ocr_text, database)
                 
                 if match:
+                    norm_ocr = "".join(ch for ch in (ocr_text or "") if "\u4e00" <= ch <= "\u9fff")
+                    generic_partials = {"年製", "年制", "年造", "大清", "大明", "大南"}
+                    targets = [
+                        match.get("chu_han", ""),
+                        match.get("chu_han_4", ""),
+                        match.get("chu_han_6", ""),
+                    ]
+                    targets.extend(match.get("bien_the", []) or [])
+                    if len(norm_ocr) >= 2 and norm_ocr not in generic_partials:
+                        for target in targets:
+                            norm_target = "".join(ch for ch in (target or "") if "\u4e00" <= ch <= "\u9fff")
+                            if norm_target and norm_ocr != norm_target and norm_ocr in norm_target:
+                                match_type = "partial_ocr"
+                                break
                     return {**match, "match_type": match_type}
                 
                 # Thử top matches
@@ -131,12 +166,30 @@ class PipelineMlMatch(BasePipeline):
             "exact": 0.95,
             "exact_orb_memory": 0.92,
             "substring": 0.80,
+            "partial_ocr": 0.78,
             "fuzzy": 0.60,
             "fuzzy_tiedecision": 0.55,
             "fuzzy_top1": 0.50,
             "orb_memory_soft": 0.45,
         }
         confidence = confidence_map.get(match_type, 0.40)
+        chu_han = match.get("chu_han", "")
+        if self._is_generic_or_incomplete_mark(chu_han) and confidence < 0.85:
+            return PipelineResult(
+                pipeline_name=self.name,
+                status=PipelineStatus.FAILED,
+                confidence=0.0,
+                chu_han=chu_han,
+                raw_ocr_text=chu_han,
+                error_message=(
+                    "Bỏ qua kết quả generic thiếu niên hiệu "
+                    f"({chu_han}) từ {source}/{match_type}"
+                ),
+                extra_data={
+                    "match_type": match_type,
+                    "source": source,
+                },
+            )
         
         # Xác định năm
         nam_bat_dau = None
@@ -153,7 +206,7 @@ class PipelineMlMatch(BasePipeline):
             pipeline_name=self.name,
             status=PipelineStatus.SUCCESS,
             confidence=confidence,
-            chu_han=match.get("chu_han", ""),
+            chu_han=chu_han,
             trieu_dai=match.get("trieu_dai", ""),
             nien_hieu=self._extract_nien_hieu(match),
             hoang_de=match.get("hoang_de", ""),
@@ -170,6 +223,32 @@ class PipelineMlMatch(BasePipeline):
                 "match_score": match.get("match_score"),
             },
         )
+
+    @staticmethod
+    def _is_incomplete_dynasty_mark(value: str) -> bool:
+        norm = "".join(ch for ch in (value or "") if "\u4e00" <= ch <= "\u9fff")
+        norm = norm.translate(str.maketrans({
+            "绪": "緒",
+            "统": "統",
+            "历": "曆",
+            "万": "萬",
+            "制": "製",
+            "内": "內",
+        }))
+        return norm in {"大明年製", "大清年製", "大南年製"}
+
+    @staticmethod
+    def _is_generic_or_incomplete_mark(value: str) -> bool:
+        norm = "".join(ch for ch in (value or "") if "\u4e00" <= ch <= "\u9fff")
+        norm = norm.translate(str.maketrans({
+            "绪": "緒",
+            "统": "統",
+            "历": "曆",
+            "万": "萬",
+            "制": "製",
+            "内": "內",
+        }))
+        return norm in {"大明", "大清", "大南", "年製", "年造", "大明年製", "大清年製", "大南年製"}
 
     @staticmethod
     def _extract_nien_hieu(match: Dict[str, Any]) -> str:

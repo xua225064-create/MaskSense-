@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi import Request
 from fastapi.staticfiles import StaticFiles
 import cv2
@@ -33,6 +33,42 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "hieu_de_database.json")
+PAGE_OVERRIDES_PATH = os.path.join(os.path.dirname(__file__), "data", "page_overrides.json")
+WEB_PAGE_IDS = {
+    "home",
+    "history",
+    "library",
+    "about",
+    "contact",
+    "pricing",
+    "login",
+    "register",
+    "profile",
+    "tx-history",
+    "checkout",
+    "guide",
+    "privacy",
+    "terms",
+    "faq",
+}
+MOBILE_SRC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "hieude_mobile", "src", "screens"))
+MOBILE_ASSETS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "hieude_mobile", "assets"))
+APP_PAGE_FILES = {
+    "app-home": "HomeScreen.js",
+    "app-login": "LoginScreen.js",
+    "app-register": "RegisterScreen.js",
+    "app-library": "LibraryScreen.js",
+    "app-history": "HistoryScreen.js",
+    "app-pricing": "PricingScreen.js",
+    "app-checkout": "CheckoutScreen.js",
+    "app-profile": "ProfileScreen.js",
+    "app-settings": "SettingsScreen.js",
+    "app-language": "LanguageScreen.js",
+    "app-chat": "ChatScreen.js",
+    "app-about": "AboutScreen.js",
+    "app-terms": "TermsScreen.js",
+    "app-privacy": "PrivacyScreen.js",
+}
 
 # Auto-Learning: lưu tạm ảnh vừa phân tích để user xác nhận → lưu vào thư viện tham chiếu
 _last_analyzed_images: Dict[str, bytes] = {}
@@ -44,7 +80,8 @@ from db import (fetch_all_marks, create_user, get_user_by_username, add_scan_his
     ensure_admin_columns, create_admin_account, admin_login, get_all_users_admin,
     toggle_user_lock, admin_update_credits, admin_reset_password, get_all_payments_admin, 
     admin_approve_payment, get_all_scan_history_admin, get_dashboard_stats,
-    admin_add_mark, admin_update_mark, admin_delete_mark, get_system_settings, update_system_setting)
+    admin_add_mark, admin_update_mark, admin_delete_mark, get_system_settings, update_system_setting,
+    admin_delete_user)
 from pydantic import BaseModel
 from passlib.context import CryptContext
 import httpx
@@ -97,6 +134,19 @@ ensure_admin_columns()
 _admin_hash = pwd_context.hash("123@")
 create_admin_account("admin", _admin_hash)
 print("[Admin] Admin system initialized.")
+
+# Sync database API keys with config
+try:
+    settings = get_system_settings()
+    import config
+    if settings.get("gemini_api_key"):
+        config.GEMINI_API_KEY = settings["gemini_api_key"]
+        print("[Startup] Synced GEMINI_API_KEY from database.")
+    if settings.get("openai_api_key"):
+        config.OPENAI_API_KEY = settings["openai_api_key"]
+        print("[Startup] Synced OPENAI_API_KEY from database.")
+except Exception as e:
+    print(f"[Startup] Error syncing API keys from DB: {e}")
 
 
 def _find_match(ocr_text: str, database: List[Dict[str, Any]]) -> Tuple[Optional[Dict[str, Any]], str]:
@@ -1060,7 +1110,42 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 @app.get("/")
 def read_index():
     index_path = os.path.join(os.path.dirname(__file__), "index.html")
-    return FileResponse(index_path)
+    return FileResponse(index_path, headers={"Cache-Control": "no-store"})
+
+def _render_index_page(initial_page: str) -> HTMLResponse:
+    index_path = os.path.join(os.path.dirname(__file__), "index.html")
+    with open(index_path, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    page_id = "auth" if initial_page in {"login", "register"} else initial_page
+    html = html.replace('<div class="pg on" id="pg-home">', '<div class="pg" id="pg-home">')
+    html = html.replace(f'<div class="pg" id="pg-{page_id}">', f'<div class="pg on" id="pg-{page_id}">')
+    html = html.replace('<button class="nb on" id="nb-home"', '<button class="nb" id="nb-home"')
+    html = html.replace(f'<button class="nb" id="nb-{initial_page}"', f'<button class="nb on" id="nb-{initial_page}"')
+
+    if initial_page in {"login", "register"}:
+        html = html.replace("<nav>", '<nav style="display:none">', 1)
+        html = html.replace('<footer class="site-footer"', '<footer class="site-footer" style="display:none"', 1)
+        if initial_page == "register":
+            html = html.replace('<div class="auth-slider" id="authSlider">', '<div class="auth-slider show-register" id="authSlider">', 1)
+
+    return HTMLResponse(content=html, headers={"Cache-Control": "no-store"})
+
+@app.get("/login")
+def read_login_page():
+    return _render_index_page("login")
+
+@app.get("/terms")
+def read_terms_page():
+    return _render_index_page("terms")
+
+@app.get("/privacy")
+def read_privacy_page():
+    return _render_index_page("privacy")
+
+@app.get("/history")
+def read_history_page():
+    return _render_index_page("history")
 
 @app.get("/logo.png")
 def read_logo():
@@ -1068,6 +1153,12 @@ def read_logo():
     if os.path.exists(logo_path):
         return FileResponse(logo_path)
     return JSONResponse(status_code=404, content={"message": "Logo not found"})
+
+@app.get("/{page_name}")
+def read_spa_page(page_name: str):
+    if page_name in WEB_PAGE_IDS:
+        return _render_index_page(page_name)
+    return JSONResponse(status_code=404, content={"detail": "Not Found"})
 
 
 @app.get("/data/hieu_de_database.json")
@@ -1584,20 +1675,33 @@ def social_login(data: SocialLoginRequest):
         }
     return JSONResponse(status_code=500, content={"success": False, "message": "Lỗi hệ thống khi xử lý đăng nhập."})
 
-@app.get("/history")
-def get_history(request: Request):
+@app.get("/api/history")
+def get_history_api(request: Request):
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
-        return JSONResponse(status_code=401, content={"success": False, "message": "Chưa đăng nhập."})
+        return JSONResponse(
+            status_code=401,
+            content={"success": False, "message": "Chưa đăng nhập."},
+            headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0", "Pragma": "no-cache"},
+        )
     
     user_id = auth_header.split("Bearer ")[1]
     history = get_scan_history(user_id)
-    return {"success": True, "history": history}
+    return JSONResponse(
+        content={"success": True, "history": history},
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0", "Pragma": "no-cache"},
+    )
 
 @app.get("/api/library")
 def get_library_api():
     marks = _load_database()
-    return JSONResponse(content=marks)
+    return JSONResponse(
+        content=marks,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+        },
+    )
 
 @app.get("/api/credits")
 def get_credits(request: Request):
@@ -1610,20 +1714,15 @@ def get_credits(request: Request):
     return {"success": True, "credits": credits}
 
 class BuyCreditsRequest(BaseModel):
-    package: str  # 'basic', 'pro', 'enterprise'
+    package: str  # 'pro' or 'enterprise'
 
 def get_packages_config():
     settings = get_system_settings()
     return {
-        'basic': {
-            'name': 'Cơ bản', 
-            'credits': int(settings.get('pkg_basic_credits', 50)), 
-            'amount': int(settings.get('pkg_basic_price', 490000))
-        },
         'pro': {
             'name': 'Phổ biến', 
             'credits': int(settings.get('pkg_pro_credits', 200)), 
-            'amount': int(settings.get('pkg_pro_price', 447712))
+            'amount': int(settings.get('pkg_pro_price', 499999))
         },
         'enterprise': {
             'name': 'Chuyên nghiệp', 
@@ -1826,6 +1925,139 @@ class AdminSettingUpdate(BaseModel):
     key: str
     value: str
 
+class AdminPageOverridesUpdate(BaseModel):
+    overrides: Dict[str, List[Dict[str, Any]]]
+
+class AdminAppPageUpdate(BaseModel):
+    edits: List[Dict[str, Any]]
+
+def _load_page_overrides() -> Dict[str, List[Dict[str, Any]]]:
+    try:
+        if not os.path.exists(PAGE_OVERRIDES_PATH):
+            return {}
+        with open(PAGE_OVERRIDES_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception as e:
+        print(f"[Admin] Error loading page overrides: {e}")
+        return {}
+
+def _save_page_overrides(overrides: Dict[str, List[Dict[str, Any]]]) -> bool:
+    try:
+        os.makedirs(os.path.dirname(PAGE_OVERRIDES_PATH), exist_ok=True)
+        with open(PAGE_OVERRIDES_PATH, "w", encoding="utf-8") as f:
+            json.dump(overrides, f, ensure_ascii=False, indent=2)
+        return True
+    except Exception as e:
+        print(f"[Admin] Error saving page overrides: {e}")
+        return False
+
+def _get_app_page_path(page_id: str) -> Optional[str]:
+    filename = APP_PAGE_FILES.get(page_id)
+    if not filename:
+        return None
+    path = os.path.abspath(os.path.join(MOBILE_SRC_DIR, filename))
+    if not path.startswith(MOBILE_SRC_DIR + os.sep):
+        return None
+    return path if os.path.exists(path) else None
+
+def _decode_js_string(value: str) -> str:
+    try:
+        import ast
+        return ast.literal_eval("'" + value.replace("'", "\\'") + "'")
+    except Exception:
+        return value
+
+def _extract_app_page_fields(source: str) -> List[Dict[str, Any]]:
+    fields: List[Dict[str, Any]] = []
+    seen = set()
+
+    def add_field(kind: str, label: str, value: str, start: int, end: int):
+        text = _decode_js_string(value)
+        if not text or len(text.strip()) < 2:
+            return
+        if kind != "media" and text.startswith(("../", "./", "http://", "https://")):
+            return
+        if kind != "media" and re.fullmatch(r"[A-Za-z0-9_\-./]+", text) and (" " not in text and len(text) < 18):
+            return
+        key = (start, end)
+        if key in seen:
+            return
+        seen.add(key)
+        fields.append({
+            "type": kind,
+            "label": label,
+            "rootSelector": "app-source",
+            "path": f"source:{start}:{end}",
+            "start": start,
+            "end": end,
+            "value": text,
+            "current": text,
+        })
+
+    # L('English text', 'Vietnamese text')
+    l_call = re.compile(r"\bL\(\s*(['\"])((?:\\.|(?!\1).)*?)\1\s*,\s*(['\"])((?:\\.|(?!\3).)*?)\3", re.S)
+    for index, match in enumerate(l_call.finditer(source), 1):
+        add_field("text", f"L en #{index}", match.group(2), match.start(2), match.end(2))
+        add_field("text", f"L vi #{index}", match.group(4), match.start(4), match.end(4))
+
+    # placeholder="..."
+    placeholder = re.compile(r"\bplaceholder\s*=\s*(['\"])((?:\\.|(?!\1).)*?)\1", re.S)
+    for index, match in enumerate(placeholder.finditer(source), 1):
+        add_field("placeholder", f"placeholder #{index}", match.group(2), match.start(2), match.end(2))
+
+    # import imageName from '../../assets/image.png'
+    asset_import = re.compile(r"\bimport\s+\w+\s+from\s+(['\"])((?:\\.|(?!\1).)*?\.(?:png|jpe?g|webp|gif))\1", re.I | re.S)
+    for index, match in enumerate(asset_import.finditer(source), 1):
+        add_field("media", f"asset import #{index}", match.group(2), match.start(2), match.end(2))
+
+    # require('../../assets/image.png')
+    asset_require = re.compile(r"\brequire\(\s*(['\"])((?:\\.|(?!\1).)*?\.(?:png|jpe?g|webp|gif))\1\s*\)", re.I | re.S)
+    for index, match in enumerate(asset_require.finditer(source), 1):
+        add_field("media", f"asset require #{index}", match.group(2), match.start(2), match.end(2))
+
+    # source={{ uri: 'https://...' }}
+    image_uri = re.compile(r"\buri\s*:\s*(['\"])((?:\\.|(?!\1).)*?)\1", re.S)
+    for index, match in enumerate(image_uri.finditer(source), 1):
+        add_field("media", f"image uri #{index}", match.group(2), match.start(2), match.end(2))
+
+    # <Text>Plain text</Text>
+    text_node = re.compile(r"<Text\b[^>]*>\s*([^<>{}\n][^<>{}]*)\s*</Text>", re.S)
+    for index, match in enumerate(text_node.finditer(source), 1):
+        value = re.sub(r"\s+", " ", match.group(1)).strip()
+        if value:
+            add_field("text", f"Text #{index}", value, match.start(1), match.end(1))
+
+    return sorted(fields, key=lambda item: int(item["start"]))
+
+def _js_escape_text(value: str) -> str:
+    return (
+        value
+        .replace("\\", "\\\\")
+        .replace("'", "\\'")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+    )
+
+def _apply_app_page_edits(source: str, edits: List[Dict[str, Any]]) -> str:
+    clean_edits = []
+    for edit in edits:
+        try:
+            start = int(edit.get("start"))
+            end = int(edit.get("end"))
+            value = str(edit.get("value", ""))
+        except Exception:
+            continue
+        if start < 0 or end < start or end > len(source):
+            continue
+        clean_edits.append((start, end, value))
+
+    for start, end, value in sorted(clean_edits, key=lambda item: item[0], reverse=True):
+        clean_value = _js_escape_text(value)
+        source = source[:start] + clean_value + source[end:]
+    return source
+
 def _verify_admin(request: Request):
     """Xác thực admin từ header Authorization."""
     auth = request.headers.get("Authorization", "")
@@ -1847,7 +2079,25 @@ def _verify_admin(request: Request):
 @app.get("/admin")
 def read_admin():
     admin_path = os.path.join(os.path.dirname(__file__), "admin.html")
-    return FileResponse(admin_path)
+    return FileResponse(admin_path, headers={"Cache-Control": "no-store"})
+
+@app.get("/api/page-overrides")
+def page_overrides():
+    return JSONResponse(
+        content={"success": True, "overrides": _load_page_overrides()},
+        headers={"Cache-Control": "no-store"},
+    )
+
+@app.get("/api/app-assets/{asset_path:path}")
+def app_asset_preview(asset_path: str):
+    safe_path = asset_path.replace("\\", "/").lstrip("/")
+    path = os.path.abspath(os.path.join(MOBILE_ASSETS_DIR, safe_path))
+    if not path.startswith(MOBILE_ASSETS_DIR + os.sep) or not os.path.exists(path):
+        return JSONResponse(status_code=404, content={"success": False, "message": "Asset not found"})
+    ext = os.path.splitext(path)[1].lower()
+    if ext not in {".png", ".jpg", ".jpeg", ".webp", ".gif"}:
+        return JSONResponse(status_code=400, content={"success": False, "message": "Unsupported asset"})
+    return FileResponse(path, headers={"Cache-Control": "no-store"})
 
 @app.post("/api/admin/login")
 def admin_login_endpoint(data: AdminLogin):
@@ -1910,6 +2160,16 @@ def admin_reset_pwd(data: AdminResetPassword, request: Request):
     new_hash = pwd_context.hash(data.new_password)
     success = admin_reset_password(data.user_id, new_hash)
     return {"success": success, "message": "Đã reset mật khẩu" if success else "Lỗi"}
+
+@app.delete("/api/admin/users/{user_id}")
+def admin_delete_user_endpoint(user_id: int, request: Request):
+    admin = _verify_admin(request)
+    if not admin:
+        return JSONResponse(status_code=401, content={"success": False, "message": "Unauthorized"})
+    if int(admin.get("id")) == user_id:
+        return JSONResponse(status_code=400, content={"success": False, "message": "Khong the xoa tai khoan admin dang dang nhap"})
+    success, message = admin_delete_user(user_id)
+    return {"success": success, "message": message}
 
 @app.get("/api/admin/payments")
 def admin_payments(request: Request, status: Optional[str] = None):
@@ -1988,13 +2248,96 @@ def admin_settings(request: Request):
     settings = get_system_settings()
     return {"success": True, "settings": settings}
 
+def update_env_file(key: str, value: str):
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    if not os.path.exists(env_path):
+        return
+    env_key = key.upper()
+    try:
+        with open(env_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+        found = False
+        new_lines = []
+        for line in lines:
+            if line.strip().startswith(f"{env_key}="):
+                new_lines.append(f"{env_key}={value}\n")
+                found = True
+            else:
+                new_lines.append(line)
+        if not found:
+            new_lines.append(f"\n{env_key}={value}\n")
+        with open(env_path, "w", encoding="utf-8") as f:
+            f.writelines(new_lines)
+    except Exception as e:
+        print(f"[Admin] Error updating .env file: {e}")
+
+def apply_api_keys(key: str, value: str):
+    import config
+    import services.llm_service as llm_service
+    if key == "gemini_api_key":
+        config.GEMINI_API_KEY = value
+        llm_service._gemini_client = None
+        print(f"[Admin] Dynamic Gemini API Key updated.")
+    elif key == "openai_api_key":
+        config.OPENAI_API_KEY = value
+        llm_service._openai_client = None
+        print(f"[Admin] Dynamic OpenAI API Key updated.")
+
 @app.post("/api/admin/settings")
 def admin_update_settings(data: AdminSettingUpdate, request: Request):
     admin = _verify_admin(request)
     if not admin:
         return JSONResponse(status_code=401, content={"success": False, "message": "Unauthorized"})
     success = update_system_setting(data.key, data.value)
+    if success and data.key in ("gemini_api_key", "openai_api_key"):
+        apply_api_keys(data.key, data.value)
+        update_env_file(data.key, data.value)
     return {"success": success, "message": "Đã cập nhật cài đặt" if success else "Lỗi"}
+
+
+@app.post("/api/admin/page-overrides")
+def admin_update_page_overrides(data: AdminPageOverridesUpdate, request: Request):
+    admin = _verify_admin(request)
+    if not admin:
+        return JSONResponse(status_code=401, content={"success": False, "message": "Unauthorized"})
+    success = _save_page_overrides(data.overrides)
+    return {"success": success, "message": "Da luu noi dung page" if success else "Loi luu noi dung page"}
+
+@app.get("/api/admin/app-pages/{page_id}")
+def admin_get_app_page(page_id: str, request: Request):
+    admin = _verify_admin(request)
+    if not admin:
+        return JSONResponse(status_code=401, content={"success": False, "message": "Unauthorized"})
+    path = _get_app_page_path(page_id)
+    if not path:
+        return JSONResponse(status_code=404, content={"success": False, "message": "Khong tim thay man App"})
+    with open(path, "r", encoding="utf-8") as f:
+        source = f.read()
+    return {
+        "success": True,
+        "page_id": page_id,
+        "file": APP_PAGE_FILES[page_id],
+        "fields": _extract_app_page_fields(source),
+    }
+
+@app.post("/api/admin/app-pages/{page_id}")
+def admin_save_app_page(page_id: str, data: AdminAppPageUpdate, request: Request):
+    admin = _verify_admin(request)
+    if not admin:
+        return JSONResponse(status_code=401, content={"success": False, "message": "Unauthorized"})
+    path = _get_app_page_path(page_id)
+    if not path:
+        return JSONResponse(status_code=404, content={"success": False, "message": "Khong tim thay man App"})
+    with open(path, "r", encoding="utf-8") as f:
+        source = f.read()
+    next_source = _apply_app_page_edits(source, data.edits)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(next_source)
+    return {
+        "success": True,
+        "message": "Da luu man App",
+        "fields": _extract_app_page_fields(next_source),
+    }
 
 
 # ============================================================
@@ -2017,7 +2360,59 @@ async def nckh_analyze_endpoint(
         pipelines: Danh sách pipeline cụ thể, phân cách bởi dấu phẩy
                    Ví dụ: "ocr_llm,ml_match" hoặc "ocr_llm,ocr_search,img_search,ml_match"
     """
+    def _extract_display_text(payload):
+        if not isinstance(payload, dict):
+            return ""
+        direct_keys = ("chu_han", "hieu_de", "text_ocr", "final_text", "hien_thi_chinh", "hieu_de_vi")
+        for key in direct_keys:
+            value = payload.get(key)
+            if value:
+                return str(value)
+        for nested_key in ("report", "top_match", "best_match", "final_result", "best_candidate"):
+            nested = payload.get(nested_key)
+            if isinstance(nested, dict):
+                text = _extract_display_text(nested)
+                if text:
+                    return text
+        return ""
+
+    def _save_nckh_history(image_bytes, result):
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return None
+        try:
+            import uuid
+            user_id = int(auth_header.split("Bearer ")[1])
+            if not os.path.exists("uploads"):
+                os.makedirs("uploads")
+            unique_suffix = uuid.uuid4().hex[:8]
+            hist_img_path = f"uploads/{user_id}_{unique_suffix}_scan.jpg"
+            with open(hist_img_path, "wb") as f:
+                f.write(image_bytes)
+            details = result.copy() if isinstance(result, dict) else {"result": result}
+            display_text = _extract_display_text(details)
+            details.setdefault("matched", bool(display_text))
+            details.setdefault("top_mark", display_text)
+            add_scan_history(user_id, hist_img_path, display_text, details)
+            return deduct_credit(user_id)
+        except Exception as e:
+            print("Failed to save NCKH history:", e)
+            return None
+
     try:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            try:
+                uid = int(auth_header.split("Bearer ")[1])
+                remaining = get_user_credits(uid)
+                if remaining <= 0:
+                    return JSONResponse(
+                        status_code=403,
+                        content={"success": False, "no_credits": True, "message": "Ban da het luot phan tich.", "credits": 0}
+                    )
+            except Exception:
+                pass
+
         # Validate file
         ext = os.path.splitext(file.filename or "")[1].lower()
         if ext not in ALLOWED_EXTENSIONS:
@@ -2048,7 +2443,13 @@ async def nckh_analyze_endpoint(
             result = await analyze_deep(image_bytes, database=REIGN_DATABASE)
         else:
             result = await analyze_quick(image_bytes, database=REIGN_DATABASE)
-        
+
+        new_credits = _save_nckh_history(image_bytes, result)
+        if isinstance(result, dict):
+            result.setdefault("success", True)
+            if new_credits is not None:
+                result["credits"] = new_credits
+
         return JSONResponse(content=result)
         
     except Exception as e:

@@ -1,0 +1,9 @@
+# Copy this file to proxy.data when you have real rotating proxies.
+# Supported formats:
+# HTTP|ip:port
+# HTTPS|ip:port
+# SOCKS5|ip:port
+# ip:port
+#
+# Example:
+# HTTP|127.0.0.1:8080

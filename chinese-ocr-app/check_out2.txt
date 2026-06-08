@@ -1,0 +1,110 @@
+12: appId: '1458748152636138', // Thay bằng ID ứng dụng Facebook của bạn
+1404: /* Tăng padding trái để chữ xích qua phải */
+2993: /* Ẩn hoàn toàn popup One Tap thả xuống của Google */
+2998: /* Custom Modal cho báo lỗi/xác nhận */
+3129: /* Nút đăng nhập Social tùy chỉnh (Google + Facebook) */
+3166: /* Footer cho trang đăng nhập / đăng ký */
+3423: <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6;">Ứng dụng công nghệ thị giác máy
+3424: tính và học sâu tối tân để nhận diện với độ chính xác cao.</p>
+3437: <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6;">Hàng ngàn mẫu hiệu đề được thu
+3438: thập và số hóa từ nhiều triều đại khác nhau.</p>
+3452: <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6;">Kết quả được trả về chỉ trong
+3453: vài giây. Tiết kiệm thời gian so với tra cứu thủ công.</p>
+3563: <div class="auth-feat-text"><strong>Cultural Heritage Conservation</strong><span>Lưu trữ và bảo vệ kiến thức gốm sứ
+3564: truyền thống</span></div>
+3571: <div class="auth-feat-text"><strong>Fast Authentication</strong><span>Kết quả chi tiết chỉ trong vài
+3572: giây</span></div>
+3599: <div class="auth-field-header"><label class="auth-label">Password</label><a class="auth-forgot">Quên mật
+3600: khẩu?</a></div>
+3638: <div class="auth-terms-footer">By continuing, you agree to our <a href="#">Terms of Service</a> và <a
+3639: href="#">Privacy Policy</a> của chúng tôi.</div>
+3693: <span class="auth-check-text">I agree to the <a href="#">Terms of Service</a> và <a href="#">Chính
+3694: sách bảo mật</a>, including the use of AI.</span>
+3880: <p class="sp-bento-desc">Hệ thống ứng dụng sức mạnh của mô hình PaddleOCR kết hợp cùng các kỹ thuật tiền xử lý
+3881: ảnh (Computer Vision) để trích xuất ký tự Hán Nôm từ hình ảnh hiệu đề một cách tự động và ổn định.</p>
+3894: <p class="sp-bento-desc">Bên cạnh việc đọc chữ, hệ thống triển khai thuật toán ORB (Oriented FAST and Rotated
+3895: BRIEF) nhằm trích xuất và đối chiếu các điểm đặc trưng hình học, giúp đối soát chéo với cơ sở dữ liệu mẫu.
+3910: <p class="sp-bento-desc">Xây dựng kiến trúc lưu trữ có cấu trúc (MySQL) quản lý thông tin các mẫu hiệu đề
+3911: thuộc các đại triều (Thanh, Minh, Nguyễn), hỗ trợ trích xuất thông tin niên đại và giải nghĩa nhanh chóng
+3918: <p class="sp-bento-desc">MarkSense AI là một giải pháp phần mềm được thiết kế để hỗ trợ công tác số hóa di
+3919: sản. Thay vì tra cứu thủ công qua sách vở, hệ thống cung cấp một công cụ đối chiếu kỹ thuật số trực quan,
+3920: giúp người dùng dễ dàng tiếp cận và tìm hiểu thông tin lịch sử của gốm sứ cổ truyền.</p>
+3937: <p class="sp-sub" data-i18n="contact-sub">Bạn có câu hỏi hoặc cần hỗ trợ? Đội ngũ chuyên gia của MarkSense AI
+3938: luôn sẵn sàng.</p>
+3963: const subject = encodeURIComponent('[MarkSense AI] Contact từ ' + name);
+3964: const body = encodeURIComponent('Họ và Tên: ' + name + '\n\nNội dung cần hỗ trợ:\n' + msg);
+3966: showToast('Đang chuyển hướng sang ứng dụng Email...');
+3995: <p>Nhấp vào "Sign In" ở góc trên cùng bên phải. Tạo tài khoản mới hoặc sử dụng hệ thống đăng nhập một chạm
+3996: (Google/SSO) để cấp quyền truy cập. Việc định danh là bắt buộc nhằm mục đích store personal analysis history
+3997: nhân.</p>
+4001: <p>Tại giao diện trung tâm, tải lên hình ảnh chụp hiệu đề hoặc sử dụng thao tác kéo thả. Nhấp "Bắt đầu phân
+4002: credits" để activate the computer vision AI core to process the image.</p>
+4006: <p>Hệ thống sẽ trả về kết quả nhận dạng Hán Nôm, phiên âm, triều đại và mẫu tham chiếu từ kho lưu trữ. Tất cả
+4007: báo cáo được tự động lưu trong mục "History" để tra cứu sau này.</p>
+4025: <p class="sp-item-text">Chúng tôi chỉ thu thập dữ liệu định danh ở mức tối thiểu (email) nhằm duy trì phiên đăng
+4026: nhập hợp lệ. Các hình ảnh tải lên được tiếp nhận và xử lý cục bộ trên hệ thống server.</p>
+4032: danh hoàn toàn (anonymized) nếu được sử dụng như một phần của tập huấn luyện (training set) để cải thiện độ
+4033: chính xác OCR trong tương lai.</p>
+4038: <p class="sp-item-text">Tất cả phiên truyền tải dữ liệu đều được mã hóa theo chuẩn SSL/TLS. Cơ sở dữ liệu và thư
+4039: mục hình ảnh của người dùng được Unlimited quyền truy cập bằng kiến trúc bảo mật đa tầng.</p>
+4050: <p class="sp-sub">Sử dụng hệ thống giải pháp MarkSense AI đồng nghĩa với việc bạn chấp thuận các quy định pháp
+4051: lý sau.</p>
+4057: tác giám định chuyên môn. MarkSense AI không chịu trách nhiệm đối với bất kỳ quyết định mua bán, giao dịch hay
+4058: thẩm định giá trị nào dựa trên hệ thống.</p>
+4063: <p class="sp-item-text">Người dùng cam kết sở hữu hợp pháp hình ảnh tải lên hệ thống. Bất kỳ khiếu nại bản quyền
+4064: nào phát sinh từ các mẫu cổ vật số hóa do người dùng tải lên sẽ thuộc trách nhiệm của người đó.</p>
+4069: <p class="sp-item-text">Cấu trúc hệ thống, trọng số mô hình AI, thuật toán xử lý ảnh (Computer Vision), cùng kho
+4070: dữ liệu tham chiếu là tài sản trí tuệ độc quyền của đội ngũ HieuDe Team.</p>
+4090: <div class="sp-faq-a-inner">Hệ thống hiện cung cấp tính năng tra cứu cơ sở dữ liệu và 5 lượt analyze đầu
+4091: tiên miễn phí cho tất cả tài khoản. Với nhu cầu lưu trữ và nhận dạng khối lượng lớn, người dùng có thể tham
+4092: khảo bảng giá dịch vụ cao cấp.</div>
+4102: <div class="sp-faq-a-inner">Lõi OCR của hệ thống có khả năng khôi phục một phần nét mờ dựa trên ngữ cảnh cấu
+4103: trúc chữ Hán. Tuy nhiên, hình ảnh cần được chụp rõ ràng, đủ ánh sáng, góc chụp vuông góc để tối đa hóa xác
+4104: suất trùng khớp.</div>
+4114: <div class="sp-faq-a-inner">Toàn bộ tác vụ nhận dạng được ghi nhận và lưu trong bộ nhớ tạm theo phiên làm
+4115: việc. Chúng tôi đang hoàn thiện cơ sở dữ liệu vĩnh viễn (cùng chức năng xóa thủ công) ở bản cập nhật tiếp
+4126: <div class="sp-faq-a-inner">Bộ dữ liệu tập trung mạnh nhất vào các mẫu gốm sứ thuộc đại triều nhà Thanh, nhà
+4127: Minh và nhà Nguyễn. Các niên đại khác (Tống, Nguyên) đang trong quá trình số hóa và credits hợp dần.</div>
+4159: <!-- GÓI FREE -->
+4225: <!-- GÓI PRO -->
+4315: <!-- GÓI ENTERPRISE -->
+4652: style="font-size: 1.05rem; font-weight: 600; color: #fff; letter-spacing: 0.5px;">Ngân hàng TMCP
+4653: Phương Đông (OCB)</div>
+4747: <!-- Cột 1 -->
+4794: <!-- Cột 2 -->
+4809: <!-- Cột 3 -->
+4824: <!-- Cột 4 -->
+4910: // Bắt buộc re-login nếu tài khoản từ phiên cũ chưa có token DB
+4946: console.error("Lỗi khi tải thư viện:", e);
+4952: if (d.includes('nguyễn')) return 'nguyen';
+4955: if (d.includes('tống')) return 'tong';
+5292: // 7 bước xử lý theo diagram:
+5293: // 1. Tiền xử lý ảnh
+5295: // 6. Tổng hợp & hợp nhất
+5296: // 7. Output chi tiết
+5323: formData.append("mode", "deep"); // Chạy toàn bộ 4 pipeline
+5328: // Gọi /api/nckh/analyze thay vì /ocr để chạy 4 pipeline song song
+5358: let shortVietnameseName = result.ten_viet || result['tên_việt'] || '';
+5363: hieude: displayVietnameseName || result.nien_hieu || result['niên_hiệu'] || hanziText || 'Unknown',
+5365: trieudai: result.trieu_dai || result.triều_đại || result.voted_dynasty || 'Unknown',
+5366: nienhieu: result.nien_hieu || result.niên_hiệu || 'Unknown',
+5367: niendai: result.nien_dai || result.niên_đại || ((result.nam_bat_dau && result.nam_ket_thuc) ? result.nam_bat_dau + ' - ' + result.nam_ket_thuc : (result.nam_ket_thuc_vn || 'Unknown')),
+5368: hieude_en: result.hieu_de_en || result.phien_am || result.phiên_âm || 'Unknown Period',
+5433: // Auto-Learning button đã được bỏ theo yêu cầu
+5629: return n.toLocaleString('vi-VN') + 'đ';
+5688: // Cập nhật chi tiết mã QR và thanh toán
+5696: // Chuyển giao diện sang Bước 3
+5712: // Polling chờ thanh toán thành công
+5717: // Bắt chi tiết lỗi từ API trả về để dễ debug
+5739: // Cập nhật thẻ credit hiển thị trên giao diện (cả Topbar + Pricing page)
+5769: // Hàm này không còn dùng overlay nữa, đã chuyển vào Bước 3 của trang Thanh toán
+5778: // Gọi check trạng thái ngay lập tức thay vì chờ 5s logic polling tự động sẽ chạy
+5781: console.error("Lỗi giả lập thanh toán: ", e);
+5804: showToast("Lỗi: " + result.message);
+5822: // Kiểm tra nếu là admin → chuyển hướng sang trang Admin Panel
+5876: // Lưu vào MySQL
+5907: // Giả lập cho các mạng xã hội khác (nếu còn)
+6127: var isDanger = title.toLowerCase().includes('đăng xuất') || title.toLowerCase().includes('xóa');
+6391: <div class="chat-msg bot">Xin chào! 👋 Mình là trợ lý AI của MarkSense. Bạn cần giúp đỡ về cách dùng quét hiệu đề
+6392: hay thông tin nâng cấp tài khoản?</div>
+7063: 'Bạn cần hỗ trợ gì?': 'How can we help you?',

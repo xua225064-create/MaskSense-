@@ -1,0 +1,108 @@
+Current thread 0x00003d3c (most recent call first):
+  File "D:\HieuDe_AI\chinese-ocr-app\debug_main4.py", line 6 in dump
+  File "C:\Users\MSI Bravo\AppData\Local\Programs\Python\Python310\lib\threading.py", line 953 in run
+  File "C:\Users\MSI Bravo\AppData\Local\Programs\Python\Python310\lib\threading.py", line 1016 in _bootstrap_inner
+  File "C:\Users\MSI Bravo\AppData\Local\Programs\Python\Python310\lib\threading.py", line 973 in _bootstrap
+
+Thread 0x00002114 (most recent call first):
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 1176 in create_module
+  File "<frozen importlib._bootstrap>", line 571 in module_from_spec
+  File "<frozen importlib._bootstrap>", line 674 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 1078 in _handle_fromlist
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\scipy\special\__init__.py", line 817 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1050 in _gcd_import
+  File "C:\Users\MSI Bravo\AppData\Local\Programs\Python\Python310\lib\importlib\__init__.py", line 126 in import_module
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\scipy\__init__.py", line 146 in __getattr__
+  File "<frozen importlib._bootstrap>", line 1075 in _handle_fromlist
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\scipy\ndimage\_interpolation.py", line 37 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\scipy\ndimage\_ndimage_api.py", line 11 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\scipy\ndimage\_support_alternative_backends.py", line 7 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\scipy\ndimage\__init__.py", line 156 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1050 in _gcd_import
+  File "C:\Users\MSI Bravo\AppData\Local\Programs\Python\Python310\lib\importlib\__init__.py", line 126 in import_module
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\scipy\__init__.py", line 146 in __getattr__
+  File "<frozen importlib._bootstrap>", line 1075 in _handle_fromlist
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\skimage\morphology\binary.py", line 6 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\skimage\morphology\__init__.py", line 3 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 992 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\paddleocr\ppocr\utils\e2e_utils\extract_textpoint_slow.py", line 24 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\paddleocr\ppocr\utils\e2e_utils\pgnet_pp_utils.py", line 25 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\paddleocr\ppocr\postprocess\pg_postprocess.py", line 25 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\paddleocr\ppocr\postprocess\__init__.py", line 33 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\paddleocr\tools\infer\predict_rec.py", line 31 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\paddleocr\tools\infer\predict_system.py", line 32 in <module>
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap_external>", line 883 in exec_module
+  File "<frozen importlib._bootstrap>", line 688 in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 1006 in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 1027 in _find_and_load
+  File "<frozen importlib._bootstrap>", line 241 in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 1078 in _handle_fromlist
+  File "D:\HieuDe_AI\chinese-ocr-app\.venv\lib\site-packages\paddleocr\paddleocr.py", line 48 in <module>
+  ...

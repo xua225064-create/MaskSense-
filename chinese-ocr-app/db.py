@@ -3,13 +3,16 @@ import json
 from contextlib import contextmanager
 
 DB_CONFIG = {
-    'host': 'localhost',
+    'host': '127.0.0.1',
+    'port': 3307,
     'user': 'root',
     'password': '',
     'database': 'hieude_ai_db',
     'charset': 'utf8mb4',
     'cursorclass': pymysql.cursors.DictCursor,
-    'connect_timeout': 2
+    'connect_timeout': 5,
+    'read_timeout': 5,
+    'write_timeout': 5
 }
 
 def get_db_connection():
@@ -463,6 +466,31 @@ def admin_reset_password(user_id, new_password_hash):
     except Exception as e:
         print(f"[DB] Error resetting password: {e}")
         return False
+    finally:
+        conn.close()
+
+
+def admin_delete_user(user_id):
+    """Xoa user thuong va du lieu lien quan."""
+    conn = get_db_connection()
+    if not conn: return False, "DB connection failed"
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT role FROM users WHERE id = %s", (user_id,))
+            user = cursor.fetchone()
+            if not user:
+                return False, "Khong tim thay nguoi dung"
+            if user.get('role') == 'admin':
+                return False, "Khong the xoa tai khoan admin"
+
+            cursor.execute("DELETE FROM scan_history WHERE user_id = %s", (user_id,))
+            cursor.execute("DELETE FROM payments WHERE user_id = %s", (user_id,))
+            cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        conn.commit()
+        return True, "Da xoa nguoi dung"
+    except Exception as e:
+        print(f"[DB] Error deleting user: {e}")
+        return False, "Loi xoa nguoi dung"
     finally:
         conn.close()
 

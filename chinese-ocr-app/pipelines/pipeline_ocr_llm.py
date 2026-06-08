@@ -48,6 +48,8 @@ class PipelineOcrLlm(BasePipeline):
         ocr_text = kwargs.get("ocr_text", "")
         ocr_candidates = kwargs.get("ocr_candidates", [])
         skip_verify = kwargs.get("skip_verify", False)
+        database = kwargs.get("database") or []
+        allow_db_short_circuit = kwargs.get("allow_db_short_circuit", True)
 
         # =============================================
         # Bước 1: OCR — Đọc chữ Hán từ ảnh
@@ -67,6 +69,11 @@ class PipelineOcrLlm(BasePipeline):
         print(f"[{self.name}] 📝 OCR text: '{ocr_text}'")
         if ocr_candidates:
             print(f"[{self.name}] 📝 Candidates: {ocr_candidates[:5]}")
+
+        db_match, match_type = self._match_database(ocr_text, database)
+        if allow_db_short_circuit and db_match:
+            print(f"[{self.name}] Database short-circuit: {db_match.get('ten_viet', '')} ({match_type})")
+            return self._build_result_from_db(db_match, match_type, ocr_text, ocr_candidates)
 
         # =============================================
         # Bước 2: LLM Extract — Phân tích thông tin
@@ -179,6 +186,85 @@ class PipelineOcrLlm(BasePipeline):
         
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, _ocr_sync)
+
+    def _match_database(self, ocr_text: str, database: List[Dict[str, Any]]) -> tuple:
+        query = self._norm_cjk(ocr_text)
+        if not query or not database:
+            return None, "none"
+
+        generic_partials = {"年製", "年制", "年造", "大清", "大明", "大南"}
+        partial_matches = []
+
+        for entry in database:
+            for target in self._entry_targets(entry):
+                target_norm = self._norm_cjk(target)
+                if target_norm == query:
+                    return entry, "exact"
+
+            if len(query) >= 2 and query not in generic_partials:
+                for target in self._entry_targets(entry):
+                    target_norm = self._norm_cjk(target)
+                    if target_norm and query in target_norm:
+                        score = len(query) / max(len(target_norm), 1)
+                        partial_matches.append((score, entry))
+
+        if partial_matches:
+            partial_matches.sort(key=lambda x: x[0], reverse=True)
+            return partial_matches[0][1], "partial"
+        return None, "none"
+
+    def _build_result_from_db(
+        self,
+        match: Dict[str, Any],
+        match_type: str,
+        ocr_text: str,
+        ocr_candidates: List[str],
+    ) -> PipelineResult:
+        confidence_map = {
+            "exact": 0.94,
+            "partial": 0.78,
+        }
+        return PipelineResult(
+            pipeline_name=self.name,
+            status=PipelineStatus.SUCCESS,
+            confidence=confidence_map.get(match_type, 0.70),
+            chu_han=ocr_text,
+            trieu_dai=match.get("trieu_dai", ""),
+            nien_hieu=match.get("nien_hieu", ""),
+            hoang_de=match.get("hoang_de", ""),
+            nam_bat_dau=self._safe_int(match.get("nam_bat_dau")),
+            nam_ket_thuc=self._safe_int(match.get("nam_ket_thuc")),
+            phien_am=match.get("phien_am", ""),
+            y_nghia=match.get("ghi_chu", ""),
+            raw_ocr_text=ocr_text,
+            extra_data={
+                "match_type": match_type,
+                "source": "database_short_circuit",
+                "ocr_candidates": ocr_candidates[:5],
+            },
+        )
+
+    @staticmethod
+    def _norm_cjk(value: str) -> str:
+        normalized = "".join(ch for ch in (value or "") if "\u4e00" <= ch <= "\u9fff")
+        return normalized.translate(str.maketrans({
+            "绪": "緒",
+            "统": "統",
+            "历": "曆",
+            "万": "萬",
+            "制": "製",
+            "内": "內",
+        }))
+
+    @staticmethod
+    def _entry_targets(entry: Dict[str, Any]) -> List[str]:
+        fields = [
+            entry.get("chu_han", ""),
+            entry.get("chu_han_4", ""),
+            entry.get("chu_han_6", ""),
+        ]
+        fields.extend([bt for bt in (entry.get("bien_the") or []) if bt])
+        return [field for field in fields if field]
     
     @staticmethod
     def _safe_int(value) -> Optional[int]:

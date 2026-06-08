@@ -31,12 +31,26 @@ git checkout nckh
 
 ## 🚀 Hướng dẫn chạy dự án
 
-### Chạy Backend (Web API)
-```bash
-cd d:\HieuDe_AI\chinese-ocr-app
-.\.venv\Scripts\activate
+### Chạy Web App (FastAPI)
+```powershell
+cd D:\HieuDe_AI
+.\.venv\Scripts\Activate.ps1
+
+cd .\chinese-ocr-app
 pip install -r requirements.txt
-uvicorn main:app --reload
+python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+Mở trình duyệt tại:
+
+```text
+http://127.0.0.1:8000
+```
+
+Nếu port `8000` đang bận, đổi sang port khác, ví dụ:
+
+```powershell
+python -m uvicorn main:app --host 127.0.0.1 --port 8001 --reload
 ```
 
 ### Chạy Mobile App

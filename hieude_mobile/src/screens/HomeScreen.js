@@ -241,7 +241,7 @@ const collectSources = (...objects) => {
     .slice(0, 6);
 };
 
-export default function HomeScreen({ user, credits, setScreen, refreshCredits, language, startScanner }) {
+export default function HomeScreen({ user, credits, setScreen, refreshCredits, language, startScanner, openChat }) {
   const L = (en, vi) => uiText(language, en, vi);
   const knowledgeArticles = normalizeLanguage(language) === 'vi' ? KNOWLEDGE_ARTICLES : buildKnowledgeArticles(L);
   const [image, setImage] = useState(null);
@@ -781,7 +781,14 @@ export default function HomeScreen({ user, credits, setScreen, refreshCredits, l
       </ScrollView>
 
       {!selectedArticle && !showUploader && !image && !result && !loading && (
-        <AppFooter current="Home" setScreen={setScreen} onCenterPress={openUploader} language={language} />
+        <>
+          {!!openChat && (
+            <TouchableOpacity style={s.chatFab} onPress={openChat} activeOpacity={0.86}>
+              <Feather name="message-circle" size={26} color="#ffffff" />
+            </TouchableOpacity>
+          )}
+          <AppFooter current="Home" setScreen={setScreen} onCenterPress={openUploader} language={language} />
+        </>
       )}
     </View>
   );
@@ -789,8 +796,25 @@ export default function HomeScreen({ user, credits, setScreen, refreshCredits, l
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fdfbf7' },
-  scroll: { flexGrow: 1, paddingBottom: 120 },
+  scroll: { flexGrow: 1, paddingBottom: 160 },
   scannerScroll: { paddingBottom: 0, backgroundColor: '#000' },
+  chatFab: {
+    position: 'absolute',
+    right: 18,
+    bottom: 112,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#065f46',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#065f46',
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 10,
+    zIndex: 30,
+  },
 
   cameraScreen: { height: screenHeight, minHeight: 640, backgroundColor: '#000', overflow: 'hidden' },
   cameraTopBar: { height: cameraTopHeight, paddingHorizontal: 30, paddingTop: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#000' },

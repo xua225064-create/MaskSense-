@@ -12,10 +12,16 @@ import {
   View,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
 import { apiLogin, apiRegister, apiSocialLogin } from '../api';
 import { uiText } from '../i18n';
 
-const GOOGLE_CLIENT_ID = '166557696887-000bmp74q6m90gr0sv84ct7e6s21mdq0.apps.googleusercontent.com';
+WebBrowser.maybeCompleteAuthSession();
+
+const GOOGLE_WEB_CLIENT_ID = '166557696887-000bmp74q6m90gr0sv84ct7e6s21mdq0.apps.googleusercontent.com';
+const GOOGLE_ANDROID_CLIENT_ID = '166557696887-kou5eaioa6jar6i7bqke0ba05nnnrl97.apps.googleusercontent.com';
+const GOOGLE_ANDROID_REDIRECT_URI = 'com.googleusercontent.apps.166557696887-kou5eaioa6jar6i7bqke0ba05nnnrl97:/oauthredirect';
 
 function loadGoogleScript() {
   if (Platform.OS !== 'web') return Promise.resolve();
@@ -43,6 +49,12 @@ export default function RegisterScreen({ handleLogin, setScreen, language }) {
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState('');
   const googleClientRef = useRef(null);
+  const [googleRequest, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
+    webClientId: GOOGLE_WEB_CLIENT_ID,
+    androidClientId: GOOGLE_ANDROID_CLIENT_ID,
+    redirectUri: Platform.OS === 'android' ? GOOGLE_ANDROID_REDIRECT_URI : undefined,
+    scopes: ['profile', 'email'],
+  });
 
   const showAlert = (title, message) => {
     if (Platform.OS === 'web') {
@@ -61,7 +73,7 @@ export default function RegisterScreen({ handleLogin, setScreen, language }) {
         if (window.google?.accounts) {
           clearInterval(timer);
           googleClientRef.current = window.google.accounts.oauth2.initTokenClient({
-            client_id: GOOGLE_CLIENT_ID,
+            client_id: GOOGLE_WEB_CLIENT_ID,
             scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
             callback: handleGoogleCallback,
           });
@@ -74,14 +86,29 @@ export default function RegisterScreen({ handleLogin, setScreen, language }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (Platform.OS === 'web' || googleResponse?.type !== 'success') return;
+    const accessToken = googleResponse.authentication?.accessToken || googleResponse.params?.access_token;
+    if (accessToken) {
+      handleGoogleCallback({ access_token: accessToken });
+    } else {
+      setSocialLoading('');
+      showAlert(L('Error', 'Lỗi'), L('Google sign-in failed. Please try again.', 'Đăng nhập Google thất bại. Vui lòng thử lại.'));
+    }
+  }, [googleResponse]);
+
   const handleGoogleCallback = async (tokenResponse) => {
     if (!tokenResponse?.access_token) return;
     setSocialLoading('Google');
 
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 15000);
       const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        signal: controller.signal,
       });
+      clearTimeout(timer);
       const payload = await res.json();
       const data = await apiSocialLogin(payload.email, payload.name, 'Google');
 
@@ -96,17 +123,42 @@ export default function RegisterScreen({ handleLogin, setScreen, language }) {
         showAlert(L('Notice', 'Thông báo'), data.message || L('Registration failed', 'Đăng ký thất bại'));
       }
     } catch (e) {
-      showAlert(L('Error', 'Lỗi'), L('Cannot connect.', 'Không thể kết nối.'));
+      showAlert(L('Error', 'Lỗi'), e.message || L('Cannot connect.', 'Không thể kết nối.'));
     } finally {
       setSocialLoading('');
     }
   };
 
-  const doGoogleLogin = () => {
-    if (Platform.OS === 'web' && googleClientRef.current) {
-      googleClientRef.current.requestAccessToken();
+  const doGoogleLogin = async () => {
+    if (Platform.OS === 'web') {
+      if (googleClientRef.current) {
+        googleClientRef.current.requestAccessToken();
+      } else {
+        showAlert(L('Error', 'Lỗi'), L('Google SDK is not ready.', 'Google chưa sẵn sàng.'));
+      }
       return;
     }
+
+    if (!googleRequest) {
+      showAlert(L('Error', 'Lỗi'), L('Google is not ready. Please try again.', 'Google chưa sẵn sàng. Vui lòng thử lại.'));
+      return;
+    }
+
+    setSocialLoading('Google');
+    const fallbackTimer = setTimeout(() => {
+      setSocialLoading('');
+      showAlert(L('Error', 'Lá»—i'), L('Google sign-in timed out. Please try again.', 'ÄÄƒng nháº­p Google quÃ¡ thá»i gian. Vui lÃ²ng thá»­ láº¡i.'));
+    }, 25000);
+    try {
+      const result = await promptGoogleAsync();
+      clearTimeout(fallbackTimer);
+      if (result?.type !== 'success') setSocialLoading('');
+    } catch (e) {
+      clearTimeout(fallbackTimer);
+      setSocialLoading('');
+      showAlert(L('Error', 'Lỗi'), L('Google sign-in failed. Please try again.', 'Đăng nhập Google thất bại. Vui lòng thử lại.'));
+    }
+    return;
 
     showAlert(
       L('Google sign-in', 'Đăng nhập Google'),
@@ -142,7 +194,7 @@ export default function RegisterScreen({ handleLogin, setScreen, language }) {
         showAlert(L('Error', 'Lỗi'), data.message || L('Registration failed', 'Đăng ký thất bại'));
       }
     } catch (e) {
-      showAlert(L('Error', 'Lỗi'), L('Connection error', 'Lỗi kết nối'));
+      showAlert(L('Error', 'Lỗi'), e.message || L('Connection error', 'Lỗi kết nối'));
     } finally {
       setLoading(false);
     }
@@ -235,16 +287,18 @@ export default function RegisterScreen({ handleLogin, setScreen, language }) {
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.btnText}>{L('Create account', 'Tạo tài khoản')}</Text>}
           </TouchableOpacity>
 
-          <TouchableOpacity style={s.googleBtn} onPress={doGoogleLogin} disabled={!!socialLoading}>
-            {socialLoading === 'Google' ? (
-              <ActivityIndicator size="small" color="#065f46" />
-            ) : (
-              <>
-                <Text style={s.googleIcon}>G</Text>
-                <Text style={s.googleText}>{L('Continue with Google', 'Tiếp tục với Google')}</Text>
-              </>
-            )}
-          </TouchableOpacity>
+          {(
+            <TouchableOpacity style={s.googleBtn} onPress={doGoogleLogin} disabled={!!socialLoading}>
+              {socialLoading === 'Google' ? (
+                <ActivityIndicator size="small" color="#065f46" />
+              ) : (
+                <>
+                  <Text style={s.googleIcon}>G</Text>
+                  <Text style={s.googleText}>{L('Continue with Google', 'Tiếp tục với Google')}</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
 
           <View style={s.switchRow}>
             <Text style={s.switchText}>{L('Already have an account?', 'Đã có tài khoản?')}</Text>

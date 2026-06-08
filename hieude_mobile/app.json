@@ -2,7 +2,11 @@
   "expo": {
     "name": "MarkSense",
     "slug": "hieude_mobile",
-    "version": "1.0.0",
+    "scheme": [
+      "com.hieude.marksense",
+      "com.googleusercontent.apps.166557696887-kou5eaioa6jar6i7bqke0ba05nnnrl97"
+    ],
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,17 +24,26 @@
       }
     },
     "android": {
+      "package": "com.hieude.marksense",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "versionCode": 5,
+      "edgeToEdgeEnabled": false,
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-web-browser"
-    ]
+      "expo-web-browser",
+      "./plugins/withAndroidCleartext"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "85b04a22-efca-448c-afba-edc0c90c008b"
+      }
+    }
   }
 }

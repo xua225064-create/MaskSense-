@@ -1,0 +1,45 @@
+/* Tăng padding trái để chữ xích qua phải */
+/* Ẩn hoàn toàn popup One Tap thả xuống của Google */
+/* Custom Modal cho báo lỗi/xác nhận */
+/* Nút đăng nhập Social tùy chỉnh (Google + Facebook) */
+/* Footer cho trang đăng nhập / đăng ký */
+const subject = encodeURIComponent('[MarkSense AI] Contact từ ' + name);
+const body = encodeURIComponent('Họ và Tên: ' + name + '\n\nNội dung cần hỗ trợ:\n' + msg);
+<!-- GÓI FREE -->
+<!-- GÓI PRO -->
+<!-- GÓI ENTERPRISE -->
+<!-- Cột 1 -->
+<!-- Cột 2 -->
+<!-- Cột 3 -->
+<!-- Cột 4 -->
+// Bắt buộc re-login nếu tài khoản từ phiên cũ chưa có token DB
+if (d.includes('nguyễn')) return 'nguyen';
+if (d.includes('tống')) return 'tong';
+if (reason.includes('Bỏ qua kết quả generic thiếu niên hiệu')) reason = 'Ignored generic result with
+if (reason.includes('từ rule/fuzzy_top1')) reason = reason.replace('từ rule/fuzzy_top1', 'from rule/
+// 7 bước xử lý theo diagram:
+// 1. Tiền xử lý ảnh
+// 6. Tổng hợp & hợp nhất
+// 7. Output chi tiết
+// Gọi /api/nckh/analyze thay vì /ocr để chạy 4 pipeline song song
+let shortVietnameseName = result.ten_viet || result['tên_việt'] || '';
+if (boicanhText.includes('Trị vì lâu nhất nhà Minh')) boicanhText = 'Longest reigning Ming emperor, 
+if (boicanhText.includes('Trị vì lâu nhất nhà Nguyễn')) boicanhText = 'Longest reigning emperor of t
+if (boicanhText.includes('Trị vì lâu nhất lịch sử TQ')) boicanhText = 'Longest reigning emperor in C
+if (thuphapText.includes('Đa phần dùng thể Khải thư (Kaishu)')) thuphapText = 'Predominantly uses Ka
+hieude: displayVietnameseName || result.nien_hieu || result['niên_hiệu'] || hanziText || 'Unknown',
+trieudai: result.trieu_dai || result.triều_đại || result.voted_dynasty || 'Unknown',
+nienhieu: result.nien_hieu || result.niên_hiệu || 'Unknown',
+niendai: result.nien_dai || result.niên_đại || ((result.nam_bat_dau && result.nam_ket_thuc) ? result
+hieude_en: result.hieu_de_en || result.phien_am || result.phiên_âm || 'Unknown Period',
+// Auto-Learning button đã được bỏ theo yêu cầu
+// Cập nhật chi tiết mã QR và thanh toán
+// Chuyển giao diện sang Bước 3
+// Polling chờ thanh toán thành công
+// Bắt chi tiết lỗi từ API trả về để dễ debug
+// Cập nhật thẻ credit hiển thị trên giao diện (cả Topbar + Pricing page)
+// Hàm này không còn dùng overlay nữa, đã chuyển vào Bước 3 của trang Thanh toán
+// Gọi check trạng thái ngay lập tức thay vì chờ 5s logic polling tự động sẽ chạy
+// Kiểm tra nếu là admin → chuyển hướng sang trang Admin Panel
+// Giả lập cho các mạng xã hội khác (nếu còn)
+var isDanger = title.toLowerCase().includes('đăng xuất') || title.toLowerCase().includes('xóa');

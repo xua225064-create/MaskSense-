@@ -28,6 +28,10 @@ chinese-ocr-app/debug/
 chinese-ocr-app/uploads/
 *.log
 
+# Mobile build artifacts
+hieude_mobile/.expo-export-test/
+hieude_mobile/*.apk
+
 # OS
 .DS_Store
 Thumbs.db

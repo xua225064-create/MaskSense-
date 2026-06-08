@@ -1,0 +1,40 @@
+{
+  "dataset": {
+    "name": "reference_library_available_data",
+    "images": 28,
+    "note": "Functional/reference-set experiment on labeled images available in the repository. Module A uses leave-one-out ORB matching; this is not an independent external benchmark."
+  },
+  "module_a_orb_leave_one_out": {
+    "n": 28,
+    "correct": 1,
+    "accuracy": 0.03571428571428571,
+    "avg_latency": 0.21787142857142858
+  },
+  "module_b_multi_variant_ocr": {
+    "n": 28,
+    "correct": 14,
+    "accuracy": 0.5,
+    "avg_latency": 74.10595357142857
+  },
+  "module_b_candidate_recall": {
+    "n": 28,
+    "correct": 19,
+    "accuracy": 0.6785714285714286
+  },
+  "module_c_ocr_plus_database_fuzzy": {
+    "n": 28,
+    "correct": 23,
+    "accuracy": 0.8214285714285714,
+    "avg_latency": 0.015303571428571429
+  },
+  "combined_offline_core": {
+    "n": 28,
+    "correct": 23,
+    "accuracy": 0.8214285714285714,
+    "avg_latency": 74.33914285714286
+  },
+  "outputs": {
+    "csv": "D:\\HieuDe_AI\\chinese-ocr-app\\experiments\\results\\reference_set_evaluation.csv",
+    "json": "D:\\HieuDe_AI\\chinese-ocr-app\\experiments\\results\\reference_set_summary.json"
+  }
+}

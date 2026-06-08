@@ -41,6 +41,7 @@ fonttools==4.62.1
 fsspec==2026.3.0
 future==1.0.0
 greenlet==3.3.2
+google-genai==2.2.0
 h11==0.16.0
 httpcore==1.0.9
 httptools==0.7.1
@@ -69,9 +70,11 @@ numpy==1.26.4
 onnx
 onnxruntime==1.23.2
 onnxslim==0.1.86
+openai==2.36.0
 opencv-contrib-python==4.6.0.66
 opencv-python==4.6.0.66
 opencv-python-headless==4.11.0.86
+ollama==0.6.2
 openpyxl==3.1.5
 opt-einsum==3.3.0
 packaging==26.0
@@ -114,6 +117,7 @@ rsa==4.9.1
 scikit-image==0.25.2
 scikit-learn==1.7.2
 scipy==1.15.3
+selenium==4.25.0
 shapely==2.1.2
 simsimd==6.5.16
 six==1.17.0
@@ -137,5 +141,6 @@ urllib3==2.6.3
 uvicorn==0.42.0
 visualdl==2.5.3
 watchfiles==1.1.1
+webdriver-manager==4.0.2
 websockets==16.0
 Werkzeug==3.1.8

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { apiGetLibrary } from '../api';
 import { AppFooter } from '../components/NavHeader';
@@ -111,19 +111,34 @@ function normalizeItem(item, idx, L, isVi) {
 export default function LibraryScreen({ setScreen, language }) {
   const lang = normalizeLanguage(language);
   const isVi = lang === 'vi';
-  const L = (en, vi) => uiText(lang, en, vi);
+  const L = useCallback((en, vi) => uiText(lang, en, vi), [lang]);
   const [items, setItems] = useState([]);
   const [era, setEra] = useState('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadLibrary = useCallback(async ({ showLoader = false, showRefresh = false } = {}) => {
+    if (showLoader) setLoading(true);
+    if (showRefresh) setRefreshing(true);
+    try {
+      const data = await apiGetLibrary();
+      setItems((Array.isArray(data) ? data : []).map((item, index) => normalizeItem(item, index, L, isVi)));
+    } catch (e) {
+      setItems([]);
+    } finally {
+      if (showLoader) setLoading(false);
+      if (showRefresh) setRefreshing(false);
+    }
+  }, [L, isVi]);
 
   useEffect(() => {
-    setLoading(true);
-    apiGetLibrary()
-      .then((data) => setItems((Array.isArray(data) ? data : []).map((item, index) => normalizeItem(item, index, L, isVi))))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [lang]);
+    loadLibrary({ showLoader: true });
+  }, [loadLibrary, lang]);
+
+  const refreshLibrary = useCallback(() => {
+    loadLibrary({ showRefresh: true });
+  }, [loadLibrary]);
 
   const filtered = items.filter((x) => {
     if (era !== 'all' && x.era !== era) return false;
@@ -168,6 +183,14 @@ export default function LibraryScreen({ setScreen, language }) {
         keyExtractor={(item, i) => String(item.id || i)}
         renderItem={renderItem}
         contentContainerStyle={s.listContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refreshLibrary}
+            tintColor="#065f46"
+            colors={['#065f46']}
+          />
+        }
         ListHeaderComponent={
           <View style={{ paddingTop: 55 }}>
             <Text style={s.pageTitle}>
@@ -216,7 +239,7 @@ export default function LibraryScreen({ setScreen, language }) {
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fdfbf7' },
-  listContent: { paddingHorizontal: 20, paddingBottom: 130 },
+  listContent: { paddingHorizontal: 20, paddingBottom: 170 },
   pageTitle: { fontSize: 32, fontFamily: 'serif', color: '#064e3b', marginBottom: 24, flexWrap: 'wrap', fontWeight: 'bold' },
   countText: { fontSize: 16, color: '#78716c', fontWeight: '500', fontFamily: 'System' },
   searchWrap: { backgroundColor: '#f5f5f4', borderRadius: 24, flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 8, height: 52, marginBottom: 20, borderWidth: 1, borderColor: '#eee8df' },

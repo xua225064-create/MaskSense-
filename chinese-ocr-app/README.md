@@ -33,3 +33,18 @@ http://localhost:8000
 
 - OCR dung EasyOCR voi `ch_sim` va `ch_tra`.
 - Hinh anh co the bi cong/goc, he thong se tu dong tien xu ly va OCR.
+
+## Cau hinh form Contact gui mail
+
+Copy `.env.example` thanh `.env`, sau do dien SMTP:
+
+```env
+CONTACT_RECIPIENT=xuatruong30@gmail.com
+CONTACT_SMTP_HOST=smtp.gmail.com
+CONTACT_SMTP_PORT=587
+CONTACT_SMTP_USER=your_gmail_address@gmail.com
+CONTACT_SMTP_PASSWORD=your_gmail_app_password
+CONTACT_FROM_EMAIL=your_gmail_address@gmail.com
+```
+
+Voi Gmail, `CONTACT_SMTP_PASSWORD` phai la App Password, khong phai mat khau dang nhap Gmail.

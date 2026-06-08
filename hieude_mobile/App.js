@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Platform, TouchableOpacity } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { View, StatusBar, StyleSheet } from 'react-native';
 import { COLORS } from './src/config';
 import { getStoredUser, storeUser, clearUser, apiGetCredits } from './src/api';
 
@@ -75,7 +74,19 @@ export default function App() {
     await AsyncStorage.setItem('appLang', normalized);
   };
 
-  const props = { user, credits, setScreen, handleLogin, handleLogout, refreshCredits, goCheckout, checkoutPkg, language, setLanguage: changeLanguage };
+  const props = {
+    user,
+    credits,
+    setScreen,
+    handleLogin,
+    handleLogout,
+    refreshCredits,
+    goCheckout,
+    checkoutPkg,
+    language,
+    setLanguage: changeLanguage,
+    openChat: () => setScreen('Chat'),
+  };
 
   const renderScreen = () => {
     switch (screen) {
@@ -99,34 +110,13 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.paper} />
       {renderScreen()}
-      {screen !== 'Chat' && (
-        <TouchableOpacity style={styles.chatFab} onPress={() => setScreen('Chat')} activeOpacity={0.86}>
-          <Feather name="message-circle" size={26} color="#ffffff" />
-        </TouchableOpacity>
-      )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.paper, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
-  chatFab: {
-    position: 'absolute',
-    right: 18,
-    bottom: 104,
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#065f46',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#065f46',
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 10,
-  },
+  container: { flex: 1, backgroundColor: COLORS.paper },
 });

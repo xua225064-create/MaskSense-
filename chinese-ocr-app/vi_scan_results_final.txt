@@ -1,0 +1,1700 @@
+.\admin.html:198 - <div class="sub">Bảng điều khiển quản trị hệ thống</div>
+.\admin.html:199 - <input type="text" id="loginUser" placeholder="Tên đăng nhập" autocomplete="off">
+.\admin.html:200 - <input type="password" id="loginPass" placeholder="Mật khẩu">
+.\admin.html:201 - <button onclick="doLogin()"><i class="fas fa-right-to-bracket"></i> Đăng Nhập</button>
+.\admin.html:216 - <i class="fas fa-chart-pie"></i><span>Tổng Quan</span></a>
+.\admin.html:218 - <i class="fas fa-users"></i><span>Người Dùng</span></a>
+.\admin.html:220 - <i class="fas fa-credit-card"></i><span>Giao Dịch</span></a>
+.\admin.html:222 - <i class="fas fa-book-open"></i><span>Từ Điển Hiệu Đề</span></a>
+.\admin.html:224 - <i class="fas fa-magnifying-glass"></i><span>Lịch Sử Scan</span></a>
+.\admin.html:226 - <i class="fas fa-gear"></i><span>Cài Đặt</span></a>
+.\admin.html:229 - <button onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</button>
+.\admin.html:236 - <h1 id="pageTitle">Tổng Quan</h1>
+.\admin.html:247 - <h3><i class="fas fa-chart-bar" style="color:var(--primary2)"></i> Doanh Thu 7 Ngày</h3>
+.\admin.html:251 - <h3><i class="fas fa-chart-line" style="color:var(--cyan)"></i> Lượt Scan 7 Ngày</h3>
+.\admin.html:261 - <h3><i class="fas fa-users" style="color:var(--primary2)"></i> Danh Sách Người Dùng</h3>
+.\admin.html:263 - <input type="text" id="userSearch" placeholder="🔍 Tìm kiếm..." oninput="filterUsers()">
+.\admin.html:268 - <thead><tr><th>ID</th><th>Username</th><th>Credits</th><th>Lượt Scan</th><th>Chi Tiêu</th><th>Role</
+.\admin.html:279 - <h3><i class="fas fa-tags" style="color:var(--primary2)"></i> Quản Lý Các Gói Nâng Cấp</h3>
+.\admin.html:283 - <h4 style="margin-bottom:12px;color:var(--text);font-size:14px;">Gói Cơ Bản</h4>
+.\admin.html:285 - <label>Số tiền (VNĐ)</label>
+.\admin.html:289 - <label>Lượt phân tích</label>
+.\admin.html:295 - <h4 style="margin-bottom:12px;color:var(--text);font-size:14px;">Gói Phổ Biến</h4>
+.\admin.html:297 - <label>Số tiền (VNĐ)</label>
+.\admin.html:301 - <label>Lượt phân tích</label>
+.\admin.html:307 - <h4 style="margin-bottom:12px;color:var(--text);font-size:14px;">Gói Chuyên Nghiệp</h4>
+.\admin.html:309 - <label>Số tiền (VNĐ)</label>
+.\admin.html:313 - <label>Lượt phân tích</label>
+.\admin.html:320 - <button class="btn btn-primary" onclick="savePackages()"><i class="fas fa-save"></i> Cập Nhật Các Gó
+.\admin.html:326 - <h3><i class="fas fa-credit-card" style="color:var(--green2)"></i> Quản Lý Giao Dịch</h3>
+.\admin.html:329 - <option value="all">Tất cả</option>
+.\admin.html:330 - <option value="pending">Chờ xử lý</option>
+.\admin.html:331 - <option value="completed">Hoàn thành</option>
+.\admin.html:332 - <option value="failed">Thất bại</option>
+.\admin.html:338 - <thead><tr><th>ID</th><th>User</th><th>Số Tiền</th><th>Credits</th><th>Trạng Thái</th><th>Mã GD</th>
+.\admin.html:349 - <h3><i class="fas fa-book-open" style="color:var(--yellow)"></i> Từ Điển Hiệu Đề</h3>
+.\admin.html:351 - <input type="text" id="markSearch" placeholder="🔍 Tìm hiệu đề..." oninput="filterMarks()">
+.\admin.html:352 - <button class="btn btn-primary" onclick="openMarkModal()"><i class="fas fa-plus"></i> Thêm Mới</butt
+.\admin.html:357 - <thead><tr><th>ID</th><th>Chữ Hán</th><th>4 Chữ</th><th>Tên Việt</th><th>Triều Đại</th><th>Hoàng Đế<
+.\admin.html:368 - <h3><i class="fas fa-magnifying-glass" style="color:var(--cyan)"></i> Lịch Sử Phân Tích AI</h3>
+.\admin.html:370 - <input type="text" id="scanSearch" placeholder="🔍 Tìm kiếm..." oninput="filterScans()">
+.\admin.html:375 - <thead><tr><th>ID</th><th>Ảnh</th><th>User</th><th>OCR Text</th><th>Kết Quả</th><th>Thời Gian</th></
+.\admin.html:385 - <h3><i class="fas fa-coins"></i> Cấu Hình Tín Dụng (Credits)</h3>
+.\admin.html:388 - <div class="name">Tỷ giá Credit</div>
+.\admin.html:389 - <div class="desc">Số tiền VNĐ cần trả cho 1 Credit (dùng cho tính toán gói cước)</div>
+.\admin.html:392 - <button class="btn btn-sm btn-primary" onclick="saveSetting('credit_rate')">Lưu</button>
+.\admin.html:396 - <div class="name">Credits miễn phí mặc định</div>
+.\admin.html:397 - <div class="desc">Số lượt phân tích tặng khi đăng ký tài khoản mới</div>
+.\admin.html:400 - <button class="btn btn-sm btn-primary" onclick="saveSetting('free_credits')">Lưu</button>
+.\admin.html:404 - <h3><i class="fas fa-database"></i> Thông Tin Hệ Thống</h3>
+.\admin.html:406 - <div class="info"><div class="name">Phiên bản</div><div class="desc">MarkSense AI Admin Panel v1.0</
+.\admin.html:412 - <div class="info"><div class="name">Tổng hiệu đề</div><div class="desc" id="totalMarksInfo">Đang tải
+.\admin.html:423 - <h3><i class="fas fa-coins" style="color:var(--yellow)"></i> Cập Nhật Credits
+.\admin.html:427 - <label>Thao tác</label>
+.\admin.html:429 - <option value="add">Cộng thêm</option>
+.\admin.html:430 - <option value="subtract">Trừ bớt</option>
+.\admin.html:431 - <option value="set">Đặt giá trị</option>
+.\admin.html:435 - <label>Số lượng Credits</label>
+.\admin.html:439 - <button class="btn btn-ghost" onclick="closeModal('creditModal')">Hủy</button>
+.\admin.html:440 - <button class="btn btn-primary" onclick="submitCredits()"><i class="fas fa-check"></i> Xác Nhận</but
+.\admin.html:448 - <h3><i class="fas fa-key" style="color:var(--cyan)"></i> Reset Mật Khẩu
+.\admin.html:452 - <label>Mật khẩu mới</label>
+.\admin.html:453 - <input type="text" id="newPassword" placeholder="Nhập mật khẩu mới...">
+.\admin.html:456 - <button class="btn btn-ghost" onclick="closeModal('resetPwdModal')">Hủy</button>
+.\admin.html:465 - <h3><i class="fas fa-book-open" style="color:var(--yellow)"></i> <span id="markModalTitle">Thêm Hiệu
+.\admin.html:469 - <div class="form-group"><label>Chữ Hán (6 chữ)</label><input type="text" id="m_chu_han" placeholder=
+.\admin.html:470 - <div class="form-group"><label>Chữ Hán (4 chữ)</label><input type="text" id="m_chu_han_4" placeholde
+.\admin.html:473 - <div class="form-group"><label>Chữ Hán 6 (biến thể)</label><input type="text" id="m_chu_han_6" place
+.\admin.html:474 - <div class="form-group"><label>Biến thể (cách bởi dấu ;)</label><input type="text" id="m_bien_the" p
+.\admin.html:477 - <div class="form-group"><label>Phiên âm</label><input type="text" id="m_phien_am"></div>
+.\admin.html:478 - <div class="form-group"><label>Tên Việt</label><input type="text" id="m_ten_viet"></div>
+.\admin.html:481 - <div class="form-group"><label>Hoàng Đế</label><input type="text" id="m_hoang_de"></div>
+.\admin.html:482 - <div class="form-group"><label>Triều Đại</label>
+.\admin.html:484 - <option value="">-- Chọn --</option>
+.\admin.html:485 - <option value="Minh Triều">Minh Triều</option>
+.\admin.html:486 - <option value="Thanh Triều">Thanh Triều</option>
+.\admin.html:487 - <option value="Nhà Nguyễn (Việt Nam)">Nhà Nguyễn (Việt Nam)</option>
+.\admin.html:488 - <option value="Khác">Khác</option>
+.\admin.html:493 - <div class="form-group"><label>Năm bắt đầu</label><input type="number" id="m_nam_bat_dau"></div>
+.\admin.html:494 - <div class="form-group"><label>Năm kết thúc</label><input type="number" id="m_nam_ket_thuc"></div>
+.\admin.html:497 - <div class="form-group"><label>Niên hiệu</label><input type="text" id="m_nien_hieu"></div>
+.\admin.html:498 - <div class="form-group"><label>Hiệu đề EN</label><input type="text" id="m_hieu_de_en"></div>
+.\admin.html:500 - <div class="form-group"><label>Ghi chú</label><textarea id="m_ghi_chu" rows="2"></textarea></div>
+.\admin.html:501 - <div class="form-group"><label>Mô tả</label><textarea id="m_mo_ta" rows="2"></textarea></div>
+.\admin.html:502 - <div class="form-group"><label>Thư pháp</label><textarea id="m_thu_phap" rows="2"></textarea></div>
+.\admin.html:503 - <div class="form-group"><label>Nghệ thuật</label><textarea id="m_nghe_thuat" rows="2"></textarea></d
+.\admin.html:505 - <button class="btn btn-ghost" onclick="closeModal('markModal')">Hủy</button>
+.\admin.html:506 - <button class="btn btn-primary" onclick="submitMark()"><i class="fas fa-save"></i> Lưu</button>
+.\admin.html:532 - document.getElementById('loginError').textContent = d.message || 'Đăng nhập thất bại';
+.\admin.html:534 - } catch (e) { document.getElementById('loginError').textContent = 'Lỗi kết nối server'; }
+.\admin.html:562 - const titles = { dashboard: 'Tổng Quan', users: 'Quản Lý Người Dùng', payments: 'Quản Lý Giao Dịch',
+.\admin.html:596 - <div class="stat-card"><div class="icon blue"><i class="fas fa-users"></i></div><div class="value">$
+.\admin.html:597 - <div class="stat-card"><div class="icon green"><i class="fas fa-wallet"></i></div><div class="value"
+.\admin.html:598 - <div class="stat-card"><div class="icon cyan"><i class="fas fa-search"></i></div><div class="value">
+.\admin.html:599 - <div class="stat-card"><div class="icon yellow"><i class="fas fa-clock"></i></div><div class="value"
+.\admin.html:600 - <div class="stat-card"><div class="icon pink"><i class="fas fa-user-plus"></i></div><div class="valu
+.\admin.html:601 - <div class="stat-card"><div class="icon green"><i class="fas fa-chart-line"></i></div><div class="va
+.\admin.html:602 - <div class="stat-card"><div class="icon cyan"><i class="fas fa-bolt"></i></div><div class="value">${
+.\admin.html:603 - <div class="stat-card"><div class="icon blue"><i class="fas fa-book"></i></div><div class="value">${
+.\admin.html:612 - if (!data.length) { c.innerHTML = '<div class="empty-state"><p>Chưa có dữ liệu</p></div>'; return; }
+.\admin.html:646 - <td>${formatVND(u.total_spent || 0)}đ</td>
+.\admin.html:648 - <td>${u.locked ? '<span class="badge badge-red">Đã khóa</span>' : '<span class="badge badge-green">H
+.\admin.html:653 - ${u.locked ? `<button class="btn btn-sm btn-green" onclick="unlockUser(${u.id})" title="Mở khóa"><i 
+.\admin.html:654 - <button class="btn btn-sm btn-ghost" onclick="openResetPwd(${u.id})" title="Reset mật khẩu"><i class
+.\admin.html:658 - `).join('') || '<tr><td colspan="9" class="empty-state">Chưa có người dùng</td></tr>';
+.\admin.html:679 - if (d.success) { toast('Cập nhật credits thành công!', 'success'); closeModal('creditModal'); loadUs
+.\admin.html:680 - else toast(d.message || 'Lỗi', 'error');
+.\admin.html:681 - } catch (e) { toast('Lỗi kết nối', 'error'); }
+.\admin.html:685 - if (!confirm('Xác nhận khóa tài khoản này?')) return;
+.\admin.html:688 - if (d.success) { toast('Đã khóa tài khoản', 'success'); loadUsers(); } else toast('Lỗi', 'error');
+.\admin.html:694 - if (d.success) { toast('Đã mở khóa tài khoản', 'success'); loadUsers(); } else toast('Lỗi', 'error')
+.\admin.html:706 - if (!pw) { toast('Vui lòng nhập mật khẩu', 'error'); return; }
+.\admin.html:709 - if (d.success) { toast('Đã reset mật khẩu', 'success'); closeModal('resetPwdModal'); } else toast('L
+.\admin.html:723 - <td><strong>${Number(p.amount_vnd).toLocaleString('vi-VN')}đ</strong></td>
+.\admin.html:725 - <td>${p.status==='completed' ? '<span class="badge badge-green">Thành công</span>' : p.status==='pen
+.\admin.html:729 - `).join('') || '<tr><td colspan="7" class="empty-state">Chưa có giao dịch</td></tr>';
+.\admin.html:741 - toast('Đã cập nhật cấu hình các gói thành công!', 'success');
+.\admin.html:742 - } catch (e) { toast('Lỗi kết nối khi lưu các gói', 'error'); }
+.\admin.html:768 - <button class="btn btn-sm btn-primary" onclick="editMark(${m.id})" title="Sửa"><i class="fas fa-edit
+.\admin.html:769 - <button class="btn btn-sm btn-red" onclick="deleteMark(${m.id})" title="Xóa"><i class="fas fa-trash"
+.\admin.html:773 - `).join('') || '<tr><td colspan="8" class="empty-state">Chưa có hiệu đề</td></tr>';
+.\admin.html:793 - document.getElementById('markModalTitle').textContent = mark ? 'Sửa Hiệu Đề' : 'Thêm Hiệu Đề Mới';
+.\admin.html:836 - else toast(d.message || 'Lỗi', 'error');
+.\admin.html:837 - } catch (e) { toast('Lỗi kết nối', 'error'); }
+.\admin.html:841 - if (!confirm('Xác nhận xóa hiệu đề này? Hành động không thể hoàn tác!')) return;
+.\admin.html:844 - if (d.success) { toast('Đã xóa hiệu đề', 'success'); loadMarks(); } else toast('Lỗi', 'error');
+.\admin.html:863 - matchInfo = mr.top_mark || mr.chu_han || (mr.matched ? 'Có kết quả' : 'Không khớp');
+.\admin.html:876 - }).join('') || '<tr><td colspan="6" class="empty-state">Chưa có lịch sử scan</td></tr>';
+.\admin.html:905 - if (d2.success) document.getElementById('totalMarksInfo').textContent = `${d2.stats.total_marks || 0
+.\admin.html:914 - if (d.success) toast('Đã lưu cài đặt!', 'success'); else toast('Lỗi', 'error');
+.\admin.html:915 - } catch (e) { toast('Lỗi kết nối', 'error'); }
+.\check_db.py:5 - print(f'✓ Nội Phủ marks found: {len(neifu)}\n')
+.\config.py:2 - Cấu hình chung cho hệ thống Multi-Pipeline HieuDe AI (NCKH).
+.\config.py:3 - Tất cả API keys và thresholds được quản lý tập trung tại đây.
+.\config.py:9 - # Load .env file nếu có
+.\config.py:28 - # LLM chính được sử dụng: "gemini", "openai", hoặc "ollama"
+.\config.py:29 - # Hệ thống sẽ fallback sang cái còn lại nếu cái chính lỗi
+.\config.py:34 - OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "neural-chat")  # hoặc mistral, llama2, etc.
+.\config.py:38 - # Nhiệt độ LLM (0.0 = deterministic, 1.0 = creative)
+.\config.py:68 - SEARCH_N_RESULTS = int(os.getenv("SEARCH_N_RESULTS", "5"))  # Số bài viết lấy từ Google
+.\config.py:69 - SEARCH_TIMEOUT = int(os.getenv("SEARCH_TIMEOUT", "15"))  # Timeout (giây)
+.\config.py:70 - SCRAPE_TIMEOUT = int(os.getenv("SCRAPE_TIMEOUT", "10"))  # Timeout đọc bài viết
+.\config.py:100 - # Timeout cho mỗi pipeline (giây)
+.\config.py:103 - # Số pipeline tối thiểu phải trả về kết quả để voting hợp lệ
+.\db.py:114 - """Tìm hoặc tạo user từ đăng nhập mạng xã hội (Google/Facebook)."""
+.\db.py:119 - # Kiểm tra user đã tồn tại chưa
+.\db.py:124 - # Tạo user mới (không cần password cho social login)
+.\db.py:130 - # Lấy lại user vừa tạo
+.\db.py:136 - # Nếu bảng chưa có cột display_name/provider, fallback tạo đơn giản
+.\db.py:158 - """Đảm bảo cột scan_credits tồn tại trong bảng users."""
+.\db.py:181 - """Lấy số lượt phân tích còn lại của user."""
+.\db.py:198 - """Trừ 1 lượt phân tích. Trả về số lượt còn lại hoặc -1 nếu hết lượt."""
+.\db.py:219 - """Thêm lượt phân tích cho user (sau khi mua gói)."""
+.\db.py:289 - """Đảm bảo cột role và locked tồn tại trong bảng users."""
+.\db.py:294 - # Thêm cột role
+.\db.py:304 - # Thêm cột locked
+.\db.py:314 - # Tạo bảng system_settings nếu chưa có
+.\db.py:324 - # Thêm cài đặt mặc định
+.\db.py:342 - """Tạo tài khoản admin nếu chưa tồn tại."""
+.\db.py:350 - # Cập nhật role thành admin
+.\db.py:371 - """Đăng nhập admin, trả về user nếu role='admin'."""
+.\db.py:390 - """Lấy danh sách tất cả users cho admin."""
+.\db.py:418 - """Khóa/Mở khóa tài khoản user."""
+.\db.py:434 - """Admin cộng/trừ credit cho user."""
+.\db.py:455 - """Admin reset mật khẩu cho user."""
+.\db.py:471 - """Lấy danh sách tất cả giao dịch cho admin."""
+.\db.py:501 - """Admin duyệt thủ công một giao dịch pending."""
+.\db.py:509 - return False, "Không tìm thấy giao dịch"
+.\db.py:511 - return False, "Giao dịch đã được duyệt trước đó"
+.\db.py:524 - return True, f"Đã duyệt thành công, cộng {payment['credits']} credits cho user #{payment['user_id']}
+.\db.py:533 - """Lấy toàn bộ lịch sử scan cho admin."""
+.\db.py:564 - """Lấy thống kê tổng quan cho Dashboard."""
+.\db.py:594 - # Doanh thu 7 ngày gần nhất
+.\db.py:602 - # Lượt scan 7 ngày gần nhất
+.\db.py:619 - """Thêm hiệu đề mới vào database."""
+.\db.py:624 - # Lấy ID lớn nhất
+.\db.py:659 - """Cập nhật hiệu đề trong database."""
+.\db.py:696 - """Xóa hiệu đề khỏi database."""
+.\db.py:712 - """Lấy tất cả system settings."""
+.\db.py:728 - """Cập nhật một system setting."""
+.\diagnose_confidence.py:4 - Kiểm tra xem confidence filtering có quá nghiêm ngặt không
+.\fix_pages.py:22 - <div><div class="sp-contact-label">Email Hợp Tác</div><div class="sp-contact-value">xuatruong30@gmai
+.\fix_pages.py:26 - <div><div class="sp-contact-label">Văn Phòng</div><div class="sp-contact-value">Đường 3/2, Phường Tâ
+.\fix_pages.py:31 - <div class="sp-section-label">Gửi tin nhắn</div>
+.\fix_pages.py:33 - <form onsubmit="event.preventDefault(); showToast('Tin nhắn đã được gửi!'); this.reset();">
+.\fix_pages.py:34 - <div class="sp-form-group"><label class="sp-form-label">Họ và Tên</label><input class="sp-form-input
+.\fix_pages.py:35 - <div class="sp-form-group"><label class="sp-form-label">Nội dung</label><textarea class="sp-form-tex
+.\fix_pages.py:36 - <button type="submit" class="sp-form-btn" data-i18n="contact-send">Gửi Tin Nhắn</button>
+.\fix_pages.py:48 - <div class="sp-pill sp-pill-blue">HƯỚNG DẪN</div>
+.\fix_pages.py:49 - <h1 class="sp-h1">Hướng dẫn <span>sử dụng</span></h1>
+.\fix_pages.py:50 - <p class="sp-sub">Bắt đầu sử dụng MarkSense AI chỉ với 3 bước đơn giản.</p>
+.\fix_pages.py:56 - <div class="sp-step-num" style="color:#60a5fa">Bước 01</div>
+.\fix_pages.py:57 - <h3>Đăng ký &amp; Đăng nhập</h3>
+.\fix_pages.py:58 - <p>Bấm vào "Đăng nhập" ở góc trên bên phải để tạo tài khoản mới hoặc đăng nhập bằng Google/SSO.</p>
+.\fix_pages.py:62 - <div class="sp-step-num" style="color:#a78bfa">Bước 02</div>
+.\fix_pages.py:63 - <h3>Phân tích hiệu đề</h3>
+.\fix_pages.py:64 - <p>Tải lên hình ảnh hoặc kéo thả trực tiếp. Bấm "Bắt đầu phân tích" để hệ thống xử lý bằng AI.</p>
+.\fix_pages.py:68 - <div class="sp-step-num" style="color:#4ade80">Bước 03</div>
+.\fix_pages.py:69 - <h3>Xem kết quả &amp; lịch sử</h3>
+.\fix_pages.py:70 - <p>Kết quả phân tích được lưu tự động trong tab "Lịch sử" để bạn xem lại bất kỳ lúc nào.</p>
+.\fix_pages.py:81 - <div class="sp-pill sp-pill-green">BẢO MẬT</div>
+.\fix_pages.py:82 - <h1 class="sp-h1">Chính sách <span>bảo mật</span></h1>
+.\fix_pages.py:83 - <p class="sp-sub">Bảo vệ dữ liệu người dùng là ưu tiên hàng đầu của chúng tôi.</p>
+.\fix_pages.py:87 - <h3 style="color:#4ade80">Thu thập thông tin</h3>
+.\fix_pages.py:88 - <p>Chúng tôi chỉ thu thập thông tin tối thiểu cần thiết để duy trì tài khoản và phục vụ quá trình ph
+.\fix_pages.py:92 - <h3 style="color:#60a5fa">Sử dụng dữ liệu</h3>
+.\fix_pages.py:93 - <p>Hình ảnh tải lên được bảo mật, mã hóa và có thể được sử dụng ẩn danh để cải thiện mô hình AI.</p>
+.\fix_pages.py:97 - <h3 style="color:#c084fc">Bảo vệ thông tin</h3>
+.\fix_pages.py:98 - <p>Chúng tôi sử dụng biện pháp bảo mật tiêu chuẩn ngành để bảo vệ dữ liệu cá nhân của bạn.</p>
+.\fix_pages.py:108 - <div class="sp-pill sp-pill-blue">ĐIỀU KHOẢN</div>
+.\fix_pages.py:109 - <h1 class="sp-h1">Điều khoản <span>dịch vụ</span></h1>
+.\fix_pages.py:110 - <p class="sp-sub">Khi sử dụng MarkSense AI, bạn đồng ý với các điều khoản sau đây.</p>
+.\fix_pages.py:113 - <div class="sp-card-title"><div class="sp-dot" style="background:#f87171"></div>Quyền rủi ro</div>
+.\fix_pages.py:114 - <p class="sp-card-text">Kết quả nhận dạng chỉ mang tính tham khảo. MarkSense AI không chịu trách nhi
+.\fix_pages.py:117 - <div class="sp-card-title"><div class="sp-dot" style="background:#60a5fa"></div>Bản quyền người dùng
+.\fix_pages.py:118 - <p class="sp-card-text">Bạn tự chịu trách nhiệm về bản quyền hình ảnh hiệu đề tải lên hệ thống.</p>
+.\fix_pages.py:121 - <div class="sp-card-title"><div class="sp-dot" style="background:#4ade80"></div>Quyền sở hữu trí tuệ
+.\fix_pages.py:122 - <p class="sp-card-text">Toàn bộ hệ thống MarkSense AI thuộc quyền sở hữu trí tuệ của đội ngũ HieuDe 
+.\fix_pages.py:131 - <div class="sp-pill sp-pill-amber">CÂU HỎI</div>
+.\fix_pages.py:132 - <h1 class="sp-h1">Câu hỏi <span>thường gặp</span></h1>
+.\fix_pages.py:133 - <p class="sp-sub">Tìm câu trả lời nhanh cho những thắc mắc phổ biến nhất.</p>
+.\fix_pages.py:136 - <div class="sp-faq-q"><h4>MarkSense AI có miễn phí không?</h4><svg class="sp-faq-arrow" viewBox="0 0
+.\fix_pages.py:137 - <div class="sp-faq-a"><div class="sp-faq-a-inner">Hiện tại hệ thống cung cấp chức năng tra cứu và ph
+.\fix_pages.py:140 - <div class="sp-faq-q"><h4>Hệ thống nhận dạng kém chính xác với ảnh mờ?</h4><svg class="sp-faq-arrow"
+.\fix_pages.py:141 - <div class="sp-faq-a"><div class="sp-faq-a-inner">Đúng vậy, AI phụ thuộc vào chất lượng ảnh. Vui lòn
+.\fix_pages.py:144 - <div class="sp-faq-q"><h4>Làm sao để xóa lịch sử?</h4><svg class="sp-faq-arrow" viewBox="0 0 24 24" 
+.\fix_pages.py:145 - <div class="sp-faq-a"><div class="sp-faq-a-inner">Tính năng xóa lịch sử đang được phát triển và sẽ c
+.\fix_pages.py:148 - <div class="sp-faq-q"><h4>Hệ thống hỗ trợ những triều đại nào?</h4><svg class="sp-faq-arrow" viewBox
+.\fix_pages.py:149 - <div class="sp-faq-a"><div class="sp-faq-a-inner">MarkSense AI hỗ trợ Nhà Thanh, Nhà Minh, Nhà Nguyễ
+.\index.html:12 - appId: '1458748152636138', // Thay bằng ID ứng dụng Facebook của bạn
+.\index.html:1404 - /* Tăng padding trái để chữ xích qua phải */
+.\index.html:2993 - /* Ẩn hoàn toàn popup One Tap thả xuống của Google */
+.\index.html:2998 - /* Custom Modal cho báo lỗi/xác nhận */
+.\index.html:3129 - /* Nút đăng nhập Social tùy chỉnh (Google + Facebook) */
+.\index.html:3166 - /* Footer cho trang đăng nhập / đăng ký */
+.\index.html:3231 - <p class="mast-sub" data-i18n="home-sub">Chụp hoặc tải ảnh hiệu đề lên, hệ thống Multi-Pipeline AI s
+.\index.html:3271 - <span style="color: rgba(255,255,255,0.7); font-size: 1rem; font-weight: 500;" data-i18n="credits-la
+.\index.html:3272 - phân credits còn lại:</span>
+.\index.html:3292 - <div class="uc-title" data-i18n="upload-title">Tải lên hình ảnh hiệu đề </div>
+.\index.html:3334 - onclick="event.stopPropagation(); doAnalyze()">Phân credits ảnh này</button>
+.\index.html:3424 - <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6;">Ứng dụng công nghệ th
+.\index.html:3425 - tính và học sâu tối tân để nhận diện với độ chính xác cao.</p>
+.\index.html:3438 - <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6;">Hàng ngàn mẫu hiệu đề
+.\index.html:3439 - thập và số hóa từ nhiều triều đại khác nhau.</p>
+.\index.html:3453 - <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.6;">Kết quả được trả về c
+.\index.html:3454 - vài giây. Tiết kiệm thời gian so với tra cứu thủ công.</p>
+.\index.html:3505 - <div class="pg-ttl" style="display: flex; align-items: center;"><span data-i18n="lib-title">Thư viện
+.\index.html:3506 - đề</span> <span
+.\index.html:3508 - data-i18n="lib-showing">Hiển
+.\index.html:3509 - thị</span> <span id="libCount">0</span> <span data-i18n="lib-samples">samples</span></span></div>
+.\index.html:3523 - placeholder="Tìm kiếm niên hiệu, triều đại..." oninput="renderLib()"
+.\index.html:3547 - <p class="auth-left-sub">Ứng dụng <strong>trí tuệ nhân tạo</strong> để nhận diện và phân credits hiệ
+.\index.html:3548 - cổ vật gốm sứ với độ chính xác cao.</p>
+.\index.html:3557 - <div class="auth-feat-text"><strong>Multi-agent AI</strong><span>Phân credits chính xác nguồn gốc
+.\index.html:3558 - và niên đại cổ vật</span></div>
+.\index.html:3565 - <div class="auth-feat-text"><strong>Cultural Heritage Conservation</strong><span>Lưu trữ và bảo vệ k
+.\index.html:3566 - truyền thống</span></div>
+.\index.html:3573 - <div class="auth-feat-text"><strong>Fast Authentication</strong><span>Kết quả chi tiết chỉ trong vài
+.\index.html:3574 - giây</span></div>
+.\index.html:3601 - <div class="auth-field-header"><label class="auth-label">Password</label><a class="auth-forgot">Quên
+.\index.html:3602 - khẩu?</a></div>
+.\index.html:3640 - <div class="auth-terms-footer">Bằng việc tiếp tục, bạn đồng ý với <a href="#">Điều khoản Dịch vụ</a>
+.\index.html:3641 - href="#">Chính sách Bảo mật</a> của chúng tôi.</div>
+.\index.html:3695 - <span class="auth-check-text">I agree to the <a href="#">Terms of Service</a> và <a href="#">Chính
+.\index.html:3696 - sách bảo mật</a>, including the use of AI.</span>
+.\index.html:3848 - <div class="sp-pill">Về chúng tôi</div>
+.\index.html:3850 - <p class="sp-sub">Hệ thống tối tân hỗ trợ quy trình giám định, nhận dạng và phân credits hiệu đề trê
+.\index.html:3851 - học bằng thị giác máy tính và trí tuệ nhân tạo.</p>
+.\index.html:3882 - <p class="sp-bento-desc">Hệ thống ứng dụng sức mạnh của mô hình PaddleOCR kết hợp cùng các kỹ thuật 
+.\index.html:3883 - ảnh (Computer Vision) để trích xuất ký tự Hán Nôm từ hình ảnh hiệu đề một cách tự động và ổn định.</
+.\index.html:3896 - <p class="sp-bento-desc">Bên cạnh việc đọc chữ, hệ thống triển khai thuật toán ORB (Oriented FAST an
+.\index.html:3897 - BRIEF) nhằm trích xuất và đối chiếu các điểm đặc trưng hình học, giúp đối soát chéo với cơ sở dữ liệ
+.\index.html:3912 - <p class="sp-bento-desc">Xây dựng kiến trúc lưu trữ có cấu trúc (MySQL) quản lý thông tin các mẫu hi
+.\index.html:3913 - thuộc các đại triều (Thanh, Minh, Nguyễn), hỗ trợ trích xuất thông tin niên đại và giải nghĩa nhanh 
+.\index.html:3920 - <p class="sp-bento-desc">MarkSense AI là một giải pháp phần mềm được thiết kế để hỗ trợ công tác số 
+.\index.html:3921 - sản. Thay vì tra cứu thủ công qua sách vở, hệ thống cung cấp một công cụ đối chiếu kỹ thuật số trực 
+.\index.html:3922 - giúp người dùng dễ dàng tiếp cận và tìm hiểu thông tin lịch sử của gốm sứ cổ truyền.</p>
+.\index.html:3927 - <p>Phiên bản 1.0.0</p>
+.\index.html:3928 - <p>© 2026 MarkSense AI. Phát triển bởi HieuDe Team.</p>
+.\index.html:3937 - <div class="sp-pill">Kết nối</div>
+.\index.html:3939 - <p class="sp-sub" data-i18n="contact-sub">Bạn có câu hỏi hoặc cần hỗ trợ? Đội ngũ chuyên gia của Mar
+.\index.html:3940 - luôn sẵn sàng.</p>
+.\index.html:3956 - <p>Đường 3/2, Phường Tân An,<br>Ninh Kiều, Cần Thơ, Việt Nam</p>
+.\index.html:3965 - const subject = encodeURIComponent('[MarkSense AI] Contact từ ' + name);
+.\index.html:3966 - const body = encodeURIComponent('Họ và Tên: ' + name + '\n\nNội dung cần hỗ trợ:\n' + msg);
+.\index.html:3968 - showToast('Đang chuyển hướng sang ứng dụng Email...');
+.\index.html:3991 - <p class="sp-sub">Bắt đầu quá trình nhận dạng và giám định hiệu đề gốm sứ với 3 bước cơ bản trên hệ 
+.\index.html:3997 - <p>Nhấp vào "Sign In" ở góc trên cùng bên phải. Tạo tài khoản mới hoặc sử dụng hệ thống đăng nhập mộ
+.\index.html:3998 - (Google/SSO) để cấp quyền truy cập. Việc định danh là bắt buộc nhằm mục đích lưu trữ lịch sử phân cr
+.\index.html:3999 - nhân.</p>
+.\index.html:4003 - <p>Tại giao diện trung tâm, tải lên hình ảnh chụp hiệu đề hoặc sử dụng thao tác kéo thả. Nhấp "Bắt đ
+.\index.html:4004 - credits" để kích hoạt lõi AI thị giác máy tính xử lý ảnh.</p>
+.\index.html:4008 - <p>Hệ thống sẽ trả về kết quả nhận dạng Hán Nôm, phiên âm, triều đại và mẫu tham chiếu từ kho lưu tr
+.\index.html:4009 - báo cáo được tự động lưu trong mục "History" để tra cứu sau này.</p>
+.\index.html:4027 - <p class="sp-item-text">Chúng tôi chỉ thu thập dữ liệu định danh ở mức tối thiểu (email) nhằm duy tr
+.\index.html:4028 - nhập hợp lệ. Các hình ảnh tải lên được tiếp nhận và xử lý cục bộ trên hệ thống server.</p>
+.\index.html:4033 - <p class="sp-item-text">Hình ảnh được tải lên phục vụ trực tiếp cho thuật toán phân credits. Dữ liệu
+.\index.html:4034 - danh hoàn toàn (anonymized) nếu được sử dụng như một phần của tập huấn luyện (training set) để cải t
+.\index.html:4035 - chính xác OCR trong tương lai.</p>
+.\index.html:4040 - <p class="sp-item-text">Tất cả phiên truyền tải dữ liệu đều được mã hóa theo chuẩn SSL/TLS. Cơ sở dữ
+.\index.html:4041 - mục hình ảnh của người dùng được Unlimited quyền truy cập bằng kiến trúc bảo mật đa tầng.</p>
+.\index.html:4052 - <p class="sp-sub">Sử dụng hệ thống giải pháp MarkSense AI đồng nghĩa với việc bạn chấp thuận các quy
+.\index.html:4053 - lý sau.</p>
+.\index.html:4058 - <p class="sp-item-text">Các báo cáo và kết quả phân credits do AI trả về mang tính tham chiếu và bổ 
+.\index.html:4059 - tác giám định chuyên môn. MarkSense AI không chịu trách nhiệm đối với bất kỳ quyết định mua bán, gia
+.\index.html:4060 - thẩm định giá trị nào dựa trên hệ thống.</p>
+.\index.html:4065 - <p class="sp-item-text">Người dùng cam kết sở hữu hợp pháp hình ảnh tải lên hệ thống. Bất kỳ khiếu n
+.\index.html:4066 - nào phát sinh từ các mẫu cổ vật số hóa do người dùng tải lên sẽ thuộc trách nhiệm của người đó.</p>
+.\index.html:4071 - <p class="sp-item-text">Cấu trúc hệ thống, trọng số mô hình AI, thuật toán xử lý ảnh (Computer Visio
+.\index.html:4072 - dữ liệu tham chiếu là tài sản trí tuệ độc quyền của đội ngũ HieuDe Team.</p>
+.\index.html:4092 - <div class="sp-faq-a-inner">Hệ thống hiện cung cấp tính năng tra cứu cơ sở dữ liệu và 5 lượt phân cr
+.\index.html:4093 - tiên miễn phí cho tất cả tài khoản. Với nhu cầu lưu trữ và nhận dạng khối lượng lớn, người dùng có t
+.\index.html:4094 - khảo bảng giá dịch vụ cao cấp.</div>
+.\index.html:4104 - <div class="sp-faq-a-inner">Lõi OCR của hệ thống có khả năng khôi phục một phần nét mờ dựa trên ngữ 
+.\index.html:4105 - trúc chữ Hán. Tuy nhiên, hình ảnh cần được chụp rõ ràng, đủ ánh sáng, góc chụp vuông góc để tối đa h
+.\index.html:4106 - suất trùng khớp.</div>
+.\index.html:4116 - <div class="sp-faq-a-inner">Toàn bộ tác vụ nhận dạng được ghi nhận và lưu trong bộ nhớ tạm theo phiê
+.\index.html:4117 - việc. Chúng tôi đang hoàn thiện cơ sở dữ liệu vĩnh viễn (cùng chức năng xóa thủ công) ở bản cập nhật
+.\index.html:4128 - <div class="sp-faq-a-inner">Bộ dữ liệu tập trung mạnh nhất vào các mẫu gốm sứ thuộc đại triều nhà Th
+.\index.html:4129 - Minh và nhà Nguyễn. Các niên đại khác (Tống, Nguyên) đang trong quá trình số hóa và credits hợp dần.
+.\index.html:4161 - <!-- GÓI FREE -->
+.\index.html:4227 - <!-- GÓI PRO -->
+.\index.html:4317 - <!-- GÓI ENTERPRISE -->
+.\index.html:4617 - style="font-size: 2.5rem; font-weight: 700; color: #60a5fa; letter-spacing: 1px;">0đ</div>
+.\index.html:4654 - style="font-size: 1.05rem; font-weight: 600; color: #fff; letter-spacing: 0.5px;">Ngân hàng TMCP
+.\index.html:4655 - Phương Đông (OCB)</div>
+.\index.html:4728 - Bạn đã hết lượt phân credits miễn phí.</h2>
+.\index.html:4749 - <!-- Cột 1 -->
+.\index.html:4759 - Hệ thống nhận dạng và phân credits hiệu đề<br>and analysis system, applying<br>Artificial Intelligen
+.\index.html:4796 - <!-- Cột 2 -->
+.\index.html:4811 - <!-- Cột 3 -->
+.\index.html:4826 - <!-- Cột 4 -->
+.\index.html:4897 - setTimeout(() => showToast('Đăng nhập Facebook thành công!'), 500);
+.\index.html:4912 - // Bắt buộc re-login nếu tài khoản từ phiên cũ chưa có token DB
+.\index.html:4940 - dyn: item.trieu_dai || 'Chưa rõ',
+.\index.html:4941 - nienhieu: item.nien_hieu || 'Chưa rõ',
+.\index.html:4942 - p: (item.nam_bat_dau && item.nam_ket_thuc) ? `${item.nam_bat_dau} - ${item.nam_ket_thuc}` : item.nie
+.\index.html:4944 - desc: item.mo_ta || item.ghi_chu || 'Không có mô tả'
+.\index.html:4948 - console.error("Lỗi khi tải thư viện:", e);
+.\index.html:4954 - if (d.includes('nguyễn')) return 'nguyen';
+.\index.html:4957 - if (d.includes('tống')) return 'tong';
+.\index.html:4970 - var lbPer = isEn ? 'Period:' : 'Thời kỳ:';
+.\index.html:4971 - var lbFeat = isEn ? 'Features:' : 'Đặc điểm:';
+.\index.html:4972 - var lbMark = isEn ? 'Mark' : 'Hiệu đề';
+.\index.html:4973 - var lbCeramic = isEn ? 'Ceramic' : 'Gốm sứ';
+.\index.html:4974 - var lbEmpty = isEn ? 'No matching marks found.' : 'Không tìm thấy hiệu đề phù hợp.';
+.\index.html:5123 - alert(isEn ? 'Cannot access camera. Please check permissions.' : 'Không thể truy cập camera. Vui lòn
+.\index.html:5206 - if (!result.pipeline_details) return 'Phân credits 4-Pipeline';
+.\index.html:5210 - var lines = ['<b>📊 Chi tiết xử lý:</b>'];
+.\index.html:5219 - p.pipeline_name === 'vision_read' ? 'LLM đọc ảnh' :
+.\index.html:5221 - p.pipeline_name === 'img_search' ? 'Selenium tìm ảnh' :
+.\index.html:5226 - if (result.voted_dynasty) lines.push('🗳 Kết luận: <b>' + result.voted_dynasty + '</b>');
+.\index.html:5228 - lines.push('✅ <b>Đã kiểm chứng bằng nguồn web</b>');
+.\index.html:5233 - ? '⚠ <b>Có nguồn tham khảo, cần đối chiếu thêm</b>'
+.\index.html:5234 - : '⚠ <b>Chưa tìm được link nguồn web đủ rõ</b>');
+.\index.html:5237 - lines.push('<br><b>Nguồn ủng hộ:</b>');
+.\index.html:5250 - lines.push('<br><b>Link minh chứng / nguồn đã tra cứu:</b>');
+.\index.html:5265 - return host || ('Nguồn ' + (idx + 1));
+.\index.html:5267 - return 'Nguồn ' + (idx + 1);
+.\index.html:5294 - // 7 bước xử lý theo diagram:
+.\index.html:5295 - // 1. Tiền xử lý ảnh
+.\index.html:5297 - // 6. Tổng hợp & hợp nhất
+.\index.html:5298 - // 7. Output chi tiết
+.\index.html:5300 - { pct: 5, msg: '1️⃣ Tiền xử lý ảnh...', delay: 300 },
+.\index.html:5301 - { pct: 15, msg: '2️⃣ Luồng A: OCR + LLM kiểm tra...', delay: 1000 },
+.\index.html:5302 - { pct: 35, msg: '3️⃣ Luồng B: LLM đọc ảnh...', delay: 5000 },
+.\index.html:5303 - { pct: 50, msg: '4️⃣ Luồng C: Selenium tìm ảnh...', delay: 8000 },
+.\index.html:5304 - { pct: 65, msg: '5️⃣ Luồng D: Feature matching...', delay: 12000 },
+.\index.html:5305 - { pct: 80, msg: '6️⃣ Tổng hợp & hợp nhất...', delay: 20000 },
+.\index.html:5306 - { pct: 92, msg: '7️⃣ Tạo báo cáo chi tiết...', delay: 28000 },
+.\index.html:5315 - setProgress(5, '1️⃣ Tiền xử lý ảnh...');
+.\index.html:5325 - formData.append("mode", "deep"); // Chạy toàn bộ 4 pipeline
+.\index.html:5330 - // Gọi /api/nckh/analyze thay vì /ocr để chạy 4 pipeline song song
+.\index.html:5346 - throw new Error(`Server báo lỗi: ${await resp.text()}`);
+.\index.html:5360 - let shortVietnameseName = result.ten_viet || result['tên_việt'] || '';
+.\index.html:5365 - hieude: displayVietnameseName || result.nien_hieu || result['niên_hiệu'] || hanziText || 'Không rõ',
+.\index.html:5367 - trieudai: result.trieu_dai || result.triều_đại || result.voted_dynasty || 'Không rõ',
+.\index.html:5368 - nienhieu: result.nien_hieu || result.niên_hiệu || 'Không rõ',
+.\index.html:5369 - niendai: result.nien_dai || result.niên_đại || ((result.nam_bat_dau && result.nam_ket_thuc) ? result
+.\index.html:5370 - hieude_en: result.hieu_de_en || result.phien_am || result.phiên_âm || 'Unknown Period',
+.\index.html:5372 - boicanh: result.mo_ta || result.boi_canh || result.ghi_chu || result.ghi_chu_them || result.y_nghia 
+.\index.html:5373 - thuphapdacbiet: (result.thu_phap || result.thu_phap_dac_biet || '') + (result.nghe_thuat || result.d
+.\index.html:5388 - showToast(e.message || 'Lỗi kết nối — vui lòng thử lại');
+.\index.html:5392 - setProgress(100, 'Hoàn tất!');
+.\index.html:5435 - // Auto-Learning button đã được bỏ theo yêu cầu
+.\index.html:5447 - btn.innerHTML = '⏳ Đang lưu...';
+.\index.html:5462 - btn.innerHTML = '✅ Đã ghi nhớ thành công!';
+.\index.html:5467 - btn.innerHTML = '❌ Lỗi: ' + (data.message || 'Không rõ');
+.\index.html:5473 - btn.innerHTML = '❌ Lỗi kết nối';
+.\index.html:5511 - let statusText = tx.status === 'completed' ? (typeof currentLang !== 'undefined' && currentLang === 
+.\index.html:5516 - <div style="font-weight: 600; color: #fff; font-size: 1.1rem; margin-bottom: 4px;">+${tx.credits} ${
+.\index.html:5517 - <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">${isEn ? 'TX ID' : 'Mã GD'}: #${tx.id
+.\index.html:5547 - let title = r.top_mark || h.ocr_text || 'Không rõ';
+.\index.html:5553 - let subDisplay = viName || h.ocr_text || 'Không có chữ';
+.\index.html:5596 - basic: { name: 'Gói Cơ bản', credits: 50, price: 490000 },
+.\index.html:5597 - pro: { name: 'Gói Phổ biến', credits: 200, price: 447712 },
+.\index.html:5598 - enterprise: { name: 'Gói Chuyên nghiệp', credits: 99999, price: 2490000 }
+.\index.html:5608 - basic: { name: 'Gói Cơ bản', credits: data.packages.basic.credits, price: data.packages.basic.amount
+.\index.html:5609 - pro: { name: 'Gói Phổ biến', credits: data.packages.pro.credits, price: data.packages.pro.amount },
+.\index.html:5610 - enterprise: { name: 'Gói Chuyên nghiệp', credits: data.packages.enterprise.credits, price: data.pack
+.\index.html:5620 - if (eProCredits) eProCredits.textContent = 'Trọn gói ' + data.packages.pro.credits + ' lượt quét';
+.\index.html:5622 - if (eEntCredits) eEntCredits.textContent = 'Trọn gói ' + (data.packages.enterprise.credits >= 99999 
+.\index.html:5631 - return n.toLocaleString('vi-VN') + 'đ';
+.\index.html:5642 - document.getElementById('checkout-pkg-desc').textContent = pkg.credits >= 99999 ? 'Quét vô hạn' : pk
+.\index.html:5647 - document.getElementById('checkout-tax').textContent = '0đ';
+.\index.html:5648 - document.getElementById('checkout-discount').textContent = '0đ';
+.\index.html:5675 - btn.textContent = 'ĐANG XỬ LÝ...';
+.\index.html:5690 - // Cập nhật chi tiết mã QR và thanh toán
+.\index.html:5698 - // Chuyển giao diện sang Bước 3
+.\index.html:5714 - // Polling chờ thanh toán thành công
+.\index.html:5719 - // Bắt chi tiết lỗi từ API trả về để dễ debug
+.\index.html:5724 - showAlertModal('Lỗi', errorMsg || 'Thanh toán thất bại.');
+.\index.html:5727 - showAlertModal('Lỗi', 'Không thể kết nối đến máy chủ.');
+.\index.html:5729 - btn.textContent = 'TIẾP TỤC';
+.\index.html:5741 - // Cập nhật thẻ credit hiển thị trên giao diện (cả Topbar + Pricing page)
+.\index.html:5744 - showAlertModal('Thanh toán thành công! 🎉', 'Tokens have been added to your account.');
+.\index.html:5754 - btn.textContent = 'ĐANG KIỂM TRA...';
+.\index.html:5761 - showAlertModal('Chưa nhận được thanh toán', 'Hệ thống vẫn đang chờ xác nhận từ ngân hàng. Quá trình 
+.\index.html:5764 - showToast('Lỗi kết nối khi kiểm tra trạng thái.');
+.\index.html:5766 - setTimeout(() => { if (btn.textContent === 'ĐANG KIỂM TRA...') btn.textContent = 'I HAVE TRANSFERRED
+.\index.html:5771 - // Hàm này không còn dùng overlay nữa, đã chuyển vào Bước 3 của trang Thanh toán
+.\index.html:5780 - // Gọi check trạng thái ngay lập tức thay vì chờ 5s logic polling tự động sẽ chạy
+.\index.html:5783 - console.error("Lỗi giả lập thanh toán: ", e);
+.\index.html:5806 - showToast("Lỗi: " + result.message);
+.\index.html:5809 - showToast("Lỗi kết nối: " + e.message);
+.\index.html:5824 - // Kiểm tra nếu là admin → chuyển hướng sang trang Admin Panel
+.\index.html:5834 - showToast('Chào mừng ' + curU.name + '!');
+.\index.html:5869 - showAlertModal('Lỗi', 'Facebook SDK chưa được tải. Vui lòng tải lại trang.');
+.\index.html:5878 - // Lưu vào MySQL
+.\index.html:5896 - showAlertModal('Thành công', 'Đăng nhập Facebook thành công!');
+.\index.html:5899 - showAlertModal('Thông báo', 'Đăng nhập Facebook bị hủy hoặc bị chặn.');
+.\index.html:5904 - showAlertModal('Lỗi', 'Không thể gọi Facebook Login: ' + e.message);
+.\index.html:5909 - // Giả lập cho các mạng xã hội khác (nếu còn)
+.\index.html:5913 - showToast('Đăng nhập bằng ' + provider + ' thành công!');
+.\index.html:5946 - showAlertModal('Thành công', 'Đăng nhập thành công! Xin chào ' + payload.name);
+.\index.html:5956 - showAlertModal('Lỗi', 'Google SDK chưa được tải. Vui lòng tải lại trang.');
+.\index.html:5989 - Hồ sơ của tôi
+.\index.html:5993 - Lịch sử giao dịch
+.\index.html:6028 - showToast('Đã đăng xuất');
+.\index.html:6094 - <div class="modal-title" id="cmTitle">Thông báo</div>
+.\index.html:6129 - var isDanger = title.toLowerCase().includes('đăng xuất') || title.toLowerCase().includes('xóa');
+.\index.html:6382 - Trợ lý MarkSense
+.\index.html:6393 - <div class="chat-msg bot">Xin chào! 👋 Mình là trợ lý AI của MarkSense. Bạn cần giúp đỡ về cách dùng 
+.\index.html:6394 - hay thông tin nâng cấp tài khoản?</div>
+.\index.html:6402 - <input type="text" class="chat-input" id="chatInput" placeholder="Nhập câu trả lời..."
+.\index.html:6444 - chatBody.insertBefore(Object.assign(document.createElement('div'), { className: 'chat-msg bot', inne
+.\index.html:6448 - chatBody.insertBefore(Object.assign(document.createElement('div'), { className: 'chat-msg bot', inne
+.\index.html:6697 - 'home-title': 'Nhận Dạng Hiệu Đề Gốm Sứ<br>Bằng AI',
+.\index.html:6698 - 'home-sub': 'Chụp hoặc tải ảnh hiệu đề lên, hệ thống Multi-Pipeline AI sẽ phân credits chéo qua 5 lu
+.\index.html:6709 - 'upload-btn': 'Chọn ảnh từ máy',
+.\index.html:6729 - 'lib-search': 'Tìm kiếm niên hiệu, triều đại...',
+.\index.html:6745 - 'footer-desc': 'Hệ thống nhận dạng và phân credits hiệu đề<br>and analysis system, applying<br>công 
+.\index.html:7065 - 'Bạn cần hỗ trợ gì?': 'How can we help you?',
+.\index.html:7066 - 'Tìm kiếm niên hiệu, triều đại...': 'Search reign title, dynasty...',
+.\main.py:37 - # Auto-Learning: lưu tạm ảnh vừa phân tích để user xác nhận → lưu vào thư viện tham chiếu
+.\main.py:119 - placeholders = {"", None, "Đang cập nhật...", "Chưa xác định", "Không rõ", "Unknown Period"}
+.\main.py:183 - # Đảm bảo cột scan_credits tồn tại
+.\main.py:186 - # Khởi tạo hệ thống Admin
+.\main.py:202 - # FIX 1: Bảng sửa lỗi OCR được làm lại cẩn thận.
+.\main.py:203 - # NGUYÊN TẮC: Chỉ sửa khi lỗi OCR thực sự xảy ra
+.\main.py:204 - # (nhầm nét do mực/ánh sáng), KHÔNG sửa một triều vua
+.\main.py:205 - # thành triều vua khác. Ví dụ: 洪武 ≠ 弘治, KHÔNG được sửa!
+.\main.py:208 - # Lỗi OCR thường gặp: nhầm nét tương tự
+.\main.py:209 - "宣得": "宣德",   # 得 vs 德 — nét gần nhau
+.\main.py:210 - "宣徳": "宣德",   # biến thể chữ 德
+.\main.py:211 - "成化": "成化",   # OK, giữ nguyên
+.\main.py:212 - "嘉請": "嘉靖",   # 請 vs 靖 — nét gần
+.\main.py:213 - "嘉清": "嘉靖",   # 清 vs 靖 — nét gần
+.\main.py:214 - "萬厤": "萬曆",   # biến thể cổ của 曆
+.\main.py:215 - "萬歴": "萬曆",   # biến thể cổ của 曆
+.\main.py:216 - "乹隆": "乾隆",   # 乹 là biến thể của 乾
+.\main.py:267 - # FIX 4: Tie-breaker dựa trên số ký tự chính xác khớp,
+.\main.py:268 - # KHÔNG dùng ID (ID không liên quan độ chính xác OCR).
+.\main.py:270 - """Đếm số vị trí mà ký tự OCR và target trùng nhau."""
+.\main.py:284 - return "Chưa xác định"
+.\main.py:290 - return base or "Chưa xác định"
+.\main.py:295 - "大": ("Đại", "lớn, vĩ đại"),
+.\main.py:296 - "明": ("Minh", "sáng, triều Minh"),
+.\main.py:297 - "清": ("Thanh", "trong sáng, triều Thanh"),
+.\main.py:298 - "年": ("Niên", "năm"),
+.\main.py:299 - "製": ("Chế", "chế tác, sản xuất"),
+.\main.py:300 - "制": ("Chế", "chế tác, sản xuất"),
+.\main.py:301 - "造": ("Tạo", "tạo ra, chế tạo"),
+.\main.py:302 - "嘉": ("Gia", "tốt lành, đẹp đẽ"),
+.\main.py:303 - "靖": ("Tĩnh", "yên tĩnh, bình ổn"),
+.\main.py:304 - "康": ("Khang", "khỏe mạnh, thịnh vượng"),
+.\main.py:305 - "熙": ("Hy", "hưng thịnh, hoan hỉ"),
+.\main.py:306 - "乾": ("Càn", "trời, dương"),
+.\main.py:307 - "隆": ("Long", "thịnh vượng, hưng long"),
+.\main.py:308 - "萬": ("Vạn", "vạn, mười nghìn"),
+.\main.py:309 - "万": ("Vạn", "vạn, mười nghìn"),
+.\main.py:310 - "曆": ("Lịch", "lịch, thời gian"),
+.\main.py:311 - "历": ("Lịch", "lịch, thời gian"),
+.\main.py:312 - "歷": ("Lịch", "lịch, trải qua"),
+.\main.py:313 - "宣": ("Tuyên", "tuyên bố, công bố"),
+.\main.py:314 - "德": ("Đức", "đức hạnh, đạo đức"),
+.\main.py:315 - "成": ("Thành", "hoàn thành, thành công"),
+.\main.py:316 - "化": ("Hóa", "biến hóa, cảm hóa"),
+.\main.py:317 - "正": ("Chính", "ngay thẳng, đúng đắn"),
+.\main.py:318 - "統": ("Thống", "thống nhất, trị vì"),
+.\main.py:319 - "统": ("Thống", "thống nhất, trị vì"),
+.\main.py:320 - "弘": ("Hoằng", "rộng lớn, phát huy"),
+.\main.py:321 - "治": ("Trị", "trị vì, cai trị"),
+.\main.py:322 - "順": ("Thuận", "thuận lợi, thuận theo"),
+.\main.py:323 - "雍": ("Ung", "hòa hợp, trang nhã"),
+.\main.py:324 - "道": ("Đạo", "đạo lý, con đường"),
+.\main.py:325 - "光": ("Quang", "ánh sáng, rực rỡ"),
+.\main.py:326 - "同": ("Đồng", "cùng nhau, đồng lòng"),
+.\main.py:327 - "緒": ("Tự", "kế thừa, mối"),
+.\main.py:328 - "绪": ("Tự", "kế thừa, mối"),
+.\main.py:329 - "洪": ("Hồng", "lớn lao, to lớn"),
+.\main.py:330 - "武": ("Vũ", "võ, dũng mãnh"),
+.\main.py:331 - "永": ("Vĩnh", "mãi mãi, vĩnh cửu"),
+.\main.py:332 - "樂": ("Lạc", "vui vẻ, âm nhạc"),
+.\main.py:333 - "宏": ("Hoằng", "rộng lớn"),
+.\main.py:334 - "景": ("Cảnh", "cảnh vật, phong cảnh"),
+.\main.py:335 - "泰": ("Thái", "thái bình, an ổn"),
+.\main.py:336 - "崇": ("Sùng", "tôn sùng, cao quý"),
+.\main.py:337 - "禎": ("Trinh", "điềm lành, tốt đẹp"),
+.\main.py:338 - "天": ("Thiên", "trời, thiên nhiên"),
+.\main.py:339 - "啟": ("Khải", "mở ra, khởi đầu"),
+.\main.py:340 - "內": ("Nội", "bên trong, nội cung"),
+.\main.py:341 - "内": ("Nội", "bên trong, nội cung"),
+.\main.py:342 - "府": ("Phủ", "phủ quan, kho"),
+.\main.py:343 - "侍": ("Thị", "hầu hạ, phục vụ"),
+.\main.py:344 - "從": ("Tòng", "theo hầu, tùy tùng"),
+.\main.py:345 - "御": ("Ngự", "của vua, hoàng gia"),
+.\main.py:346 - "用": ("Dụng", "sử dụng"),
+.\main.py:347 - "玩": ("Ngoạn", "thưởng ngoạn, vật quý"),
+.\main.py:348 - "珍": ("Trân", "quý báu, trân quý"),
+.\main.py:349 - "賞": ("Thưởng", "thưởng thức, ban thưởng"),
+.\main.py:350 - "壽": ("Thọ", "sống lâu, trường thọ"),
+.\main.py:351 - "福": ("Phúc", "phúc lộc, may mắn"),
+.\main.py:352 - "祥": ("Tường", "điềm lành, may mắn"),
+.\main.py:369 - year_range = "Chưa xác định"
+.\main.py:401 - if words[0].lower() == "đại" and words[1].lower() in ["minh", "thanh", "nam"]:
+.\main.py:428 - "chu_han": ocr_text or "Không rõ",
+.\main.py:429 - "trieu_dai": "Chưa xác định",
+.\main.py:430 - "nien_hieu": "Chưa xác định",
+.\main.py:432 - "ghi_chu": "Không tìm thấy trong database. Dịch nghĩa tham khảo từng chữ.",
+.\main.py:524 - # Tỷ lệ ký tự s1 có mặt trong s2
+.\main.py:526 - # Tỷ lệ ký tự s2 có mặt trong s1
+.\main.py:532 - # CONTAINMENT BONUS: Nếu MỌI chữ OCR đọc được đều nằm trong target (fuzzy),
+.\main.py:533 - # → rất có thể OCR chỉ đọc được 1 phần (3/6 chữ) nhưng đúng hiệu đề.
+.\main.py:537 - # Chỉ áp dụng khi OCR đọc >= 3 chữ hợp lệ
+.\main.py:539 - # Cộng điểm phạt bu trừ cho "s2 có mặt trong s1" bị thấp do OCR đọc thiếu chữ
+.\main.py:540 - # Và thưởng mạnh nếu đích (target s2) là chuỗi 6 chữ
+.\main.py:589 - """Gộp nhiều candidate OCR để giảm sai lệch do 1 lần đọc nhầm."""
+.\main.py:595 - # Ưu tiên ứng viên có độ dài lớn hơn
+.\main.py:603 - # Weight thấp cho candidate ở sau, và weight cực thấp nếu OCR chỉ đọc được 1-2 chữ
+.\main.py:647 - Chuẩn hóa các lỗi OCR phổ biến theo ngữ cảnh hiệu đề.
+.\main.py:648 - Giữ quy tắc bảo thủ: chỉ thay thế khi có pattern đặc trưng.
+.\main.py:654 - # Ký tự cuối thường bị OCR lệch khi gặp "年製"
+.\main.py:658 - # Một số ảnh mờ đọc nhầm 乾 -> 农/蓬 khi đi cùng 隆年
+.\main.py:662 - # Nếu chuỗi có 年 nhưng thiếu 製/造 thì thử bổ sung hậu tố phổ biến.
+.\main.py:667 - # Heuristic cho mẫu "內府侍X" khi OCR nhiễu chữ gần nét.
+.\main.py:668 - # QUAN TRỌNG: Có nhiều biến thể (侍右, 侍旨, 侍南, 侍左, 侍中, 侍從) — KHÔNG được ép cố định!
+.\main.py:669 - # Chỉ sửa ký tự thứ 3 khi bị OCR đọc sai (特→侍, 社→侍), GIỮ NGUYÊN ký tự thứ 4.
+.\main.py:670 - # Ký tự thứ 4 sẽ được xử lý bởi _boost_neifu_match_score() thay vì normalize cứng.
+.\main.py:674 - # Sửa ký tự thứ 3 bị OCR đọc nhầm: 特→侍, 社→侍, 待→侍
+.\main.py:678 - # ĐÃ XÓA: Không normalize cứng ký tự thứ 4 nữa.
+.\main.py:679 - # Lý do: các biến thể 侍左/侍右/侍旨/侍南/侍中 dễ bị nhầm lẫn khi dùng if-elif chain.
+.\main.py:680 - # Thay bằng: _boost_neifu_match_score() sẽ điều chỉnh score dựa trên char thứ 4 OCR đọc được.
+.\main.py:715 - Chỉ inject 大清康熙年製 khi có bằng chứng cụ thể rằng cả hai ký tự 康 VÀ 熙
+.\main.py:716 - (hoặc biến thể OCR gần đúng) đều xuất hiện trong kết quả OCR.
+.\main.py:717 - KHÔNG inject mặc định khi chỉ thấy 大清…年製 — đó là lỗi cũ gây nhầm triều đại.
+.\main.py:722 - # Chỉ inject khi có cả 康 VÀ (熙 hoặc biến thể gần nét)
+.\main.py:767 - 4. Special handling for 内府 (Nội Phủ) workshop marks
+.\main.py:1062 - # Các lỗi OCR phổ biến cho ký tự thứ 4 trong chuỗi "內府侍X"
+.\main.py:1063 - # Map: (ký tự OCR sai) -> (ký tự đúng)
+.\main.py:1064 - # --- 侍左 (Thị Tả) ---
+.\main.py:1066 - # --- 侍右 (Thị Hữu) ---
+.\main.py:1068 - # --- 侍旨 (Thị Chỉ) ---
+.\main.py:1070 - # --- 侍南 (Thị Nam) ---
+.\main.py:1072 - # --- 侍中 (Thị Trung) ---
+.\main.py:1074 - # --- 侍東 (Thị Đông) ---
+.\main.py:1076 - # --- 侍從 (Thị Tòng) ---
+.\main.py:1093 - Từ chuỗi OCR có chứa 內府侍, cố gắng xác định ký tự thứ 4.
+.\main.py:1094 - Không phụ thuộc vào thứ tự chuỗi do PaddleOCR thường sắp xếp lộn xộn các ký tự
+.\main.py:1095 - của hiệu đề viết dọc / viết vuông 4 chữ.
+.\main.py:1099 - # Kiểm tra xem có đủ các kí tự cấu thành "Nội Phủ Thị" không (bất kể thứ tự)
+.\main.py:1102 - # 侍 hay bị nhầm thành các chữ này
+.\main.py:1106 - # Nếu có Nội và Phủ, ta quét tìm xem trong chuỗi có chữ nào
+.\main.py:1107 - # map được với ký tự thứ 4 không.
+.\main.py:1113 - # Nếu không có chữ nào khớp trong map, ta đành chịu
+.\main.py:1123 - Tăng score cho entry Nội Phủ có chữ thứ 4 khớp với OCR,
+.\main.py:1124 - đồng thời phạt các entry Nội Phủ có chữ thứ 4 KHÔNG khớp.
+.\main.py:1127 - candidates: list[str] — các chuỗi OCR đã normalize
+.\main.py:1128 - scored_items: list[dict] — kết quả từ rank_by_multi_candidates / find_best_matches
+.\main.py:1129 - normalize_cjk_fn: hàm _normalize_cjk
+.\main.py:1133 - list[dict] đã được re-sort theo score mới
+.\main.py:1135 - # Tìm chữ thứ 4 từ các candidates
+.\main.py:1142 - # Lấy chữ thứ 4
+.\main.py:1149 - return scored_items  # Không có tín hiệu Nội Phủ rõ ràng → giữ nguyên
+.\main.py:1162 - # Lấy chữ thứ 4 của entry này
+.\main.py:1168 - # Khớp chữ thứ 4: boost mạnh
+.\main.py:1172 - # Sai chữ thứ 4: phạt
+.\main.py:1193 - Chọn text hiển thị theo bằng chứng OCR:
+.\main.py:1194 - - Ảnh 4 chữ -> ưu tiên chu_han_4
+.\main.py:1195 - - Ảnh 6 chữ -> ưu tiên chu_han
+.\main.py:1196 - Tránh tự thêm tiền tố triều đại khi không có trong ảnh.
+.\main.py:1220 - # Có tín hiệu 6 chữ rõ -> hiển thị đủ 6 chữ.
+.\main.py:1224 - # Có tín hiệu 4 chữ rõ -> hiển thị đúng 4 chữ.
+.\main.py:1228 - # Fallback bảo thủ
+.\main.py:1332 - # Laplacian variance thấp => ảnh mờ/thiếu chi tiết, nên dùng deep mode.
+.\main.py:1393 - # Trừ 1 lượt phân tích
+.\main.py:1400 - # === KIỂM TRA LƯỢT PHÂN TÍCH ===
+.\main.py:1409 - content={"success": False, "no_credits": True, "message": "Bạn đã hết lượt phân tích miễn phí.", "cr
+.\main.py:1417 - content={"success": False, "message": "Không tìm thấy tệp hình ảnh.", "chu_han": "", "top5": [], "re
+.\main.py:1424 - content={"success": False, "message": "Định dạng ảnh không được hỗ trợ.", "chu_han": "", "top5": [],
+.\main.py:1431 - # === VALIDATION: Kiểm tra ảnh có phải mark trước khi xử lý ===
+.\main.py:1441 - content={"success": False, "message": "Định dạng ảnh không hợp lệ", "chu_han": ""}
+.\main.py:1454 - "message": "Đây không phải ảnh gốm sứ có hiệu đề",
+.\main.py:1455 - "warning": "Vui lòng đưa ảnh chân chính của hiệu đề gốm sứ (nằm ở đáy bát/bình/đĩa)",
+.\main.py:1466 - # Lưu tạm ảnh để hỗ trợ Auto-Learning (xác nhận kết quả đúng → lưu vào thư viện)
+.\main.py:1470 - # 1. Kiểm tra thư viện tham chiếu (ORB)
+.\main.py:1483 - # 2. Chạy OCR (auto deep cho ảnh mờ nếu client không chỉ định)
+.\main.py:1505 - # Nếu pass nhanh chưa ra kết quả, tự fallback sang deep mode.
+.\main.py:1527 - # 3. Xác minh ORB match bằng tỷ lệ best/second-best + OCR.
+.\main.py:1533 - # Nếu best >> second-best: rất có thể là cùng một ảnh → tin ORB ngay.
+.\main.py:1534 - # Ví dụ: cùng ảnh best=300, second=50 → ratio=6.0 → tin ORB
+.\main.py:1535 - # Ảnh khác nền giống: best=100, second=95 → ratio=1.05 → cần kiểm tra OCR
+.\main.py:1540 - # ORB rất tự tin: best score đủ cao (>= 85) → tin ORB không cần OCR
+.\main.py:1541 - # (Thay vì dùng ratio tương đối, dùng absolute score vì nó đã rất tốt)
+.\main.py:1548 - # ORB có tỷ lệ tốt (>= 1.02) và score hợp lý (>= 55) → tin ORB
+.\main.py:1549 - # Thậm chí close scores (94 vs 91) là đủ tốt để tin
+.\main.py:1555 - # ORB match gần nhau → cần kiểm tra bằng OCR
+.\main.py:1561 - # Fuzzy overlap: tính cả ký tự tương tự (OCR hay nhầm)
+.\main.py:1610 - # OCR không đọc được gì → chỉ tin ORB khi ratio đủ cao
+.\main.py:1620 - # Đủ ký tự trùng (fuzzy) → tin ORB
+.\main.py:1626 - # Ký tự OCR mâu thuẫn với ORB → bỏ qua ORB, tiếp tục OCR
+.\main.py:1632 - content={"success": False, "message": "Không đọc được chữ trong ảnh. Thử chụp rõ hơn.", "chu_han": "
+.\main.py:1652 - "message": "Ảnh quá mờ hoặc chữ quá nhỏ, không đủ dữ liệu để xác định hiệu đề.",
+.\main.py:1693 - # FIX Nội Phủ: Điều chỉnh score dựa trên chữ thứ 4 OCR đọc được
+.\main.py:1694 - # QUAN TRỌNG: Phải boost trên danh sách đầy đủ `matches` trước,
+.\main.py:1695 - # bởi vì nếu biến thể đúng bị văng khỏi top 5 từ sớm (do nhiễu OCR),
+.\main.py:1696 - # nó sẽ không bao giờ được phục hồi.
+.\main.py:1709 - # Re-slice top 5 sau khi đã boost lại điểm
+.\main.py:1759 - # Không đảo thứ hạng dựa trên tỷ lệ không rõ ràng (bỏ logic swap cũ dễ gây lỗi)
+.\main.py:1775 - "message": "Kết quả hiện tại không đủ dấu hiệu của hiệu đề niên chế (年製/年造). Vui lòng thử ảnh rõ hơn
+.\main.py:1783 - # Chặn trả sai khi OCR quá yếu (vd chỉ 1-2 ký tự nhiễu nhưng vẫn match vào DB).
+.\main.py:1788 - "message": "Không đủ bằng chứng để xác định chính xác hiệu đề. Vui lòng thử ảnh rõ hơn hoặc chụp thẳ
+.\main.py:1794 - # Deep mode thường sinh kết quả ngắn gây nhầm triều đại; yêu cầu chứng cứ mạnh hơn.
+.\main.py:1824 - "message": "Ảnh quá mờ, hệ thống chưa đủ chắc chắn để kết luận chính xác hiệu đề.",
+.\main.py:1872 - return JSONResponse(status_code=200, content={"success": True, "message": "Đã lưu thành công vào thư
+.\main.py:1874 - return JSONResponse(status_code=500, content={"success": False, "message": "Không thể lưu ảnh mẫu."}
+.\main.py:1880 - """Auto-Learning: Khi user xác nhận kết quả đúng, lưu ảnh vào thư viện tham chiếu.
+.\main.py:1881 - Lần sau gặp ảnh tương tự → ORB khớp ngay, không cần OCR."""
+.\main.py:1889 - return JSONResponse(status_code=400, content={"success": False, "message": "Không tìm thấy ảnh. Vui 
+.\main.py:1892 - return JSONResponse(status_code=400, content={"success": False, "message": "Thiếu dữ liệu hiệu đề."}
+.\main.py:1896 - # Xóa cache sau khi lưu
+.\main.py:1903 - "message": f"Đã học thành công! Thư viện hiện có {ref_count} mẫu tham chiếu.",
+.\main.py:1907 - return JSONResponse(status_code=500, content={"success": False, "message": "Không thể lưu mẫu."})
+.\main.py:1917 - return JSONResponse(status_code=400, content={"success": False, "message": "Tên người dùng đã tồn tạ
+.\main.py:1922 - return {"success": True, "message": "Đăng ký thành công!"}
+.\main.py:1923 - return JSONResponse(status_code=500, content={"success": False, "message": "Lỗi hệ thống."})
+.\main.py:1929 - return JSONResponse(status_code=401, content={"success": False, "message": "Sai tài khoản hoặc mật k
+.\main.py:1931 - # Kiểm tra tài khoản bị khóa
+.\main.py:1933 - return JSONResponse(status_code=403, content={"success": False, "message": "Tài khoản của bạn đã bị 
+.\main.py:1942 - provider: str  # 'Google' hoặc 'Facebook'
+.\main.py:1946 - """Đăng nhập bằng Google hoặc Facebook - tạo tài khoản tự động nếu chưa có."""
+.\main.py:1956 - "message": f"Đăng nhập {data.provider} thành công!"
+.\main.py:1958 - return JSONResponse(status_code=500, content={"success": False, "message": "Lỗi hệ thống khi xử lý đ
+.\main.py:1964 - return JSONResponse(status_code=401, content={"success": False, "message": "Chưa đăng nhập."})
+.\main.py:1977 - """Lấy số lượt phân tích còn lại."""
+.\main.py:1980 - return JSONResponse(status_code=401, content={"success": False, "message": "Chưa đăng nhập."})
+.\main.py:1992 - 'name': 'Cơ bản',
+.\main.py:1997 - 'name': 'Phổ biến',
+.\main.py:2002 - 'name': 'Chuyên nghiệp',
+.\main.py:2012 - # Cấu hình thanh toán SePay
+.\main.py:2026 - return JSONResponse(status_code=401, content={"success": False, "message": "Chưa đăng nhập."})
+.\main.py:2032 - return JSONResponse(status_code=400, content={"error": "Gói không hợp lệ"})
+.\main.py:2036 - return JSONResponse(status_code=500, content={"error": "Không thể lưu giao dịch vào CSDL. Vui lòng k
+.\main.py:2055 - if not payment: return JSONResponse(status_code=404, content={"error": "Không tìm thấy"})
+.\main.py:2066 - return {"status": "pending", "message": "Đang kết nối ngân hàng..."}
+.\main.py:2088 - """API giả lập thanh toán thành công dành cho Developer"""
+.\main.py:2090 - if not payment: return JSONResponse(status_code=404, content={"error": "Hóa đơn không tồn tại"})
+.\main.py:2093 - # Giả lập mã giao dịch ngân hàng là một số ngẫu nhiên lớn
+.\main.py:2100 - return {"status": "completed", "message": "Giả lập thanh toán thành công!"}
+.\main.py:2116 - """Mua thêm lượt phân tích (giả lập thanh toán)."""
+.\main.py:2119 - return JSONResponse(status_code=401, content={"success": False, "message": "Chưa đăng nhập."})
+.\main.py:2125 - return JSONResponse(status_code=400, content={"success": False, "message": "Gói không hợp lệ."})
+.\main.py:2130 - return {"success": True, "credits": new_credits, "added": pkg['credits'], "package_name": pkg['name'
+.\main.py:2131 - return JSONResponse(status_code=500, content={"success": False, "message": "Lỗi hệ thống."})
+.\main.py:2140 - if any(k in msg for k in ["chào", "hello", "xin chào"]) or "hi" in words:
+.\main.py:2141 - resp = "Chào bạn! Tôi là trợ lý MarkSense AI. Tôi có thể giúp bạn giải đáp các thông tin về nhận dạn
+.\main.py:2142 - elif any(k in msg for k in ["hiệu đề là gì", "hiệu đề", "đáy gốm", "chữ hán", "khái niệm", "ý nghĩa"
+.\main.py:2143 - resp = "Hiệu đề là dòng chữ nhỏ in dưới đáy các món đồ gốm sứ (thường gồm 4 hoặc 6 chữ Hán/Nôm), chỉ
+.\main.py:2144 - elif any(k in msg for k in ["cách dùng", "hướng dẫn", "giám định", "kiểm tra", "quét", "phân tích", 
+.\main.py:2145 - resp = "Rất đơn giản! Bạn chỉ cần ấn vào khu vực Khu Vực Tải Ảnh (Trang chủ) và chọn bức ảnh chụp rõ
+.\main.py:2146 - elif any(k in msg for k in ["giá", "nâng cấp", "lượt", "bao nhiêu", "tiền", "mua", "vip", "pro", "th
+.\main.py:2147 - resp = "Tài khoản mới sẽ có sẵn một số lượt phân tích. Nếu cần nhiều hơn, bạn có thể Nâng cấp tài kh
+.\main.py:2148 - elif any(k in msg for k in ["lịch sử", "triều đại", "minh", "thanh", "nguyễn", "nhà minh", "nhà than
+.\main.py:2149 - resp = "Dữ liệu MarkSense lưu trữ lịch sử hàng trăm hiệu đề lớn nhỏ suốt các triều Đại Minh, Đại Tha
+.\main.py:2150 - elif any(k in msg for k in ["sai", "không đúng", "lỗi", "mờ", "không nhận ra", "không dịch được"]):
+.\main.py:2151 - resp = "Để tăng tối đa độ chính xác (OCR), bạn vui lòng chụp ảnh căn góc từ trên xuống, hạn chế ánh 
+.\main.py:2152 - elif any(k in msg for k in ["cảm ơn", "thanks", "ok", "tuyệt", "hay", "tốt", "hiểu rồi"]):
+.\main.py:2153 - resp = "Dạ, rất vui được hỗ trợ! Chúc bạn có những phiên tiếp cận cổ vật thật xuất sắc."
+.\main.py:2155 - resp = "Trợ lý ảo hiện đang ở phiên bản hỗ trợ cơ bản. Bạn hãy thử dùng lại các từ khoá đơn giản: 'c
+.\main.py:2158 - await asyncio.sleep(0.6) # Giả lập delay suy nghĩ
+.\main.py:2203 - """Xác thực admin từ header Authorization."""
+.\main.py:2229 - return JSONResponse(status_code=401, content={"success": False, "message": "Sai tài khoản hoặc mật k
+.\main.py:2260 - return {"success": success, "message": "Đã khóa tài khoản" if success else "Lỗi"}
+.\main.py:2268 - return {"success": success, "message": "Đã mở khóa tài khoản" if success else "Lỗi"}
+.\main.py:2276 - return {"success": success, "message": f"Đã cập nhật credits" if success else "Lỗi"}
+.\main.py:2285 - return {"success": success, "message": "Đã reset mật khẩu" if success else "Lỗi"}
+.\main.py:2329 - return {"success": True, "id": new_id, "message": "Đã thêm hiệu đề mới"}
+.\main.py:2330 - return JSONResponse(status_code=500, content={"success": False, "message": "Lỗi thêm hiệu đề"})
+.\main.py:2341 - return {"success": True, "message": "Đã cập nhật hiệu đề"}
+.\main.py:2342 - return JSONResponse(status_code=500, content={"success": False, "message": "Lỗi cập nhật hiệu đề"})
+.\main.py:2353 - return {"success": True, "message": "Đã xóa hiệu đề"}
+.\main.py:2354 - return JSONResponse(status_code=500, content={"success": False, "message": "Lỗi xóa hiệu đề"})
+.\main.py:2370 - return {"success": success, "message": "Đã cập nhật cài đặt" if success else "Lỗi"}
+.\main.py:2385 - API phân tích hiệu đề bằng Multi-Pipeline (NCKH).
+.\main.py:2388 - file: Ảnh hiệu đề
+.\main.py:2389 - mode: "quick" hoặc "deep" (mặc định: deep theo 4 luồng trong slide)
+.\main.py:2390 - pipelines: Danh sách pipeline cụ thể, phân cách bởi dấu phẩy
+.\main.py:2391 - Ví dụ: "ocr_llm,vision_read,img_search,ml_match"
+.\main.py:2404 - "chu_han", "hieu_de", "trieu_dai", "triều_đại",
+.\main.py:2405 - "nien_hieu", "niên_hiệu", "hoang_de", "hoàng_đế",
+.\main.py:2406 - "nam_bat_dau", "nam_ket_thuc", "nien_dai", "niên_đại",
+.\main.py:2407 - "ten_viet", "tên_việt", "ten_viet_ngan", "hien_thi_chinh",
+.\main.py:2408 - "hieu_de_vi", "hieu_de_en", "phien_am", "phiên_âm",
+.\main.py:2412 - "mo_ta", "boi_canh", "ghi_chu", "y_nghia", "ý_nghĩa",
+.\main.py:2471 - "message": "Bạn đã hết lượt phân tích miễn phí.",
+.\main.py:2483 - content={"error": f"File không hợp lệ. Chấp nhận: {ALLOWED_EXTENSIONS}"}
+.\main.py:2488 - return JSONResponse(status_code=400, content={"error": "File rỗng"})
+.\main.py:2490 - # Crop nếu có tham số
+.\main.py:2491 - # (tương thích với frontend hiện tại)
+.\main.py:2496 - # Xác định pipeline cần chạy
+.\main.py:2520 - content={"error": f"Lỗi phân tích: {str(e)}"}
+.\main.py:2526 - """Kiểm tra trạng thái hệ thống Multi-Pipeline."""
+.\main.py:2542 - # Kiểm tra Selenium
+.\ocr_corrections.py:2 - OCR Corrections Module — Fix hiệu đề đọc sai thường gặp
+.\ocr_corrections.py:4 - Chiến lược:
+.\ocr_corrections.py:5 - 1. Visual similarity mapping: các ký tự hay nhầm lẫn
+.\ocr_corrections.py:6 - 2. Valid character set: chỉ ký tự thực sự có trên gốm Việt
+.\ocr_corrections.py:7 - 3. Context-based correction: từ position trong hiệu đề
+.\ocr_corrections.py:11 - # PHẦN 1: Visual Similarity Mapping
+.\ocr_corrections.py:12 - # Những cặp ký tự thường bị OCR nhầm lẫn
+.\ocr_corrections.py:19 - "石": ["北", "白", "左"],           # 石 (shí) vs 北 (běi)
+.\ocr_corrections.py:20 - "杜": ["右", "社", "左"],           # 杜 can be OCR noise for 右 in Nội Phủ marks
+.\ocr_corrections.py:23 - "佚": ["侍", "待", "保"],           # 佚 (yì) vs 侍 (shì)
+.\ocr_corrections.py:26 - "停": ["侍"],                       # 停 vs 侍 (cùng bộ 亻, PaddleOCR thường nhầm)
+.\ocr_corrections.py:29 - "康": ["庚"],                       # 康 vs 庚 (chỉ dùng khi database xác nhận)
+.\ocr_corrections.py:30 - "泰": ["康"],                       # PaddleOCR có thể đọc 康 thành 泰
+.\ocr_corrections.py:37 - "左": ["右", "左"],                 # 左 (zuǒ) vs 右 (yòu)
+.\ocr_corrections.py:38 - "白": ["北", "白", "自"],           # 白 (bái) vs 北 (běi)
+.\ocr_corrections.py:41 - "八": ["八", "入"],                 # 八 (bā) vs 入 (rù)
+.\ocr_corrections.py:43 - "二": ["二", "三"],                 # 二 (èr) vs 三 (sān)
+.\ocr_corrections.py:44 - "土": ["士", "土"],                 # 土 (tǔ) vs 士 (shì)
+.\ocr_corrections.py:45 - "寸": ["寸", "寺"],                 # 寸 (cùn) vs 寺 (sì)
+.\ocr_corrections.py:55 - # PHẦN 2: Valid Character Set cho Vietnamese Ceramic Marks
+.\ocr_corrections.py:56 - # Chỉ những ký tự THỰC SỰ xuất hiện trên gốm Việt/Trung cổ
+.\ocr_corrections.py:60 - # Nội Phủ (Internal Palace marks)
+.\ocr_corrections.py:84 - # PHẦN 3: Multi-Character Pattern Validation
+.\ocr_corrections.py:90 - 4: ["Nội Phủ 4-char", "內府侍北"],
+.\ocr_corrections.py:96 - # PHẦN 4: Correction Functions
+.\ocr_corrections.py:100 - """Kiểm tra ký tự có phải valid Vietnamese ceramic mark char không."""
+.\ocr_corrections.py:106 - Gợi ý các ký tự thay thế cho ký tự sai.
+.\ocr_corrections.py:109 - wrong_char: Ký tự bị OCR đọc sai
+.\ocr_corrections.py:112 - Danh sách ký tự thay thế (sắp xếp theo likelihood)
+.\ocr_corrections.py:124 - Sửa OCR text bằng visual similarity + database validation.
+.\ocr_corrections.py:127 - 1. Scan từng ký tự
+.\ocr_corrections.py:128 - 2. Nếu ký tự không valid → suggest corrections
+.\ocr_corrections.py:129 - 3. Kiểm tra database xem correction nào tồn tại
+.\ocr_corrections.py:133 - ocr_text: Text từ OCR
+.\ocr_corrections.py:134 - database: Database marks để validate
+.\ocr_corrections.py:168 - # Nếu không có ký tự invalid → accepted
+.\ocr_corrections.py:234 - Sửa batch OCR results.
+.\ocr_corrections.py:237 - ocr_texts: Danh sách OCR text
+.\ocr_corrections.py:241 - Danh sách correction results
+.\ocr_corrections.py:247 - # PHẦN 5: Statistics & Learning
+.\ocr_corrections.py:251 - """Thống kê những lỗi OCR thường gặp."""
+.\ocr_engine.py:34 - SAVE_DEBUG_VARIANTS = False  # Tắt ghi file debug để tăng tốc
+.\ocr_engine.py:37 - # Bản đồ ký tự tương tự để tránh nhầm lẫn
+.\ocr_engine.py:40 - # Các ký tự tương tự cần confidence cao
+.\ocr_engine.py:41 - frozenset(['内', '乾', '干', '土']): 0.45,      # 内(nội) vs 乾(kiền/khiền)
+.\ocr_engine.py:42 - frozenset(['府', '甲', '甲', '申']): 0.45,      # 府(phủ) vs các ký tự tương tự
+.\ocr_engine.py:43 - frozenset(['蓝', '篮', '监']): 0.45,            # Các ký tự "blue-like"
+.\ocr_engine.py:44 - frozenset(['蒙', '蒙', '艹']): 0.45,            # Các ký tự với "艹" radical
+.\ocr_engine.py:45 - frozenset(['康', '吊', '口']): 0.45,            # 康 vs các ký tự khác
+.\ocr_engine.py:46 - frozenset(['正', '止', '工']): 0.45,            # 正(chính) vs các ký tự khác
+.\ocr_engine.py:47 - frozenset(['嘉', '嘉', '口']): 0.45,            # 嘉(gia) vs các ký tự khác
+.\ocr_engine.py:49 - # Nội Phủ Thị series - ký tự từ hệ thống kiểu Nguyễn
+.\ocr_engine.py:50 - frozenset(['侍', '佚', '待', '寺', '停', '仃', '亭']): 0.50,  # 侍(thị) - cực kỳ dễ nhầm (停/亭/仃 cùng bộ 亻)
+.\ocr_engine.py:51 - frozenset(['北', '石', '北', '白']): 0.50,      # 北(bắc) vs 石(thạch) - dễ nhầm
+.\ocr_engine.py:52 - frozenset(['東', '东', '夫']): 0.50,            # 東(đông) - traditional vs simplified
+.\ocr_engine.py:53 - frozenset(['南', '男', '闵']): 0.50,            # 南(nam) vs 男(nam - khác nghĩa)
+.\ocr_engine.py:54 - frozenset(['中', '巾', '中']): 0.48,            # 中(trung) - viết dễ bị mờ
+.\ocr_engine.py:55 - frozenset(['右', '右', '左']): 0.48,            # 右(hữu/tây)
+.\ocr_engine.py:56 - frozenset(['左', '左', '右']): 0.48,            # 左(tả/đông)
+.\ocr_engine.py:57 - frozenset(['兌', '兑', '充']): 0.50,            # 兌(đoài) - traditional vs simplified
+.\ocr_engine.py:63 - Sửa hiệu đề OCR nhầm sử dụng module ocr_corrections.
+.\ocr_engine.py:65 - Chiến lược:
+.\ocr_engine.py:66 - 1. Kiểm tra ký tự valid
+.\ocr_engine.py:67 - 2. Nếu có ký tự invalid → suggest corrections
+.\ocr_engine.py:68 - 3. Validate với database
+.\ocr_engine.py:72 - ocr_text: Text từ OCR
+.\ocr_engine.py:75 - str: Text đã sửa hoặc text gốc
+.\ocr_engine.py:86 - print(f"  [Correction] Lỗi load database: {e}")
+.\ocr_engine.py:89 - # Sử dụng module ocr_corrections
+.\ocr_engine.py:92 - # Log chi tiết
+.\ocr_engine.py:94 - print(f"  [Validation] '{ocr_text}' chứa ký tự invalid: {correction_result['invalid_chars']}")
+.\ocr_engine.py:98 - print(f"  [✓ Database Match] '{ocr_text}' → '{correction_result['corrected']}' (tín cậy: {correction
+.\ocr_engine.py:102 - print(f"  [⚠ Corrected] '{ocr_text}' → '{correction_result['corrected']}' (tín cậy: {correction_resu
+.\ocr_engine.py:110 - True nếu chuỗi có dạng hiệu niên hào hợp lệ (đủ tín hiệu 年製/年造/年玩 hoặc 內府…).
+.\ocr_engine.py:111 - Dùng để KHÔNG dừng sớm / KHÔNG ưu tiên các chuỗi OCR lộn cột kiểu 「盛大年清银康」.
+.\ocr_engine.py:280 - - tier 0: đã có 年製/年造/…
+.\ocr_engine.py:281 - - tier 1: chưa đủ — ưu tiên chuỗi DÀI hơn (OCR lộn cột vẫn còn nhiều ký tự để khớp DB),
+.\ocr_engine.py:282 - tránh chọn mẫu quá ngắn kiểu 「派大年」.
+.\ocr_engine.py:315 - "停": "侍",    # PaddleOCR rất hay nhầm 侍→停 (cùng bộ 亻)
+.\ocr_engine.py:317 - "亭": "侍",    # 亭 vs 侍 (phần dưới giống)
+.\ocr_engine.py:321 - "柱": "右",    # 柱 bị nhầm khi nét mờ
+.\ocr_engine.py:327 - "男": "南",    # 男 vs 南 trên men mờ
+.\ocr_engine.py:333 - """Normalize common OCR order/noise for Nguyen Nội Phủ workshop marks."""
+.\ocr_engine.py:352 - # Case 1: Đủ 3 ký tự core 內 + 府 + 侍
+.\ocr_engine.py:357 - # Chỉ có 內府侍 không suffix (3 char mark)
+.\ocr_engine.py:363 - # Case 2: OCR thiếu 侍 — chỉ đọc 內 + 府 + 1 suffix
+.\ocr_engine.py:364 - # → Suy luận đây là 內府侍X bị thiếu chữ thứ 3
+.\ocr_engine.py:418 - Kiểm tra xem ký tự có phải là ký tự tương tự/nhầm lẫn cao không.
+.\ocr_engine.py:419 - Các ký tự này cần confidence cao hơn bình thường.
+.\ocr_engine.py:429 - Tính toán confidence threshold cần thiết cho text dựa trên ký tự trong đó.
+.\ocr_engine.py:430 - Nếu có ký tự tương tự, cần confidence cao hơn.
+.\ocr_engine.py:433 - - Kiểm tra TẤT CẢ ký tự
+.\ocr_engine.py:434 - - Trả về threshold CAO NHẤT cần thiết
+.\ocr_engine.py:435 - - Ký tự "cực kỳ nguy hiểm" (侍, 北, etc.) → 0.50
+.\ocr_engine.py:436 - - Ký tự "tương tự" khác → 0.48
+.\ocr_engine.py:437 - - Bình thường → 0.35
+.\ocr_engine.py:439 - # Ký tự cực kỳ nguy hiểm (thường nhầm lẫn)
+.\ocr_engine.py:445 - if '\u4e00' <= c <= '\u9fff':  # Chữ Hán
+.\ocr_engine.py:456 - Tìm các khớp trong database theo tiêu chí:
+.\ocr_engine.py:457 - 1. Khớp chính xác
+.\ocr_engine.py:458 - 2. Khớp trong biến thể (bien_the)
+.\ocr_engine.py:459 - 3. Khớp fuzzy (cho phép sai 1-2 ký tự - dành cho OCR nhầm lẫn)
+.\ocr_engine.py:462 - List[dict] với structure: [{'match': 'exact'|'variant'|'fuzzy', 'entry': {...}, 'score': float}]
+.\ocr_engine.py:479 - # 1. Khớp chính xác
+.\ocr_engine.py:489 - # 2. Khớp trong biến thể
+.\ocr_engine.py:500 - # 3. Khớp fuzzy - cho phép sai 1 ký tự (OCR nhầm)
+.\ocr_engine.py:507 - if diff_count == 1:  # Chỉ sai 1 ký tự
+.\ocr_engine.py:508 - # Kiểm tra xem ký tự bị nhầm có nằm trong SIMILAR_CHAR_GROUPS không
+.\ocr_engine.py:518 - # Kiểm tra xem đây có phải là cặp ký tự dễ nhầm không
+.\ocr_engine.py:529 - 'score': 0.85,  # Độ tin cậy cao hơn fuzzy thường
+.\ocr_engine.py:539 - 'score': 0.70,  # Độ tin cậy thấp hơn
+.\ocr_engine.py:546 - # Sắp xếp theo score (cao nhất trước)
+.\ocr_engine.py:552 - print(f"  [DB] Lỗi tìm kiếm: {e}")
+.\ocr_engine.py:558 - Kiểm tra xem OCR text có khớp với database không.
+.\ocr_engine.py:561 - dict với:
+.\ocr_engine.py:563 - - warning: str (cảnh báo nếu có)
+.\ocr_engine.py:564 - - best_match: dict hoặc None
+.\ocr_engine.py:565 - - suggestions: list[dict] (các gợi ý nếu không khớp chính xác)
+.\ocr_engine.py:570 - 'warning': 'Không có OCR result',
+.\ocr_engine.py:581 - 'warning': f"Hiệu đề '{ocr_text}' không tìm thấy trong cơ sở dữ liệu",
+.\ocr_engine.py:599 - 'warning': f"Là biến thể của '{best['matched_text']}'",
+.\ocr_engine.py:605 - # Đây là trường hợp OCR nhầm ký tự dễ nhầm lẫn
+.\ocr_engine.py:606 - suggestion_text = f"OCR đọc '{best['wrong_char']}' nhưng có thể là '{best['correct_char']}'?"
+.\ocr_engine.py:617 - 'warning': f"Gợi ý: Có thể là '{best['matched_text']}' (sai ký tự vị trí {best['position']})?",
+.\ocr_engine.py:623 - print(f"  [DB] Lỗi validate: {e}")
+.\ocr_engine.py:633 - # Hàm tiện ích
+.\ocr_engine.py:645 - FIX 2: Phát hiện ảnh đã được zoom cận cảnh vào hiệu đề (từ Google/search).
+.\ocr_engine.py:646 - Nếu vùng viền ngoài 20% hầu như không có nội dung tối (trắng/sáng), thì đây là
+.\ocr_engine.py:647 - ảnh bát to, cần crop. Nếu vùng viền có nhiều nội dung, ảnh đã zoom sẵn → KHÔNG crop.
+.\ocr_engine.py:652 - # Kiểm tra viền: 4 dải ngoài cùng (20% mỗi chiều)
+.\ocr_engine.py:654 - gray[:int(h * 0.20), :].flatten(),         # viền trên
+.\ocr_engine.py:655 - gray[int(h * 0.80):, :].flatten(),          # viền dưới
+.\ocr_engine.py:656 - gray[:, :int(w * 0.20)].flatten(),           # viền trái
+.\ocr_engine.py:657 - gray[:, int(w * 0.80):].flatten(),           # viền phải
+.\ocr_engine.py:660 - # Nếu viền chứa nhiều pixel tối (< 100) → chữ nằm gần biên → ảnh đã zoom
+.\ocr_engine.py:663 - return dark_ratio > 0.12   # > 12% pixel tối ở viền → không crop
+.\ocr_engine.py:672 - FIX 2: Chỉ crop nếu ảnh là ảnh bát to (chưa zoom).
+.\ocr_engine.py:673 - Nếu ảnh đã zoom cận cảnh, trả về nguyên ảnh.
+.\ocr_engine.py:676 - print("  [crop] Ảnh đã zoom sẵn → KHÔNG cắt")
+.\ocr_engine.py:698 - print("Lỗi khi lưu ảnh debug:", e)
+.\ocr_engine.py:713 - Phát hiện xem ảnh có phải từ Google Search không.
+.\ocr_engine.py:714 - Google images thường có:
+.\ocr_engine.py:715 - - Watermark ở góc
+.\ocr_engine.py:717 - - Chất lượng khác nhau
+.\ocr_engine.py:720 - # Kiểm tra watermark ở góc
+.\ocr_engine.py:729 - # Nếu nhiều góc có pixel rất sáng/trắng → có thể là watermark Google
+.\ocr_engine.py:741 - Preprocessing tối ưu cho ảnh Google Search.
+.\ocr_engine.py:742 - - Giảm watermark
+.\ocr_engine.py:743 - - Cải thiện contrast
+.\ocr_engine.py:744 - - Khử nhiễu compression
+.\ocr_engine.py:746 - # Khử nhiễu bilateral filter (giữ cạnh)
+.\ocr_engine.py:749 - # Cải thiện contrast với CLAHE trên LAB
+.\ocr_engine.py:758 - # Slight unsharp mask để làm nét chữ
+.\ocr_engine.py:774 - # Phát hiện hồng đề (chữ đỏ): nếu pixel đỏ tập trung ở trung tâm ảnh
+.\ocr_engine.py:775 - # → đây là chữ đỏ, KHÔNG xóa
+.\ocr_engine.py:786 - # Nếu đỏ tập trung ở trung tâm (>40%) VÀ mật độ đỏ đáng kể (>0.5%)
+.\ocr_engine.py:787 - # → hồng đề, không xóa
+.\ocr_engine.py:789 - print("  [red_detect] Hồng đề detected (red text). Skipping red removal.")
+.\ocr_engine.py:796 - # Dành cho chữ đen trên nền vàng (như men gốm vàng)
+.\ocr_engine.py:851 - """Giảm nhiễu rồi làm nét nhẹ cho ảnh mờ/out-focus."""
+.\ocr_engine.py:859 - """Nhấn mạnh nét chữ tối trên nền men sáng/vàng."""
+.\ocr_engine.py:870 - Super-resolution nhẹ cho OCR:
+.\ocr_engine.py:871 - - upscale bằng bicubic
+.\ocr_engine.py:872 - - khử nhiễu giữ biên
+.\ocr_engine.py:873 - - tăng tương phản kênh sáng + làm nét nhẹ
+.\ocr_engine.py:883 - # Khử nhiễu nhưng giữ contour chữ
+.\ocr_engine.py:886 - # CLAHE trên kênh sáng để làm nổi nét mực
+.\ocr_engine.py:893 - # Unsharp nhẹ
+.\ocr_engine.py:901 - Tìm vùng bát/đĩa men vàng trong ảnh lớn (kể cả screenshot), sau đó crop ROI
+.\ocr_engine.py:902 - để OCR không bị loãng do chữ quá nhỏ so với toàn ảnh.
+.\ocr_engine.py:909 - # Dải vàng men gốm thường gặp
+.\ocr_engine.py:934 - # Ưu tiên contour lớn và gần trung tâm khung hình
+.\ocr_engine.py:960 - Dò vòng tròn đáy bát (concentric ring) và cắt vùng trung tâm chứa hiệu đề.
+.\ocr_engine.py:961 - Hữu ích khi chữ rất nhỏ trong ảnh toàn cảnh.
+.\ocr_engine.py:989 - # Ưu tiên vòng gần trung tâm ảnh
+.\ocr_engine.py:1001 - # Crop sát vùng chữ trong lòng vòng tròn
+.\ocr_engine.py:1098 - Dò trực tiếp vùng mực chữ (đỏ hoặc đen) để tách ROI chữ khỏi nền bát.
+.\ocr_engine.py:1099 - Hiệu quả cho ảnh nền trắng/vàng có chữ nhỏ.
+.\ocr_engine.py:1183 - # Tạo crop rộng hơn một chút phòng dính nét
+.\ocr_engine.py:1203 - # Sắp xếp block theo thứ tự đọc hiệu đề (cột dọc RTL)
+.\ocr_engine.py:1236 - # Chạy OCR trên 1 ảnh — trả về (text, score tổng hợp)
+.\ocr_engine.py:1237 - # FIX 3: Có thêm score = len(text) * avg_conf để chọn kết quả tốt hơn
+.\ocr_engine.py:1243 - quality_score = tổng conf * len → ưu tiên kết quả nhiều chữ VÀ tin cậy cao
+.\ocr_engine.py:1263 - print(f"  [{name}]: Không phát hiện chữ nào")
+.\ocr_engine.py:1283 - # Pass 1: ngưỡng chuẩn - kiểm tra strict hơn cho ký tự tương tự
+.\ocr_engine.py:1295 - # Pass 2: ảnh mờ - nếu chưa lấy được gì, nới ngưỡng nhưng vẫn kiểm tra ký tự tương tự.
+.\ocr_engine.py:1300 - # Để fallback vẫn strict cho ký tự tương tự/nguy hiểm
+.\ocr_engine.py:1309 - quality = total_conf  # sum(conf * char_len) — thưởng cả số chữ lẫn conf
+.\ocr_engine.py:1318 - # Kiểm tra xem ảnh có phải ảnh gốm sứ với hiệu đề không
+.\ocr_engine.py:1322 - CÙNG CẮT: Chỉ accept ảnh hiệu đề HOÀN HẢO.
+.\ocr_engine.py:1323 - Reject tất cả ảnh tượng, con người, hoa văn phức tạp.
+.\ocr_engine.py:1326 - bool: True ONLY nếu 100% confirm là mark
+.\ocr_engine.py:1338 - # === STEP 1: KIỂM TRA KẾT CẤU ===
+.\ocr_engine.py:1339 - # Tính Laplacian để đo độ chi tiết
+.\ocr_engine.py:1343 - # NGẶT: texture > 5.0 = reject ngay (không phải mark)
+.\ocr_engine.py:1350 - # === STEP 2: BINARY THRESHOLD NGẶT ===
+.\ocr_engine.py:1351 - # Chỉ lấy pixel RẤT tối (< 100)
+.\ocr_engine.py:1354 - # Xóa nhiễu MẠNH
+.\ocr_engine.py:1359 - # === STEP 3: TÌM CONTOUR ===
+.\ocr_engine.py:1366 - # === STEP 4: FILTER CONTOUR NGẶT ===
+.\ocr_engine.py:1370 - if area < 150:  # quá nhỏ
+.\ocr_engine.py:1372 - if area > (h * w) * 0.08:  # quá lớn
+.\ocr_engine.py:1378 - # Aspect ratio NGẶT
+.\ocr_engine.py:1382 - # Solidity NGẶT (> 0.5)
+.\ocr_engine.py:1387 - if solidity < 0.50:  # NGẶT
+.\ocr_engine.py:1395 - # === STEP 5: SỐ LƯỢNG NGẶT ===
+.\ocr_engine.py:1396 - # Hiệu đề: 2-6 ký tự (KHÔNG 7-8)
+.\ocr_engine.py:1403 - # === STEP 6: KIỂM TRA ALIGNMENT NGẶT ===
+.\ocr_engine.py:1408 - # Y alignment NGẶT: y_std < 15% height
+.\ocr_engine.py:1412 - # === STEP 7: KẾ THỐNG KHOẢNG CÁCH ===
+.\ocr_engine.py:1420 - # Khoảng cách tối thiểu > 20% width
+.\ocr_engine.py:1424 - # === STEP 8: KIỂM TRA TỈ LỆ ===
+.\ocr_engine.py:1436 - # Hiệu đề trong ảnh gốc thường nhỏ, nhưng ảnh upload có thể là crop cận
+.\ocr_engine.py:1437 - # cảnh/screenshot đã phóng to. Không loại các ảnh này chỉ vì chữ lớn.
+.\ocr_engine.py:1447 - # === STEP 9: KIỂM TRA VÀNH TRÒN ===
+.\ocr_engine.py:1462 - # === STEP 10: VỊ TRÍ ===
+.\ocr_engine.py:1474 - # === KẾT LUẬN ===
+.\ocr_engine.py:1492 - # Hàm chính: đọc hiệu đề từ ảnh gốm sứ
+.\ocr_engine.py:1501 - # === VALIDATION: chỉ dùng làm tín hiệu cảnh báo, không chặn OCR ===
+.\ocr_engine.py:1505 - "Ảnh không giống bố cục hiệu đề chuẩn, hệ thống vẫn thử OCR "
+.\ocr_engine.py:1506 - "vì có thể là ảnh crop cận cảnh hoặc screenshot."
+.\ocr_engine.py:1510 - # Phát hiện và xử lý ảnh Google Search
+.\ocr_engine.py:1512 - print("[Google Image Detected] Áp dụng preprocessing tối ưu...")
+.\ocr_engine.py:1553 - # FIX 2: Chỉ crop nếu ảnh chưa zoom sẵn
+.\ocr_engine.py:1557 - # Upscale nếu ảnh nhỏ
+.\ocr_engine.py:1564 - # FIX 2: Dùng _is_already_zoomed để quyết định có crop không
+.\ocr_engine.py:1569 - # CROP ÉP BUỘC: Đề phòng viền tối ở background gây nhầm lẫn là zoom
+.\ocr_engine.py:1616 - # Bổ sung một variant: Không dùng auto_detect_text_region, chỉ Crop cố định ngay lõi trung tâm (35% 
+.\ocr_engine.py:1617 - # Đề phòng auto_detect_text_region bắt nhầm vành bát thay vì chữ
+.\ocr_engine.py:1631 - # Tiny-text fallback: quét cửa sổ trung tâm, phóng đại rất mạnh.
+.\ocr_engine.py:1632 - # Dành cho ảnh mà hiệu đề chỉ chiếm vài % khung hình.
+.\ocr_engine.py:1654 - # Fallback quan trọng cho ảnh screenshot: OCR trên ROI bát vàng.
+.\ocr_engine.py:1670 - # Fallback vòng tròn đáy bát: ưu tiên chữ nhỏ nằm giữa tâm.
+.\ocr_engine.py:1749 - # Chỉ bật khi người dùng chọn deep mode: SR variants cho ảnh cực mờ/chữ nhỏ.
+.\ocr_engine.py:1788 - # Ưu tiên ROI vòng tròn / mực chữ (đáy sứ) trước crop 25–75% để tránh OCR lộn khi chữ xếp 2 cột.
+.\ocr_engine.py:1817 - # FIX 3 & 5: Thu thập tất cả (text, score) từ các variant
+.\ocr_engine.py:1826 - # Smart skip: theo dõi các prefix ROI liên tiếp không đọc được
+.\ocr_engine.py:1827 - _empty_streak = {}  # prefix -> số lần liên tiếp không đọc được
+.\ocr_engine.py:1828 - _SKIP_THRESHOLD = 2  # Skip các variant cùng prefix nếu 2 liên tiếp rỗng
+.\ocr_engine.py:1831 - # Smart skip: nếu cùng 1 ROI prefix đã trống 2 lần liên tiếp, bỏ qua
+.\ocr_engine.py:1845 - # Dừng sớm: KHÔNG yêu cầu _plausible (để dừng cho cả hiệu đề Nội Phủ, Khánh Xuân...)
+.\ocr_engine.py:1851 - and cjk_len >= 4  # Không dừng sớm nếu chưa đủ 4 ký tự CJK
+.\ocr_engine.py:1858 - # Nếu pass nhanh không đủ thông tin thì mới chạy pass sâu (nặng hơn) cho ảnh mờ.
+.\ocr_engine.py:1886 - and deep_cjk_len >= 4  # Không dừng sớm nếu chưa đủ 4 ký tự CJK
+.\ocr_engine.py:1891 - # FIX 3 & 5: Chọn best_text — ưu tiên chuỗi có 年製/年造, rồi mới theo score
+.\ocr_engine.py:1911 - # Chặn kết quả quá ngắn và điểm thấp (thường là ký tự nhiễu đơn lẻ).
+.\ocr_engine.py:1922 - "warning": validation_warning or "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+.\ocr_engine.py:1925 - # === NEW: Cố gắng sửa chữ OCR nhầm ===
+.\ocr_engine.py:1934 - print(f"[AUTO-CORRECTED] OCR nhầm, sửa thành: '{best_text}'")
+.\ocr_engine.py:1936 - # Kiểm tra kết quả với database (bao gồm gợi ý sửa nếu OCR nhầm ký tự)
+.\ocr_engine.py:1939 - # Confidence estimate dựa trên score tương đối
+.\ocr_engine.py:1943 - # Xây dựng thông điệp cảnh báo chi tiết
+.\ocr_engine.py:1949 - # Nếu có gợi ý (là fuzzy match hoặc không tìm thấy), thêm vào warning
+.\ocr_engine.py:1954 - warning_msg += f"\n💡 Gợi ý: Có thể là '{suggestion_text}' (score: {best_suggestion.get('score', 0):.
+.\ocr_engine.py:1959 - "candidates": list(dict.fromkeys(all_candidates)),  # deduplicate, giữ thứ tự
+.\ocr_enhanced.py:4 - Khi strict confidence không tìm được, thử chiến lược khác
+.\ocr_enhanced.py:25 - Khi strict confidence không tìm được gì, thử chiến lược aggressive
+.\ocr_enhanced.py:26 - - Giảm threshold
+.\ocr_enhanced.py:27 - - Thử nhiều preprocessing
+.\ocr_enhanced.py:28 - - Lấy mọi kết quả
+.\ocr_enhanced.py:125 - Phân tích vị trí và kích thước của các bounding box
+.\ocr_enhanced.py:126 - Có thể lọc được noise dựa trên vị trí, kích thước
+.\reference_matcher.py:12 - # Cache lưu trữ đặc điểm (descriptors) của các ảnh mẫu để so sánh nhanh
+.\reference_matcher.py:16 - # Khởi tạo thuật toán ORB (Oriented FAST and Rotated BRIEF)
+.\reference_matcher.py:19 - # Khởi tạo Brute-Force Matcher với khoảng cách NORM_HAMMING chuyên cho ORB
+.\reference_matcher.py:22 - # Ngưỡng (Threshold) cấu hình: Mức độ tương đồng tối thiểu để xác nhận là 1 ảnh.
+.\reference_matcher.py:23 - # Hạ nhẹ để nhận diện được ảnh chụp nghiêng/thiếu sáng.
+.\reference_matcher.py:46 - """Trích xuất keypoints và descriptors từ ảnh bằng hệ quy chiếu xám"""
+.\reference_matcher.py:53 - # Cân bằng biểu đồ thu nhỏ độ chênh lệch ánh sáng (CLAHE) giúp bắt nét tốt hơn trên bát gốm trơn bón
+.\reference_matcher.py:62 - """Đọc thư mục reference_library và nạp toàn bộ ảnh mẫu vào RAM dưới dạng Descriptors"""
+.\reference_matcher.py:89 - # Đọc cấu trúc JSON
+.\reference_matcher.py:93 - # Đọc ảnh và trích xuất đặc điểm
+.\reference_matcher.py:111 - # Khởi chạy nạp dữ liệu ở lần chạy đầu tiên
+.\reference_matcher.py:117 - So sánh ảnh người dùng truyền lên với thư viện mẫu.
+.\reference_matcher.py:118 - Nếu tìm thấy ảnh mẫu siêu khớp (> MIN_GOOD_MATCHES), trả về ngay lập tức JSON phân tích
+.\reference_matcher.py:119 - của ảnh mẫu đó. Nếu không, trả về None (thuật toán sẽ đẩy tiếp vào PaddleOCR).
+.\reference_matcher.py:142 - # So khớp
+.\reference_matcher.py:145 - # Sắp xếp matches theo khoảng cách (càng nhỏ càng giống)
+.\reference_matcher.py:148 - # Lọc 'good' matches: Khoảng cách Hamming nhỏ hơn ngưỡng
+.\reference_matcher.py:183 - # Chỉnh match_type để front-end biết là nhận diện từ Memory
+.\reference_matcher.py:240 - """Lưu ảnh và kết quả OCR thành 1 cặp mẫu trong thư viện tham chiếu"""
+.\reference_matcher.py:249 - # Gom tên triều đại hoặc vua để dễ nhìn (ví dụ hong_vu_1234abcd)
+.\reference_matcher.py:269 - # Nạp lại RAM
+.\scan_vi_final.py:5 - vietnamese_pattern = re.compile(r'[áàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹ
+.\test_correction.py:4 - Kiểm tra hệ thống sửa chữ tự động khi OCR nhầm ký tự
+.\test_correction.py:29 - print(f"✅ Found group containing 侍 (thị): {group}")
+.\test_correction.py:34 - print(f"✅ Found group containing 北 (bắc): {group}")
+.\test_correction.py:43 - ('內府侍石', "錯誤: 北→石 (dễ nhầm)"),
+.\test_correction.py:44 - ('內府佚北', "錯誤: 侍→佚 (dễ nhầm)"),
+.\test_correction.py:45 - ('康熙年製', "Ký tự thông thường"),
+.\test_correction.py:46 - ('大清乾隆年製', "Nhiều ký tự"),
+.\test_correction.py:60 - ('內府侍石', "OCR nhầm: 北→石"),
+.\test_correction.py:61 - ('內府佚北', "OCR nhầm: 侍→佚"),
+.\test_correction.py:62 - ('內府侍旨', "Biến thể hợp lệ"),
+.\test_diagnostic.py:26 - # Find all Vietnamese "Nội Phủ Thị" marks
+.\test_diagnostic.py:27 - noi_phu_marks = [entry for entry in database if 'Nội Phủ Thị' in entry.get('ten_viet', '')]
+.\test_diagnostic.py:28 - print(f"\n📦 Found {len(noi_phu_marks)} Vietnamese 'Nội Phủ Thị' marks:")
+.\test_diagnostic.py:35 - print("[SCENARIO 1] Testing character confusion for Nội Phủ marks")
+.\test_diagnostic.py:66 - # For each Nội Phủ mark, simulate common OCR errors
+.\test_diagnostic.py:139 - ('內府侍北', 'Nội Phủ Thị Bắc'),
+.\test_diagnostic.py:141 - ('內府侍旨', 'Nội Phủ Thị Chỉ'),
+.\test_diagnostic.py:142 - ('內府侍右', 'Nội Phủ Thị Hữu'),
+.\test_diagnostic.py:143 - ('內府侍左', 'Nội Phủ Thị Tả'),
+.\test_diagnostic.py:144 - ('內府侍中', 'Nội Phủ Thị Trung'),
+.\test_diagnostic.py:177 - - Vietnamese Nội Phủ marks require ULTRA-STRICT (0.72) confidence
+.\test_diagnostic.py:184 - 3. To fix "vẫn nhận dạng sai":
+.\test_ocr_image.py:3 - Test OCR trên ảnh được upload
+.\test_ocr_image.py:10 - # Lấy path ảnh từ argument
+.\test_ocr_image.py:17 - # Đọc ảnh
+.\test_ocr_image.py:21 - print(f"✓ Đã load ảnh: {image_path} ({len(img_bytes)} bytes)")
+.\test_ocr_image.py:23 - print(f"✗ Lỗi đọc ảnh: {e}")
+.\test_ocr_image.py:26 - # Chạy OCR
+.\test_ocr_image.py:28 - print("🚀 CHẠY OCR...")
+.\test_ocr_image.py:35 - print("📊 KẾT QUẢ OCR")
+.\test_ocr_image.py:38 - print(f"\n✅ Hiệu đề: '{result.get('text', '')}'")
+.\test_ocr_image.py:46 - print(f"\n🔍 Candidates khác:")
+.\test_ocr_image.py:51 - print(f"\n📋 Chi tiết các variants:")
+.\test_ocr_simple.py:3 - Test OCR bằng FastAPI endpoint
+.\test_ocr_simple.py:20 - print(f"\n💡 Hướng dẫn:")
+.\test_ocr_simple.py:21 - print(f"   1. Save ảnh vào: {image_path}")
+.\test_ocr_simple.py:22 - print(f"   2. Hoặc dùng:")
+.\test_ocr_simple.py:26 - print(f"📷 Đang đọc ảnh: {image_path}")
+.\test_ocr_simple.py:31 - print("\n🚀 Chạy OCR...\n")
+.\test_ocr_simple.py:35 - # In kết quả
+.\test_ocr_simple.py:37 - print("📊 KẾT QUẢ OCR")
+.\test_ocr_simple.py:46 - print(f"\n✅ HIỆU ĐỀ: {text}")
+.\test_ocr_simple.py:52 - print(f"\n❌ Không đọc được ký tự nào")
+.\test_ocr_simple.py:58 - print(f"\n🔍 Ký tự khác (candidates): {', '.join(candidates[:5])}")
+.\test_system.py:3 - Kiểm tra hệ thống OCR, LLM, và database validation
+.\test_system.py:21 - "內府侍北",  # Nội Phủ Thị Bắc (ID 90 in database)
+.\test_system.py:22 - "內府侍旨",  # Nội Phủ Thị Chỉ (ID 84)
+.\test_system.py:23 - "內府侍中",  # Nội Phủ Thị Trung (ID 86)
+.\test_system.py:44 - viet_marks = [item for item in db if "Nội Phủ" in item.get("ten_viet", "")]
+.\test_system.py:47 - print(f"✅ Vietnamese 'Nội Phủ' series: {len(viet_marks)} marks")
+.\test_system.py:69 - prompt="Hiệu đề gốm: 內府侍北 là gì? (Vietnamese ceramic mark)",
+.\test_system.py:76 - print("⚠️  Ollama không sẵn sàng, thử Gemini...")
+.\test_system.py:78 - prompt="Hiệu đề gốm: 內府侍北 là gì?",
+.\test_system.py:85 - print("❌ Không có LLM nào sẵn sàng")
+.\test_system.py:124 - prompt=f"Xác định hiệu đề gốm: {ocr_text} - thuộc triều đại nào?",
+.\update_db_origin.py:7 - "Minh Triều": "Nhà Minh",
+.\update_db_origin.py:8 - "Thanh Triều": "Nhà Thanh",
+.\update_db_origin.py:9 - "Nhà Nguyễn (Việt Nam)": "Nhà Nguyễn",
+.\update_db_origin.py:10 - "Nhà Nguyễn (Việt Nam) - Thời Chúa Nguyễn": "Thời Chúa Nguyễn",
+.\update_db_origin.py:11 - "Đặc biệt - Cung đình": "Cung Đình",
+.\update_db_origin.py:12 - "Đặc biệt - Chúc tụng": "Chúc Tụng",
+.\update_db_origin.py:13 - "Đặc biệt - Địa danh": "Địa Danh",
+.\update_db_origin.py:14 - "Đặc biệt - Cung đình Thanh": "Cung Đình Nhà Thanh",
+.\update_db_origin.py:15 - "Đặc biệt - Hall mark": "Thất Danh (Hallmark)",
+.\update_db_origin.py:16 - "Đặc biệt - Nghệ nhân": "Nghệ Nhân",
+.\update_db_origin.py:17 - "Đặc biệt - Giả/Kết hợp": "Giả / Kết Hợp",
+.\update_db_origin.py:18 - "Can Chi - Đặc biệt": "Năm Can Chi"
+.\pipelines\base.py:2 - Base Pipeline — Lớp cơ sở cho tất cả pipeline trong hệ thống Multi-Pipeline.
+.\pipelines\base.py:4 - Mỗi pipeline phải implement method `execute()` và trả về PipelineResult.
+.\pipelines\base.py:5 - Thiết kế theo Abstract Base Class pattern để đảm bảo tính nhất quán
+.\pipelines\base.py:6 - giữa 4 pipeline khác nhau.
+.\pipelines\base.py:17 - """Trạng thái kết quả pipeline."""
+.\pipelines\base.py:18 - SUCCESS = "success"           # Pipeline chạy thành công, có kết quả
+.\pipelines\base.py:19 - PARTIAL = "partial"           # Chạy được nhưng thiếu thông tin
+.\pipelines\base.py:20 - FAILED = "failed"             # Pipeline lỗi, không có kết quả
+.\pipelines\base.py:21 - TIMEOUT = "timeout"           # Pipeline quá thời gian cho phép
+.\pipelines\base.py:22 - SKIPPED = "skipped"           # Pipeline bị bỏ qua (thiếu config, etc.)
+.\pipelines\base.py:28 - Kết quả trả về từ mỗi pipeline.
+.\pipelines\base.py:30 - Cấu trúc thống nhất để Voting Logic có thể tổng hợp dễ dàng,
+.\pipelines\base.py:31 - bất kể pipeline nào trả về.
+.\pipelines\base.py:33 - pipeline_name: str                          # Tên pipeline: "ocr_llm", "ocr_search", ...
+.\pipelines\base.py:34 - status: PipelineStatus                      # Trạng thái
+.\pipelines\base.py:35 - confidence: float = 0.0                     # Độ tin cậy (0.0 → 1.0)
+.\pipelines\base.py:36 - execution_time: float = 0.0                 # Thời gian chạy (giây)
+.\pipelines\base.py:38 - # --- Thông tin hiệu đề ---
+.\pipelines\base.py:39 - chu_han: str = ""                           # Chữ Hán gốc (ví dụ: 大明宣德年製)
+.\pipelines\base.py:40 - trieu_dai: str = ""                         # Triều đại (Minh, Thanh, Nguyễn)
+.\pipelines\base.py:41 - nien_hieu: str = ""                         # Niên hiệu (Tuyên Đức, Khang Hy, ...)
+.\pipelines\base.py:42 - hoang_de: str = ""                          # Hoàng đế
+.\pipelines\base.py:43 - nam_bat_dau: Optional[int] = None           # Năm bắt đầu
+.\pipelines\base.py:44 - nam_ket_thuc: Optional[int] = None          # Năm kết thúc
+.\pipelines\base.py:45 - phien_am: str = ""                          # Phiên âm Hán-Việt
+.\pipelines\base.py:46 - y_nghia: str = ""                           # Ý nghĩa / mô tả
+.\pipelines\base.py:49 - raw_ocr_text: str = ""                      # Text OCR thô (nếu có)
+.\pipelines\base.py:50 - llm_explanation: str = ""                    # Giải thích từ LLM
+.\pipelines\base.py:51 - search_sources: List[str] = field(default_factory=list)  # URL nguồn tham khảo
+.\pipelines\base.py:52 - extra_data: Dict[str, Any] = field(default_factory=dict) # Dữ liệu bổ sung
+.\pipelines\base.py:53 - error_message: str = ""                     # Thông báo lỗi (nếu có)
+.\pipelines\base.py:56 - """Chuyển kết quả thành dictionary để trả về API."""
+.\pipelines\base.py:79 - """Kiểm tra kết quả có hợp lệ để tham gia voting không."""
+.\pipelines\base.py:89 - Abstract Base Class cho tất cả pipeline.
+.\pipelines\base.py:91 - Mỗi pipeline con phải implement:
+.\pipelines\base.py:92 - - `name` (property): tên pipeline
+.\pipelines\base.py:93 - - `_run(image_bytes, **kwargs)`: logic xử lý chính
+.\pipelines\base.py:95 - Lớp base tự động đo thời gian, bắt lỗi, và wrap kết quả.
+.\pipelines\base.py:101 - """Tên định danh của pipeline (dùng cho logging và voting)."""
+.\pipelines\base.py:107 - Logic xử lý chính của pipeline. Được implement bởi từng pipeline con.
+.\pipelines\base.py:110 - image_bytes: Ảnh đầu vào dưới dạng bytes
+.\pipelines\base.py:111 - **kwargs: Tham số bổ sung (ocr_text sẵn có, database, etc.)
+.\pipelines\base.py:114 - PipelineResult chứa kết quả phân tích
+.\pipelines\base.py:120 - Entry point chính — gọi _run() với error handling và đo thời gian.
+.\pipelines\base.py:122 - Không cần override method này. Override _run() thay vì execute().
+.\pipelines\base.py:127 - print(f"[{self.name}] ▶ Bắt đầu xử lý...")
+.\pipelines\base.py:132 - print(f"[{self.name}] ✅ Hoàn thành ({result.execution_time:.2f}s)")
+.\pipelines\base.py:136 - print(f"  Chữ Hán: {result.chu_han}")
+.\pipelines\base.py:138 - print(f"  Triều đại: {result.trieu_dai}")
+.\pipelines\base.py:146 - print(f"[{self.name}] ❌ Lỗi sau {elapsed:.2f}s: {error_msg}")
+.\pipelines\orchestrator.py:2 - Pipeline Orchestrator — Điều phối chạy 4 pipeline song song và gọi Voting.
+.\pipelines\orchestrator.py:4 - Entry point chính cho hệ thống Multi-Pipeline NCKH.
+.\pipelines\orchestrator.py:5 - Nhận ảnh đầu vào → chạy đồng thời 4 pipeline → tổng hợp kết quả.
+.\pipelines\orchestrator.py:20 - # Khởi tạo 4 pipeline instances
+.\pipelines\orchestrator.py:36 - Entry point chính — Phân tích ảnh hiệu đề bằng Multi-Pipeline.
+.\pipelines\orchestrator.py:39 - image_bytes: Ảnh đầu vào dưới dạng bytes
+.\pipelines\orchestrator.py:40 - database: Database hiệu đề (cho Pipeline 4)
+.\pipelines\orchestrator.py:41 - pipelines: Danh sách pipeline cần chạy (None = chạy tất cả)
+.\pipelines\orchestrator.py:42 - Ví dụ: ["ocr_llm", "ml_match"]
+.\pipelines\orchestrator.py:43 - timeout: Timeout tổng (giây). None = dùng config
+.\pipelines\orchestrator.py:46 - Dictionary kết quả tổng hợp từ Voting Logic
+.\pipelines\orchestrator.py:52 - print("🚀 MULTI-PIPELINE ANALYSIS — Bắt đầu phân tích")
+.\pipelines\orchestrator.py:55 - # Xác định pipeline nào cần chạy
+.\pipelines\orchestrator.py:70 - # Tạo danh sách task
+.\pipelines\orchestrator.py:136 - return {"status": "error", "message": "Không có pipeline nào được chọn"}
+.\pipelines\orchestrator.py:138 - # Chạy tất cả pipeline đồng thời
+.\pipelines\orchestrator.py:139 - print(f"\n⚡ Chạy {len(tasks)} pipeline đồng thời: {task_names}")
+.\pipelines\orchestrator.py:142 - # Thu thập kết quả
+.\pipelines\orchestrator.py:156 - print(f"\n🗳️ Bắt đầu Voting với {len(pipeline_results)} kết quả...")
+.\pipelines\orchestrator.py:185 - final["canh_bao"] = "Không có ứng viên đủ rõ để kiểm chứng bằng web."
+.\pipelines\orchestrator.py:191 - print(f"✅ PHÂN TÍCH HOÀN TẤT — Tổng thời gian: {elapsed:.2f}s")
+.\pipelines\orchestrator.py:192 - print(f"   Kết quả: {final.get('trieu_dai', '?')} / {final.get('nien_hieu', '?')}")
+.\pipelines\orchestrator.py:204 - """Chạy pipeline với timeout."""
+.\pipelines\orchestrator.py:292 - Phân tích nhanh — chỉ chạy Pipeline 1 (OCR+LLM) + Pipeline 4 (ML).
+.\pipelines\orchestrator.py:293 - Không tìm kiếm Google, nhanh hơn nhiều.
+.\pipelines\orchestrator.py:308 - Phân tích sâu — chạy tất cả 4 pipeline.
+.\pipelines\orchestrator.py:309 - Chậm hơn nhưng chính xác hơn nhờ cross-reference nhiều nguồn.
+.\pipelines\pipeline_img_search.py:4 - Luồng xử lý:
+.\pipelines\pipeline_img_search.py:5 - 1. Tiền xử lý ảnh
+.\pipelines\pipeline_img_search.py:6 - 2. Google Image Search / Google Lens (Selenium) — tìm bằng hình ảnh
+.\pipelines\pipeline_img_search.py:7 - 3. Thu thập N bài viết liên quan
+.\pipelines\pipeline_img_search.py:8 - 4. Scrape nội dung bài viết
+.\pipelines\pipeline_img_search.py:9 - 5. LLM tổng hợp thông tin → kết quả cuối
+.\pipelines\pipeline_img_search.py:11 - Pipeline này KHÔNG dùng OCR — tìm kiếm trực tiếp bằng hình ảnh.
+.\pipelines\pipeline_img_search.py:12 - Rất hữu ích khi ảnh bị mờ, chữ bị phai mà OCR không đọc được.
+.\pipelines\pipeline_img_search.py:49 - Tìm kiếm bằng hình ảnh trực tiếp, không phụ thuộc OCR.
+.\pipelines\pipeline_img_search.py:59 - image_bytes: Ảnh gốc
+.\pipelines\pipeline_img_search.py:61 - fallback_ocr_text (str): Text OCR làm fallback keyword (nếu image search thất bại)
+.\pipelines\pipeline_img_search.py:69 - # Bước 1: Lưu ảnh tạm để upload
+.\pipelines\pipeline_img_search.py:79 - print(f"[{self.name}] 📷 Ảnh tạm: {temp_path}")
+.\pipelines\pipeline_img_search.py:83 - # Bước 2: Google Image Search
+.\pipelines\pipeline_img_search.py:85 - print(f"[{self.name}] 🖼️ Bước 2: Google Image Search...")
+.\pipelines\pipeline_img_search.py:95 - print(f"[{self.name}] ⚠ Google Image Search timeout, chuyển sang text search từ OCR")
+.\pipelines\pipeline_img_search.py:98 - # Nếu image search thất bại, thử text search với OCR text
+.\pipelines\pipeline_img_search.py:100 - print(f"[{self.name}] ⚠ Image search thất bại, thử text search...")
+.\pipelines\pipeline_img_search.py:115 - error_message="Google Image/Text Search không tìm thấy link nguồn phù hợp",
+.\pipelines\pipeline_img_search.py:118 - print(f"[{self.name}] 🖼️ Tìm được {len(search_results)} kết quả")
+.\pipelines\pipeline_img_search.py:121 - # Bước 3: Trả link nguồn nhanh
+.\pipelines\pipeline_img_search.py:123 - print(f"[{self.name}] 📖 Bước 3: Chuẩn hóa link nguồn...")
+.\pipelines\pipeline_img_search.py:136 - llm_explanation="Đã tìm được link nguồn; kiểm chứng chi tiết ở evidence/voting.",
+.\pipelines\pipeline_img_search.py:146 - # Dọn file tạm
+.\pipelines\pipeline_img_search.py:165 - print(f"[{self.name}] Text search lỗi với query '{query}': {exc}")
+.\pipelines\pipeline_img_search.py:194 - if "noi phu thi" in folded or "nội phủ thị" in text.lower():
+.\pipelines\pipeline_img_search.py:252 - "terms": ["光緒", "光绪", "大清光緒", "guangxu", "kuang-hsu", "kuang hsu", "quang tự", "quang tu"],
+.\pipelines\pipeline_img_search.py:256 - "nội phủ", "noi phu", "noi-phu", "noi_phu",
+.\pipelines\pipeline_img_search.py:353 - f'"{display}" "đồ sứ ký kiểu"',
+.\pipelines\pipeline_img_search.py:366 - f"{compact} gốm sứ hiệu đề",
+.\pipelines\pipeline_img_search.py:375 - "Đại Thanh Quang Tự niên chế gốm sứ",
+.\pipelines\pipeline_ml_match.py:2 - Pipeline 4: ML/ORB Feature Matching → Thông tin cơ bản
+.\pipelines\pipeline_ml_match.py:4 - Wrap code hiện tại (reference_matcher.py + main.py rule-based matching)
+.\pipelines\pipeline_ml_match.py:5 - thành pipeline chuẩn để tham gia Voting.
+.\pipelines\pipeline_ml_match.py:7 - Luồng xử lý:
+.\pipelines\pipeline_ml_match.py:8 - 1. Tiền xử lý ảnh
+.\pipelines\pipeline_ml_match.py:9 - 2. ORB Feature Matching (so sánh với thư viện tham chiếu)
+.\pipelines\pipeline_ml_match.py:10 - 3. Nếu không match ORB → Rule-based matching từ OCR text + database
+.\pipelines\pipeline_ml_match.py:11 - 4. Trả về PipelineResult với thông tin cơ bản
+.\pipelines\pipeline_ml_match.py:23 - Sử dụng ORB (reference_matcher.py) và rule-based matching (main.py)
+.\pipelines\pipeline_ml_match.py:24 - đã có sẵn, wrap thành pipeline chuẩn.
+.\pipelines\pipeline_ml_match.py:33 - Xử lý chính của Pipeline 4.
+.\pipelines\pipeline_ml_match.py:36 - image_bytes: Ảnh gốc dưới dạng bytes
+.\pipelines\pipeline_ml_match.py:38 - ocr_text (str): Text OCR đã đọc sẵn (nếu có)
+.\pipelines\pipeline_ml_match.py:39 - database (list): Database hiệu đề (nếu có)
+.\pipelines\pipeline_ml_match.py:45 - # Bước 1: ORB Feature Matching
+.\pipelines\pipeline_ml_match.py:47 - print(f"[{self.name}] 🔍 Bước 1: ORB Feature Matching...")
+.\pipelines\pipeline_ml_match.py:56 - # Bước 2: Rule-based matching từ OCR text
+.\pipelines\pipeline_ml_match.py:62 - print(f"[{self.name}] 📊 Bước 2: Rule-based matching...")
+.\pipelines\pipeline_ml_match.py:71 - # Không tìm thấy kết quả
+.\pipelines\pipeline_ml_match.py:78 - error_message="Không tìm thấy match trong ORB library hoặc database",
+.\pipelines\pipeline_ml_match.py:82 - """Chạy ORB matching sử dụng reference_matcher.py hiện có."""
+.\pipelines\pipeline_ml_match.py:116 - """Chạy rule-based matching sử dụng logic từ main.py."""
+.\pipelines\pipeline_ml_match.py:121 - # Import các hàm matching từ main.py
+.\pipelines\pipeline_ml_match.py:146 - # Thử top matches
+.\pipelines\pipeline_ml_match.py:161 - """Chuyển kết quả match (ORB hoặc rule) thành PipelineResult."""
+.\pipelines\pipeline_ml_match.py:164 - # Tính confidence dựa trên match_type
+.\pipelines\pipeline_ml_match.py:185 - "Bỏ qua kết quả generic thiếu niên hiệu "
+.\pipelines\pipeline_ml_match.py:186 - f"({chu_han}) từ {source}/{match_type}"
+.\pipelines\pipeline_ml_match.py:194 - # Xác định năm
+.\pipelines\pipeline_ml_match.py:255 - """Trích xuất niên hiệu từ kết quả match."""
+.\pipelines\pipeline_ocr_llm.py:4 - Luồng xử lý:
+.\pipelines\pipeline_ocr_llm.py:5 - 1. Tiền xử lý ảnh (OpenCV) — sử dụng ocr_engine.py hiện có
+.\pipelines\pipeline_ocr_llm.py:6 - 2. PaddleOCR nhận dạng chữ Hán
+.\pipelines\pipeline_ocr_llm.py:7 - 3. LLM #1 (Extract): Phân tích text OCR → thông tin hiệu đề
+.\pipelines\pipeline_ocr_llm.py:8 - 4. LLM #2 (Verify): Kiểm tra chéo, sửa lỗi nếu có
+.\pipelines\pipeline_ocr_llm.py:9 - 5. Trả về PipelineResult
+.\pipelines\pipeline_ocr_llm.py:11 - Đây là pipeline chính xác nhất khi OCR đọc được text rõ ràng.
+.\pipelines\pipeline_ocr_llm.py:29 - Sử dụng PaddleOCR (đã có) để đọc chữ Hán,
+.\pipelines\pipeline_ocr_llm.py:30 - sau đó dùng LLM phân tích và kiểm tra chéo.
+.\pipelines\pipeline_ocr_llm.py:39 - Xử lý chính của Pipeline 1.
+.\pipelines\pipeline_ocr_llm.py:42 - image_bytes: Ảnh gốc dưới dạng bytes
+.\pipelines\pipeline_ocr_llm.py:44 - ocr_text (str): Text OCR đã đọc sẵn (nếu có, bỏ qua bước OCR)
+.\pipelines\pipeline_ocr_llm.py:45 - ocr_candidates (list): Danh sách candidate OCR
+.\pipelines\pipeline_ocr_llm.py:46 - skip_verify (bool): Bỏ qua bước LLM Verify (mặc định False)
+.\pipelines\pipeline_ocr_llm.py:55 - # Bước 1: OCR — Đọc chữ Hán từ ảnh
+.\pipelines\pipeline_ocr_llm.py:58 - print(f"[{self.name}] 📷 Bước 1: Chạy OCR...")
+.\pipelines\pipeline_ocr_llm.py:65 - error_message="OCR không đọc được chữ nào từ ảnh",
+.\pipelines\pipeline_ocr_llm.py:79 - # Bước 2: LLM Extract — Phân tích thông tin
+.\pipelines\pipeline_ocr_llm.py:81 - print(f"[{self.name}] 🤖 Bước 2: LLM Extract Info...")
+.\pipelines\pipeline_ocr_llm.py:93 - error_message="LLM Extract không phản hồi",
+.\pipelines\pipeline_ocr_llm.py:105 - error_message="Không parse được JSON từ LLM Extract",
+.\pipelines\pipeline_ocr_llm.py:111 - # Bước 3: LLM Verify — Kiểm tra chéo
+.\pipelines\pipeline_ocr_llm.py:114 - print(f"[{self.name}] 🔍 Bước 3: LLM Verify...")
+.\pipelines\pipeline_ocr_llm.py:128 - # Nếu có corrections, dùng verified_result
+.\pipelines\pipeline_ocr_llm.py:133 - # Cập nhật confidence từ verify
+.\pipelines\pipeline_ocr_llm.py:137 - # Lưu explanation
+.\pipelines\pipeline_ocr_llm.py:141 - # Bước 4: Build PipelineResult
+.\pipelines\pipeline_ocr_llm.py:167 - Chạy PaddleOCR sử dụng ocr_engine.py hiện có.
+.\pipelines\pipeline_ocr_llm.py:181 - # read_chinese_mark trả về: {"text": "...", "candidates": [...], "confidence": ..., "all_results": [
+.\pipelines\pipeline_ocr_llm.py:271 - """Chuyển giá trị thành int an toàn."""
+.\pipelines\pipeline_ocr_search.py:2 - Pipeline 2: OCR → LLM Extract Keywords → Google Search (N bài) → LLM Synthesize
+.\pipelines\pipeline_ocr_search.py:4 - Luồng xử lý:
+.\pipelines\pipeline_ocr_search.py:5 - 1. PaddleOCR nhận dạng chữ Hán
+.\pipelines\pipeline_ocr_search.py:6 - 2. LLM tạo keyword tìm kiếm từ OCR text
+.\pipelines\pipeline_ocr_search.py:7 - 3. Google Search (API hoặc Selenium) tìm N bài viết
+.\pipelines\pipeline_ocr_search.py:8 - 4. Web Scraper đọc nội dung N bài
+.\pipelines\pipeline_ocr_search.py:9 - 5. LLM tổng hợp thông tin từ N bài → kết quả cuối
+.\pipelines\pipeline_ocr_search.py:25 - # Prompt riêng để LLM tạo search keyword
+.\pipelines\pipeline_ocr_search.py:26 - PROMPT_GENERATE_KEYWORDS = """Từ text chữ Hán dưới đây (được OCR từ đáy gốm sứ),
+.\pipelines\pipeline_ocr_search.py:27 - hãy tạo 3-5 câu tìm kiếm Google để tra cứu thông tin về hiệu đề này.
+.\pipelines\pipeline_ocr_search.py:29 - **Chữ Hán OCR:** "{ocr_text}"
+.\pipelines\pipeline_ocr_search.py:31 - QUAN TRỌNG — Character disambiguation context:
+.\pipelines\pipeline_ocr_search.py:32 - OCR trên gốm sứ thường đọc nhầm các ký tự sau:
+.\pipelines\pipeline_ocr_search.py:35 - Nếu text chứa 内府 / 內府:
+.\pipelines\pipeline_ocr_search.py:36 - → Đây là hiệu đề xưởng gốm Nội Phủ (Imperial Household Bureau), triều Nguyễn Việt Nam
+.\pipelines\pipeline_ocr_search.py:37 - → Tạo keyword cả dạng gốc VÀ các biến thể sửa lỗi OCR
+.\pipelines\pipeline_ocr_search.py:39 - Trả về JSON:
+.\pipelines\pipeline_ocr_search.py:43 - "câu tìm kiếm 1 (chữ Hán + tiếng Anh)",
+.\pipelines\pipeline_ocr_search.py:44 - "câu tìm kiếm 2 (phiên âm Hán-Việt)",
+.\pipelines\pipeline_ocr_search.py:45 - "câu tìm kiếm 3 (tiếng Việt)",
+.\pipelines\pipeline_ocr_search.py:46 - "câu tìm kiếm 4 (biến thể OCR nếu có)",
+.\pipelines\pipeline_ocr_search.py:47 - "câu tìm kiếm 5 (ngữ cảnh triều đại)"
+.\pipelines\pipeline_ocr_search.py:49 - "chu_han_clean": "chữ Hán đã sửa lỗi OCR nếu có",
+.\pipelines\pipeline_ocr_search.py:50 - "ocr_corrections": ["ký tự gốc → ký tự sửa", "..."]
+.\pipelines\pipeline_ocr_search.py:54 - Ví dụ với "內府侍東":
+.\pipelines\pipeline_ocr_search.py:56 - → "Nội Phủ Thị Đông hiệu đề gốm sứ"
+.\pipelines\pipeline_ocr_search.py:57 - → "內府侍東 gốm sứ triều Nguyễn"
+.\pipelines\pipeline_ocr_search.py:61 - Ví dụ với "大清康熙年製":
+.\pipelines\pipeline_ocr_search.py:64 - → "Đại Thanh Khang Hy niên chế gốm sứ"
+.\pipelines\pipeline_ocr_search.py:66 - Trả về JSON hợp lệ, không markdown.
+.\pipelines\pipeline_ocr_search.py:74 - Kết hợp OCR text với thông tin từ web để có kết quả đầy đủ hơn.
+.\pipelines\pipeline_ocr_search.py:75 - Đặc biệt mạnh khi database nội bộ không có hiệu đề cần tìm.
+.\pipelines\pipeline_ocr_search.py:85 - image_bytes: Ảnh gốc
+.\pipelines\pipeline_ocr_search.py:87 - ocr_text (str): Text OCR đã đọc sẵn
+.\pipelines\pipeline_ocr_search.py:88 - search_method (str): "api", "selenium", hoặc None (auto)
+.\pipelines\pipeline_ocr_search.py:95 - # Bước 1: Lấy OCR text (nếu chưa có)
+.\pipelines\pipeline_ocr_search.py:98 - print(f"[{self.name}] 📷 Bước 1: Chạy OCR...")
+.\pipelines\pipeline_ocr_search.py:105 - error_message="OCR không đọc được chữ → không thể tìm kiếm",
+.\pipelines\pipeline_ocr_search.py:116 - # Bước 2: LLM tạo search keywords
+.\pipelines\pipeline_ocr_search.py:118 - print(f"[{self.name}] 🔑 Bước 2: Tạo search keywords...")
+.\pipelines\pipeline_ocr_search.py:122 - # Fallback: dùng OCR text trực tiếp với nhiều biến thể
+.\pipelines\pipeline_ocr_search.py:125 - f"{ocr_text} gốm sứ hiệu đề",
+.\pipelines\pipeline_ocr_search.py:132 - "Nội Phủ hiệu đề gốm sứ triều Nguyễn",
+.\pipelines\pipeline_ocr_search.py:139 - # Bước 3: Google Search
+.\pipelines\pipeline_ocr_search.py:141 - print(f"[{self.name}] 🌐 Bước 3: Google Search...")
+.\pipelines\pipeline_ocr_search.py:144 - for keyword in keywords[:5]:  # Tăng lên 5 keywords cho coverage tốt hơn
+.\pipelines\pipeline_ocr_search.py:155 - error_message="Google Search không trả về kết quả",
+.\pipelines\pipeline_ocr_search.py:158 - # Loại bỏ URL trùng
+.\pipelines\pipeline_ocr_search.py:166 - print(f"[{self.name}] 🌐 Tìm được {len(unique_results)} kết quả unique")
+.\pipelines\pipeline_ocr_search.py:169 - # Bước 4: Scrape nội dung bài viết
+.\pipelines\pipeline_ocr_search.py:171 - print(f"[{self.name}] 📖 Bước 4: Đọc nội dung bài viết...")
+.\pipelines\pipeline_ocr_search.py:177 - # Vẫn dùng snippet từ Google nếu scrape thất bại
+.\pipelines\pipeline_ocr_search.py:188 - # Bước 5: LLM tổng hợp thông tin
+.\pipelines\pipeline_ocr_search.py:190 - print(f"[{self.name}] 🤖 Bước 5: LLM tổng hợp thông tin...")
+.\pipelines\pipeline_ocr_search.py:208 - error_message="LLM Synthesize không phản hồi",
+.\pipelines\pipeline_ocr_search.py:222 - error_message="Không parse được JSON từ LLM Synthesize",
+.\pipelines\pipeline_ocr_search.py:226 - # Build kết quả
+.\pipelines\pipeline_ocr_search.py:254 - """Dùng LLM tạo keyword tìm kiếm từ OCR text."""
+.\pipelines\pipeline_ocr_search.py:267 - """Chạy OCR (reuse từ Pipeline 1)."""
+.\pipelines\pipeline_vision_read.py:104 - return "Nội Phủ Thị"
+.\pipelines\__init__.py:1 - """Pipelines package — chứa 4 pipeline xử lý chính và orchestrator."""
+.\services\evidence_service.py:370 - f'"{display}" "đồ sứ ký kiểu"',
+.\services\evidence_service.py:395 - queries.append(f"{term} gốm sứ hiệu đề")
+.\services\evidence_service.py:784 - "Bạn là chuyên gia kiểm chứng hiệu đề gốm sứ. Chỉ dùng các nguồn web được cung cấp, "
+.\services\evidence_service.py:785 - "không tự suy đoán ngoài nguồn.\n\n"
+.\services\evidence_service.py:786 - f"Ứng viên cần kiểm chứng:\n{json.dumps(candidate, ensure_ascii=False)}\n\n"
+.\services\evidence_service.py:787 - f"Nguồn web:\n{json.dumps(sources, ensure_ascii=False)[:12000]}\n\n"
+.\services\evidence_service.py:788 - "Hãy trả về JSON hợp lệ theo schema:\n"
+.\services\evidence_service.py:792 - '  "summary": "vì sao nguồn ủng hộ hoặc không ủng hộ ứng viên",\n'
+.\services\evidence_service.py:800 - "Quy tắc: supported=true chỉ khi nguồn có nhắc trực tiếp hiệu đề, niên hiệu, hoặc tên tương ứng. "
+.\services\evidence_service.py:801 - "Nếu nguồn chỉ liên quan chung chung, confidence phải dưới 0.5."
+.\services\evidence_service.py:855 - "claim": "Nguồn có nhắc trực tiếp thuật ngữ liên quan đến ứng viên.",
+.\services\evidence_service.py:864 - "summary": "Chấm bằng heuristic vì LLM không trả được JSON kiểm chứng.",
+.\services\evidence_service.py:912 - "summary": "Chưa có nguồn để kiểm chứng.",
+.\services\evidence_service.py:959 - " Biến thể 內府侍X chỉ được nguồn tìm ảnh ủng hộ; "
+.\services\evidence_service.py:960 - "cần OCR/ML đọc được chữ thứ 4 để xác nhận chính xác."
+.\services\evidence_service.py:1162 - "Nguồn web tìm được chưa khớp với kết quả OCR/DB/ML đang có độ tin cậy cao. "
+.\services\evidence_service.py:1163 - "Giữ kết quả nội bộ và chỉ dùng link nguồn để đối chiếu thêm."
+.\services\evidence_service.py:1173 - "tên_việt": _pick_vietnamese_name(best_candidate) or final.get("tên_việt", ""),
+.\services\evidence_service.py:1178 - "triều_đại": best_candidate.get("trieu_dai") or db_entry.get("trieu_dai") or final.get("triều_đại", 
+.\services\evidence_service.py:1180 - "niên_hiệu": best_candidate.get("nien_hieu") or db_entry.get("nien_hieu") or final.get("niên_hiệu", 
+.\services\evidence_service.py:1182 - "phiên_âm": best_candidate.get("phien_am") or db_entry.get("phien_am") or final.get("phiên_âm", ""),
+.\services\evidence_service.py:1184 - "hoàng_đế": db_entry.get("hoang_de") or final.get("hoàng_đế", ""),
+.\services\evidence_service.py:1188 - "niên_đại": db_entry.get("nien_dai") or final.get("niên_đại", ""),
+.\services\evidence_service.py:1194 - "nguon_du_lieu": "Bằng chứng web + ứng viên OCR/ML",
+.\services\evidence_service.py:1229 - "Đã tìm được link nguồn để đối chiếu, nhưng nguồn web chưa đủ mạnh để xác nhận độc lập. "
+.\services\evidence_service.py:1230 - "Giữ kết quả OCR/DB/ML vì các tầng nội bộ đang đồng thuận."
+.\services\evidence_service.py:1234 - "Chưa tìm được link nguồn web đủ rõ để xác nhận độc lập. "
+.\services\evidence_service.py:1235 - "Giữ kết quả OCR/DB/ML vì các tầng nội bộ đang đồng thuận."
+.\services\evidence_service.py:1248 - "tên_việt": visual_name or final.get("tên_việt", ""),
+.\services\evidence_service.py:1253 - "triều_đại": visual_candidate.get("trieu_dai") or db_entry.get("trieu_dai") or final.get("triều_đại"
+.\services\evidence_service.py:1255 - "niên_hiệu": visual_candidate.get("nien_hieu") or db_entry.get("nien_hieu") or final.get("niên_hiệu"
+.\services\evidence_service.py:1257 - "phiên_âm": visual_candidate.get("phien_am") or db_entry.get("phien_am") or final.get("phiên_âm", ""
+.\services\evidence_service.py:1259 - "hoàng_đế": db_entry.get("hoang_de") or final.get("hoàng_đế", ""),
+.\services\evidence_service.py:1263 - "niên_đại": db_entry.get("nien_dai") or final.get("niên_đại", ""),
+.\services\evidence_service.py:1277 - "AI đọc ảnh trực tiếp ra ứng viên này, nhưng chưa đủ nguồn web độc lập "
+.\services\evidence_service.py:1278 - "để xác nhận chắc chắn."
+.\services\evidence_service.py:1286 - "ten_viet": "Nội Phủ Thị (chưa xác định chữ cuối)",
+.\services\evidence_service.py:1287 - "tên_việt": "Nội Phủ Thị (chưa xác định chữ cuối)",
+.\services\evidence_service.py:1288 - "ten_viet_ngan": "Nội Phủ Thị",
+.\services\evidence_service.py:1289 - "hien_thi_chinh": "Nội Phủ Thị (chưa xác định chữ cuối)",
+.\services\evidence_service.py:1290 - "hieu_de_vi": "Nội Phủ Thị (chưa xác định chữ cuối)",
+.\services\evidence_service.py:1291 - "trieu_dai": "Nhà Nguyễn (Việt Nam)",
+.\services\evidence_service.py:1292 - "triều_đại": "Nhà Nguyễn (Việt Nam)",
+.\services\evidence_service.py:1293 - "nien_hieu": "Nội Phủ Thị",
+.\services\evidence_service.py:1294 - "niên_hiệu": "Nội Phủ Thị",
+.\services\evidence_service.py:1295 - "phien_am": "Nội Phủ Thị",
+.\services\evidence_service.py:1296 - "phiên_âm": "Nội Phủ Thị",
+.\services\evidence_service.py:1297 - "hieu_de_en": "Nội Phủ Thị Mark (uncertain final character)",
+.\services\evidence_service.py:1306 - "Đã nhận ra nhóm Nội Phủ, nhưng chưa có OCR/ML xác nhận chữ thứ 4. "
+.\services\evidence_service.py:1307 - "Không dùng kết quả tìm ảnh để kết luận chắc biến thể 侍左/侍右/侍東/侍從."
+.\services\evidence_service.py:1312 - "Đã đính kèm nguồn/truy vấn tham khảo để đối chiếu. "
+.\services\evidence_service.py:1313 - "Các nguồn hiện có chưa đủ mạnh để xác nhận chắc chắn."
+.\services\evidence_service.py:1317 - "Chưa tìm được nguồn web đủ rõ để xác nhận chắc chắn. "
+.\services\evidence_service.py:1318 - "Kết quả hiện tại chỉ là dự đoán từ OCR/ML/DB."
+.\services\google_search.py:2 - Google Search Service — Tìm kiếm Google bằng cả 2 phương pháp:
+.\services\google_search.py:3 - 1. Google Custom Search API (nhanh, ổn định, có giới hạn quota)
+.\services\google_search.py:4 - 2. Selenium trực tiếp (không giới hạn, chậm hơn, cần Chrome)
+.\services\google_search.py:6 - Hệ thống tự động chọn: thử API trước, nếu không có key thì dùng Selenium.
+.\services\google_search.py:24 - """Một kết quả tìm kiếm từ Google."""
+.\services\google_search.py:27 - snippet: str  # Mô tả ngắn
+.\services\google_search.py:332 - # Phương pháp 1: Google Custom Search API
+.\services\google_search.py:340 - Tìm kiếm bằng Google Custom Search JSON API.
+.\services\google_search.py:342 - Ưu điểm: Nhanh, ổn định, không cần Chrome
+.\services\google_search.py:343 - Nhược điểm: Giới hạn 100 request/ngày (free tier)
+.\services\google_search.py:350 - print("[GoogleSearch/API] ⚠ Thiếu GOOGLE_CSE_API_KEY hoặc GOOGLE_CSE_CX")
+.\services\google_search.py:361 - "num": min(num_results, 10),  # API giới hạn tối đa 10
+.\services\google_search.py:362 - "lr": "lang_vi|lang_en|lang_zh-CN",  # Tìm tiếng Việt, Anh, Trung
+.\services\google_search.py:378 - print(f"[GoogleSearch/API] ✅ Tìm được {len(results)} kết quả cho: '{query}'")
+.\services\google_search.py:394 - # Phương pháp 2: Selenium Google Search
+.\services\google_search.py:490 - Tìm kiếm Google bằng Selenium (mở Chrome headless).
+.\services\google_search.py:492 - Ưu điểm: Không giới hạn quota, có thể bypass nhiều restriction
+.\services\google_search.py:493 - Nhược điểm: Chậm hơn API, cần cài Chrome
+.\services\google_search.py:508 - # Tạo Chrome driver
+.\services\google_search.py:510 - print(f"[GoogleSearch/Selenium] 🌐 Tìm: '{query}'")
+.\services\google_search.py:512 - # Mở Google (URL-encode query để hỗ trợ CJK characters)
+.\services\google_search.py:518 - # Đợi kết quả tải xong
+.\services\google_search.py:526 - # Parse kết quả tìm kiếm
+.\services\google_search.py:531 - # Tìm link
+.\services\google_search.py:537 - # Tìm tiêu đề
+.\services\google_search.py:544 - # Tìm snippet
+.\services\google_search.py:584 - print(f"[GoogleSearch/Selenium] ❌ Chrome không tìm thấy. Cài Chrome hoặc ChromeDriver.")
+.\services\google_search.py:586 - print(f"[GoogleSearch/Selenium] ❌ Chrome browser không cài đặt. Cài Google Chrome.")
+.\services\google_search.py:592 - print(f"[GoogleSearch/Selenium] ⏱ Timeout tìm kết quả Google")
+.\services\google_search.py:611 - print(f"[GoogleSearch/Selenium] ✅ Tìm được {len(results)} kết quả")
+.\services\google_search.py:613 - print(f"[GoogleSearch/Selenium] ⚠ Không có kết quả hoặc Chrome lỗi")
+.\services\google_search.py:674 - print(f"[WebSearch/DDG] ✅ Tìm được {len(results)} nguồn fallback")
+.\services\google_search.py:676 - print("[WebSearch/DDG] ⚠ Không có kết quả fallback")
+.\services\google_search.py:684 - # Entry Point — Tự động chọn phương pháp tốt nhất
+.\services\google_search.py:693 - Tìm kiếm Google với fallback tự động.
+.\services\google_search.py:695 - Thứ tự ưu tiên mặc định lấy từ SEARCH_METHOD.
+.\services\google_search.py:696 - Với dự án này Selenium là chính để tránh Google CSE API 403.
+.\services\google_search.py:699 - query: Từ khóa tìm kiếm
+.\services\google_search.py:700 - num_results: Số kết quả mong muốn
+.\services\google_search.py:701 - prefer_method: "api", "selenium", hoặc None (tự động)
+.\services\google_search.py:704 - Danh sách SearchResult (có thể empty nếu cả 2 cách đều fail)
+.\services\google_search.py:711 - # Selenium là đường chính: mở Chrome thật, đọc kết quả Google trực tiếp.
+.\services\google_search.py:713 - print(f"[GoogleSearch] 🔍 Cố gắng Selenium cho: '{query}'")
+.\services\google_search.py:721 - print(f"[GoogleSearch] ⚠ Selenium lỗi, fallback API...")
+.\services\google_search.py:725 - print(f"[GoogleSearch] ⚠ Google không trả nguồn, dùng web fallback...")
+.\services\google_search.py:728 - # Nếu yêu cầu API
+.\services\google_search.py:730 - print(f"[GoogleSearch] 🔍 Dùng API cho: '{query}'")
+.\services\google_search.py:734 - print(f"[GoogleSearch] ⚠ Google API không trả nguồn, dùng web fallback...")
+.\services\google_search.py:738 - print(f"[GoogleSearch] 🔍 Thử API cho: '{query}'")
+.\services\google_search.py:743 - print(f"[GoogleSearch] ⚠ API không trả kết quả, thử Selenium...")
+.\services\google_search.py:744 - print(f"[GoogleSearch] 🔍 Thử Selenium...")
+.\services\google_search.py:747 - print(f"[GoogleSearch] ⚠ Cả API và Selenium đều fail hoặc không có kết quả, dùng web fallback...")
+.\services\google_search.py:751 - # Fallback cho giá trị cấu hình lạ: dùng Selenium, không dùng API 403.
+.\services\google_search.py:752 - print(f"[GoogleSearch] ⚠ SEARCH_METHOD='{method}' không hợp lệ, dùng Selenium")
+.\services\google_search.py:771 - Tìm kiếm Google bằng hình ảnh (Google Lens).
+.\services\google_search.py:772 - Sử dụng Selenium để upload ảnh lên Google Images.
+.\services\google_search.py:775 - image_path: Đường dẫn file ảnh trên disk
+.\services\google_search.py:776 - num_results: Số kết quả mong muốn
+.\services\google_search.py:779 - Danh sách SearchResult từ Google Image Search
+.\services\google_search.py:785 - print(f"[GoogleImageSearch] ❌ File không tồn tại: {image_path}")
+.\services\google_search.py:791 - print(f"[GoogleImageSearch/HTTP] ✅ Tìm được {len(http_results)} kết quả")
+.\services\google_search.py:794 - print("[GoogleImageSearch] ⚠ HTTP upload không có kết quả; bỏ qua Selenium image search để tránh tim
+.\services\google_search.py:809 - # Mở Google Images
+.\services\google_search.py:813 - # Click nút tìm kiếm bằng hình ảnh (icon camera)
+.\services\google_search.py:819 - "div[aria-label*='Tìm kiếm bằng hình ảnh']",
+.\services\google_search.py:820 - "button[aria-label*='Tìm kiếm bằng hình ảnh']",
+.\services\google_search.py:821 - "span[aria-label*='Tìm kiếm bằng hình ảnh']",
+.\services\google_search.py:822 - "div[aria-label*='Tìm bằng hình ảnh']",
+.\services\google_search.py:823 - "button[aria-label*='Tìm bằng hình ảnh']",
+.\services\google_search.py:826 - "div[aria-label='TÃ¬m kiáº¿m báº±ng hÃ¬nh áº£nh']",
+.\services\google_search.py:840 - raise RuntimeError("Không tìm thấy nút Google Lens/camera")
+.\services\google_search.py:844 - print(f"[GoogleImageSearch] Không tìm thấy nút camera: {e}")
+.\services\google_search.py:848 - # Upload file ảnh
+.\services\google_search.py:850 - # Tìm input file (có thể ẩn)
+.\services\google_search.py:857 - print(f"[GoogleImageSearch] Không thể upload ảnh: {e}")
+.\services\google_search.py:861 - # Đợi Google Lens render grid kết quả và parse các visual-match cards.
+.\services\google_search.py:878 - print(f"[GoogleImageSearch] Không parse được visual matches. URL hiện tại: {driver.current_url}")
+.\services\google_search.py:889 - print(f"[GoogleImageSearch] ✅ Tìm được {len(results)} kết quả")
+.\services\llm_service.py:2 - LLM Service — Kết nối và gọi LLM (Gemini + OpenAI) cho hệ thống Multi-Pipeline.
+.\services\llm_service.py:4 - Hỗ trợ:
+.\services\llm_service.py:5 - - Google Gemini API (primary) — sử dụng google-genai SDK mới
+.\services\llm_service.py:7 - - Tự động fallback khi API chính lỗi
+.\services\llm_service.py:8 - - Retry logic với exponential backoff
+.\services\llm_service.py:9 - - Prompt template cho phân tích hiệu đề
+.\services\llm_service.py:25 - # Lazy imports — chỉ import khi thật sự cần dùng
+.\services\llm_service.py:38 - """Lazy init Gemini client (google-genai SDK mới)."""
+.\services\llm_service.py:46 - print("[LLM] ⚠ GEMINI_API_KEY chưa được cấu hình")
+.\services\llm_service.py:51 - print(f"[LLM] ✅ Gemini client đã sẵn sàng (model: {GEMINI_MODEL})")
+.\services\llm_service.py:53 - print(f"[LLM] ❌ Không thể khởi tạo Gemini: {e}")
+.\services\llm_service.py:67 - print("[LLM] ⚠ OPENAI_API_KEY chưa được cấu hình")
+.\services\llm_service.py:71 - print("[LLM] ✅ OpenAI client đã sẵn sàng")
+.\services\llm_service.py:73 - print(f"[LLM] ❌ Không thể khởi tạo OpenAI: {e}")
+.\services\llm_service.py:84 - Gọi Gemini API (google-genai SDK mới) với retry cho lỗi 503.
+.\services\llm_service.py:101 - """Blocking call với retry cho 503/429."""
+.\services\llm_service.py:145 - Gọi OpenAI GPT API.
+.\services\llm_service.py:148 - prompt: Nội dung prompt
+.\services\llm_service.py:149 - temperature: Nhiệt độ
+.\services\llm_service.py:150 - max_tokens: Số token tối đa
+.\services\llm_service.py:153 - Text response hoặc None nếu lỗi
+.\services\llm_service.py:171 - "Bạn là chuyên gia về gốm sứ cổ Trung Quốc và Việt Nam. "
+.\services\llm_service.py:172 - "Bạn có kiến thức sâu về hiệu đề (reign marks) trên đáy bát, "
+.\services\llm_service.py:173 - "đĩa, lọ hoa gốm sứ qua các triều đại."
+.\services\llm_service.py:195 - """Wrapper để gọi Ollama service."""
+.\services\llm_service.py:209 - Gọi LLM với fallback tự động.
+.\services\llm_service.py:211 - Nếu provider chính lỗi, tự động thử provider phụ.
+.\services\llm_service.py:212 - Hỗ trợ: Ollama (local), Gemini (cloud), OpenAI (cloud)
+.\services\llm_service.py:215 - prompt: Nội dung prompt
+.\services\llm_service.py:216 - provider: "ollama", "gemini", "openai", hoặc None (dùng PRIMARY_LLM từ config)
+.\services\llm_service.py:217 - temperature: Override nhiệt độ (None = dùng config)
+.\services\llm_service.py:218 - max_tokens: Override max tokens (None = dùng config)
+.\services\llm_service.py:219 - retry: Số lần retry khi lỗi
+.\services\llm_service.py:222 - Text response hoặc None nếu cả 3 provider đều lỗi
+.\services\llm_service.py:230 - # Xác định thứ tự thử (primary provider trước, sau đó fallback)
+.\services\llm_service.py:256 - print(f"[LLM] ⚠ Fallback sang {name} thành công")
+.\services\llm_service.py:268 - print("[LLM] ❌ Tất cả provider đều lỗi!")
+.\services\llm_service.py:273 - # Prompt Templates — Chuyên biệt cho phân tích hiệu đề
+.\services\llm_service.py:276 - PROMPT_EXTRACT_INFO = """Bạn là chuyên gia phân tích hiệu đề (reign marks) trên gốm sứ cổ Trung Quốc
+.\services\llm_service.py:287 - 侍 ↔ 待 ↔ 停 ↔ 仃 ↔ 亭 (bộ 亻, PaddleOCR rất hay nhầm — 停 trên gốm LUÔN là 侍)
+.\services\llm_service.py:290 - 康 ↔ 泰 (PaddleOCR thường đọc sai)  造 ↔ 遣 (radical similarity)
+.\services\llm_service.py:308 - - 内府侍X = Vietnamese Nguyễn dynasty Imperial workshop marks:
+.\services\llm_service.py:310 - - 停 trên gốm sứ Huế LUÔN LUÔN là 侍 bị OCR đọc sai. Không tồn tại hiệu đề nào chứa 停.
+.\services\llm_service.py:311 - - Nếu OCR text dạng 府停内 / 内府停 / 停内府 → đây là 內府侍X bị sai thứ tự + thiếu ký tự cuối
+.\services\llm_service.py:312 - - Với nhóm 內府侍X, KHÔNG đổi 東 thành 從 nếu OCR/ảnh vẫn thấy nét của chữ 東
+.\services\llm_service.py:317 - Dưới đây là text chữ Hán được OCR đọc từ đáy một món gốm sứ:
+.\services\llm_service.py:319 - **Chữ Hán OCR: "{ocr_text}"**
+.\services\llm_service.py:321 - Hãy phân tích và trả về thông tin dưới dạng JSON (CHỈNH SỬA TRƯỚC KHI TRẢ VỀ nếu có lỗi OCR rõ ràng)
+.\services\llm_service.py:325 - "chu_han": "Chữ Hán đúng (đã sửa lỗi OCR + KHÔI PHỤC ký tự thiếu nếu có)",
+.\services\llm_service.py:326 - "trieu_dai": "Triều đại (Minh Triều / Thanh Triều / Nhà Nguyễn (Việt Nam) / Đặc biệt - Cung đình / K
+.\services\llm_service.py:327 - "nien_hieu": "Niên hiệu (ví dụ: Tuyên Đức, Khang Hy, Càn Long, Nội Phủ Thị Tòng...)",
+.\services\llm_service.py:328 - "hoang_de": "Tên hoàng đế",
+.\services\llm_service.py:329 - "nam_bat_dau": "Năm bắt đầu niên hiệu (số nguyên hoặc null)",
+.\services\llm_service.py:330 - "nam_ket_thuc": "Năm kết thúc niên hiệu (số nguyên hoặc null)",
+.\services\llm_service.py:331 - "phien_am": "Phiên âm Hán-Việt đầy đủ",
+.\services\llm_service.py:332 - "y_nghia": "Ý nghĩa của hiệu đề, mô tả ngắn gọn",
+.\services\llm_service.py:333 - "do_tin_cay": "Độ tin cậy của phân tích (0.0 → 1.0)",
+.\services\llm_service.py:334 - "ghi_chu": "Ghi chú thêm (lỗi OCR đã sửa, ký tự đã khôi phục, ký tự không chắc chắn)",
+.\services\llm_service.py:339 - Lưu ý:
+.\services\llm_service.py:340 - - Nếu text quá ngắn hoặc thiếu ký tự, hãy CỐ GẮNG SUY LUẬN mark đầy đủ từ ngữ cảnh hiệu đề gốm sứ.
+.\services\llm_service.py:341 - - Nếu phát hiện lỗi OCR phổ biến (ví dụ: 得→德, 請→靖, 厤→曆, 杜→右, 待→侍, 停→侍), hãy sửa trong "chu_han".
+.\services\llm_service.py:342 - - Nếu mark chứa 内府 hoặc 內府, đây là hiệu đề xưởng gốm Nội Phủ (Imperial Household Bureau) thuộc triều
+.\services\llm_service.py:343 - - QUAN TRỌNG: chu_han phải trả về ĐÚNG SỐ KÝ TỰ theo dạng mark (4 hoặc 6 ký tự), không được thiếu.
+.\services\llm_service.py:344 - - Trả về JSON hợp lệ, không thêm markdown hay text thừa bên ngoài JSON.
+.\services\llm_service.py:347 - PROMPT_VERIFY_INFO = """Bạn là chuyên gia lịch sử gốm sứ cổ. Hãy kiểm tra lại thông tin phân tích hi
+.\services\llm_service.py:349 - **Thông tin cần kiểm tra:**
+.\services\llm_service.py:352 - **Chữ Hán OCR gốc:** "{ocr_text}"
+.\services\llm_service.py:354 - Hãy kiểm tra tính chính xác và trả về JSON:
+.\services\llm_service.py:361 - "field_name": "giá trị đúng"
+.\services\llm_service.py:363 - "explanation": "Giải thích ngắn gọn lý do xác nhận/sửa chữa",
+.\services\llm_service.py:377 - Kiểm tra các điểm sau:
+.\services\llm_service.py:378 - 1. Niên hiệu có đúng triều đại không? (ví dụ: Tuyên Đức thuộc Minh, không phải Thanh)
+.\services\llm_service.py:379 - 2. Năm bắt đầu/kết thúc có chính xác không?
+.\services\llm_service.py:380 - 3. Phiên âm Hán-Việt có đúng không?
+.\services\llm_service.py:381 - 4. Chữ Hán có bị nhầm lẫn với hiệu đề khác không?
+.\services\llm_service.py:384 - PROMPT_SYNTHESIZE_SEARCH = """Bạn là chuyên gia gốm sứ cổ. Dưới đây là thông tin thu thập từ nhiều n
+.\services\llm_service.py:386 - **Chữ Hán OCR (nếu có):** "{ocr_text}"
+.\services\llm_service.py:388 - **Các bài viết tham khảo:**
+.\services\llm_service.py:391 - Dựa trên các bài viết trên, hãy tổng hợp thông tin về hiệu đề này và trả về JSON:
+.\services\llm_service.py:395 - "chu_han": "Chữ Hán chính xác",
+.\services\llm_service.py:396 - "trieu_dai": "Triều đại",
+.\services\llm_service.py:397 - "nien_hieu": "Niên hiệu",
+.\services\llm_service.py:398 - "hoang_de": "Hoàng đế",
+.\services\llm_service.py:401 - "phien_am": "Phiên âm Hán-Việt",
+.\services\llm_service.py:402 - "y_nghia": "Ý nghĩa tổng hợp từ các bài viết",
+.\services\llm_service.py:408 - Lưu ý:
+.\services\llm_service.py:409 - - Ưu tiên thông tin từ nguồn học thuật/bảo tàng hơn blog cá nhân.
+.\services\llm_service.py:410 - - Nếu các nguồn mâu thuẫn nhau, chọn thông tin phổ biến nhất và ghi chú sự khác biệt.
+.\services\llm_service.py:411 - - Trả về JSON hợp lệ, không markdown.
+.\services\llm_service.py:416 - # Helper — Parse JSON response từ LLM
+.\services\llm_service.py:421 - Parse JSON từ response LLM (có thể chứa markdown code block).
+.\services\llm_service.py:423 - LLM thường trả về:
+.\services\llm_service.py:427 - Hàm này tự động strip markdown wrapper.
+.\services\llm_service.py:434 - # Xóa markdown code block nếu có
+.\services\llm_service.py:436 - # Tìm dòng đầu tiên kết thúc bằng ``` và dòng cuối cùng bắt đầu bằng ```
+.\services\llm_service.py:451 - # Thử tìm JSON object trong text
+.\services\llm_service.py:460 - print(f"[LLM] ⚠ Không thể parse JSON từ response: {text[:200]}...")
+.\services\ollama_service.py:2 - Ollama Service — Tích hợp local LLM từ Ollama.
+.\services\ollama_service.py:4 - Ollama cho phép chạy LLM trên máy local (không cần API key):
+.\services\ollama_service.py:5 - - Miễn phí (chỉ cần GPU/CPU)
+.\services\ollama_service.py:6 - - Mất ~5-30s per request (tùy model + hardware)
+.\services\ollama_service.py:7 - - Bảo mật cao (dữ liệu không gửi cloud)
+.\services\ollama_service.py:8 - - Hỗ trợ nhiều model: neural-chat, mistral, llama2, qwen, etc.
+.\services\ollama_service.py:10 - Cài đặt: https://ollama.ai
+.\services\ollama_service.py:13 - Sử dụng:
+.\services\ollama_service.py:14 - async result = await call_ollama(prompt="Xác định hiệu đề: ...")
+.\services\ollama_service.py:28 - Gọi Ollama API (local inference) sử dụng ollama Python library.
+.\services\ollama_service.py:31 - prompt: Nội dung prompt
+.\services\ollama_service.py:32 - temperature: Nhiệt độ (0.0-1.0)
+.\services\ollama_service.py:33 - max_tokens: Số token tối đa output
+.\services\ollama_service.py:34 - timeout: Timeout (giây) - để cao vì inference local chậm
+.\services\ollama_service.py:37 - Text response hoặc None nếu lỗi
+.\services\ollama_service.py:43 - # Tính timeout thực tế
+.\services\ollama_service.py:46 - # Hệ thống prompt cho chuyên gia gốm sứ
+.\services\ollama_service.py:48 - "Bạn là chuyên gia về gốm sứ cổ Trung Quốc và Việt Nam. "
+.\services\ollama_service.py:49 - "Bạn có kiến thức sâu về hiệu đề (reign marks) trên đáy bát, "
+.\services\ollama_service.py:50 - "đĩa, lọ hoa gốm sứ qua các triều đại. Trả lời ngắn gọn, chính xác."
+.\services\ollama_service.py:53 - # Gọi Ollama (chạy trong executor vì blocking)
+.\services\ollama_service.py:58 - # Tạo client (library ollama tự kết nối tới localhost:11434)
+.\services\ollama_service.py:78 - # Thực hiện call với timeout
+.\services\ollama_service.py:88 - print(f"[LLM/Ollama] 💡 Model {OLLAMA_MODEL} chậm, thử model nhẹ hơn (e.g., mistral, orca-mini)")
+.\services\ollama_service.py:93 - print(f"[LLM/Ollama] ❌ Không thể kết nối Ollama ({OLLAMA_BASE_URL})")
+.\services\ollama_service.py:94 - print(f"[LLM/Ollama] 💡 Hãy cài Ollama: https://ollama.ai")
+.\services\ollama_service.py:95 - print(f"[LLM/Ollama] 💡 Sau đó chạy: ollama serve")
+.\services\ollama_service.py:104 - Kiểm tra Ollama server có chạy không.
+.\services\ollama_service.py:107 - True nếu Ollama chạy và model available, False nếu không
+.\services\ollama_service.py:113 - # Kiểm tra server live + list models
+.\services\ollama_service.py:120 - print(f"[Ollama] ⚠ Không có model nào được pull")
+.\services\ollama_service.py:121 - print(f"[Ollama] 💡 Chạy: ollama pull {OLLAMA_MODEL}")
+.\services\ollama_service.py:124 - # Kiểm tra model cụ thể
+.\services\ollama_service.py:130 - print(f"[Ollama] ⚠ Model '{OLLAMA_MODEL}' chưa được pull")
+.\services\ollama_service.py:131 - print(f"[Ollama] 💡 Chạy: ollama pull {OLLAMA_MODEL}")
+.\services\ollama_service.py:136 - print(f"[Ollama] ❌ Không thể kết nối {OLLAMA_BASE_URL}")
+.\services\ollama_service.py:137 - print(f"[Ollama] 💡 Ollama chưa chạy. Chạy lệnh:")
+.\services\ollama_service.py:141 - print(f"[Ollama] ❌ Health check lỗi: {e}")
+.\services\ollama_service.py:146 - # Dùng cho startup check
+.\services\ollama_service.py:149 - Khởi tạo Ollama khi app start.
+.\services\ollama_service.py:150 - Kiểm tra server + model availability.
+.\services\vision_service.py:146 - return f"{provider}: hết quota hoặc bị rate limit (429)"
+.\services\vision_service.py:148 - return f"{provider}: API key không hợp lệ hoặc chưa được cấp quyền"
+.\services\vision_service.py:152 - return f"{provider}: model không khả dụng"
+.\services\web_scraper.py:2 - Web Scraper Service — Đọc nội dung bài viết từ URL bằng Selenium + BeautifulSoup.
+.\services\web_scraper.py:4 - Sử dụng Selenium để load trang (bao gồm JavaScript-rendered content),
+.\services\web_scraper.py:5 - sau đó dùng BeautifulSoup để extract text sạch.
+.\services\web_scraper.py:16 - """Nội dung một bài viết đã được scrape."""
+.\services\web_scraper.py:19 - content: str          # Nội dung text sạch
+.\services\web_scraper.py:20 - word_count: int       # Số từ
+.\services\web_scraper.py:21 - language: str = ""    # Ngôn ngữ phát hiện được
+.\services\web_scraper.py:27 - "content": self.content[:2000],  # Giới hạn để không quá dài cho LLM
+.\services\web_scraper.py:33 - """Làm sạch text: xóa khoảng trắng thừa, dòng trống."""
+.\services\web_scraper.py:41 - Extract nội dung bài viết từ HTML bằng BeautifulSoup.
+.\services\web_scraper.py:42 - Ưu tiên các tag chứa nội dung chính (article, main, .content, etc.)
+.\services\web_scraper.py:48 - # Xóa các element không cần thiết
+.\services\web_scraper.py:53 - # Lấy title
+.\services\web_scraper.py:62 - # Thử tìm nội dung chính theo thứ tự ưu tiên
+.\services\web_scraper.py:70 - # 2. Tag có class/id chứa "content", "post", "article", "entry"
+.\services\web_scraper.py:81 - # 3. Fallback: lấy toàn bộ body
+.\services\web_scraper.py:92 - # Giới hạn độ dài (tránh gửi quá nhiều text cho LLM)
+.\services\web_scraper.py:109 - Đọc nội dung một URL bằng httpx (nhanh) hoặc Selenium (nếu cần JS).
+.\services\web_scraper.py:111 - Thử httpx trước, nếu thất bại (trang cần JS) thì dùng Selenium.
+.\services\web_scraper.py:113 - # Thử httpx trước (nhanh hơn nhiều so với Selenium)
+.\services\web_scraper.py:123 - """Scrape bằng httpx (HTTP GET đơn giản)."""
+.\services\web_scraper.py:137 - # Chỉ xử lý HTML
+.\services\web_scraper.py:151 - """Scrape bằng Selenium (cho trang cần JavaScript)."""
+.\services\web_scraper.py:163 - time.sleep(2)  # Đợi JS render
+.\services\web_scraper.py:184 - Scrape nhiều URL đồng thời (giới hạn concurrent để tránh bị block).
+.\services\web_scraper.py:187 - urls: Danh sách URL cần scrape
+.\services\web_scraper.py:188 - max_concurrent: Số URL xử lý đồng thời tối đa
+.\services\web_scraper.py:191 - Danh sách ArticleContent (chỉ trả về những URL scrape thành công)
+.\services\web_scraper.py:207 - print(f"[Scraper] ✅ Scrape thành công {len(articles)}/{len(urls)} bài viết")
+.\services\__init__.py:1 - """Services package — các dịch vụ dùng chung giữa các pipeline."""
+.\voting\aggregator.py:2 - Voting Aggregator — Tổng hợp kết quả từ 4 pipeline thành kết quả cuối cùng.
+.\voting\aggregator.py:4 - Sử dụng weighted voting:
+.\voting\aggregator.py:5 - - Mỗi pipeline có trọng số (weight) riêng
+.\voting\aggregator.py:6 - - Kết quả cuối = pipeline có tổng điểm (confidence × weight) cao nhất
+.\voting\aggregator.py:7 - - Thông tin bổ sung được cross-reference từ các pipeline khác
+.\voting\aggregator.py:16 - Tổng hợp kết quả từ tất cả pipeline.
+.\voting\aggregator.py:19 - 1. Lọc bỏ pipeline failed/skipped
+.\voting\aggregator.py:20 - 2. Tính weighted score cho mỗi kết quả
+.\voting\aggregator.py:21 - 3. Voting theo triều đại (majority wins)
+.\voting\aggregator.py:22 - 4. Chọn thông tin chi tiết từ pipeline có confidence cao nhất
+.\voting\aggregator.py:23 - 5. Bổ sung thông tin từ pipeline khác (cross-reference)
+.\voting\aggregator.py:26 - results: Danh sách PipelineResult từ các pipeline
+.\voting\aggregator.py:29 - Dictionary chứa kết quả tổng hợp cuối cùng
+.\voting\aggregator.py:32 - """Chỉ giữ ký tự CJK và chuẩn hóa biến thể giản/phồn thể phổ biến."""
+.\voting\aggregator.py:59 - # 1. Lọc kết quả hợp lệ, đồng thời loại kết luận generic yếu kiểu 大明年製.
+.\voting\aggregator.py:66 - "message": "Không có pipeline nào trả về kết quả hợp lệ; đã bỏ qua kết luận generic thiếu niên hiệu 
+.\voting\aggregator.py:72 - print(f"[Voting] ⚠ Chỉ có {len(valid_results)} pipeline hợp lệ "
+.\voting\aggregator.py:73 - f"(yêu cầu tối thiểu {MIN_PIPELINE_RESPONSES})")
+.\voting\aggregator.py:75 - # 2. Tính weighted score
+.\voting\aggregator.py:84 - # 3. Voting theo triều đại
+.\voting\aggregator.py:95 - # 4. Chọn pipeline chính (highest weighted score)
+.\voting\aggregator.py:104 - if "nguyen" in raw or "nguyễn" in raw or "nam" in raw or "南" in raw:
+.\voting\aggregator.py:151 - # Tìm database entry tương ứng để lấy thông tin chi tiết
+.\voting\aggregator.py:152 - # FIX: Normalize CJK để match cả 内 (simplified) vs 內 (traditional)
+.\voting\aggregator.py:171 - # Thử match theo nhiều field
+.\voting\aggregator.py:177 - # Thêm biến thể
+.\voting\aggregator.py:206 - # Logic: Nếu database có chu_han_4 và chu_han_6 khác nhau
+.\voting\aggregator.py:207 - # Hãy chọn version phù hợp với độ dài OCR
+.\voting\aggregator.py:208 - # (tránh trường hợp trả 6 chữ khi ảnh chỉ có 4 chữ)
+.\voting\aggregator.py:216 - # Nếu OCR có tín hiệu >=6 chữ, ưu tiên 6 chữ; ngược lại dùng 4 chữ
+.\voting\aggregator.py:217 - # (Tránh thêm tiền tố Dynasty khi ảnh chỉ có Mark phần chính)
+.\voting\aggregator.py:221 - # Có cả 2 version -> quyết định dựa trên OCR length
+.\voting\aggregator.py:228 - # Chỉ có 4-char version
+.\voting\aggregator.py:235 - # 5. Xây dựng kết quả cuối cùng
+.\voting\aggregator.py:236 - # NGUYÊN TẮC: Database là nguồn ưu tiên cao nhất cho thông tin lịch sử.
+.\voting\aggregator.py:237 - # LLM chỉ bổ sung khi database không có hoặc thiếu field.
+.\voting\aggregator.py:240 - # Helper: lấy giá trị ưu tiên db_entry > best_result > default
+.\voting\aggregator.py:242 - """Ưu tiên database, fallback pipeline, fallback default."""
+.\voting\aggregator.py:245 - if val is not None and val != "" and val != "Chưa xác định":
+.\voting\aggregator.py:247 - if pipeline_val is not None and pipeline_val != "" and pipeline_val != "Chưa xác định":
+.\voting\aggregator.py:251 - # Lấy thông tin ưu tiên từ DB
+.\voting\aggregator.py:271 - "tin_cay": round(best_result.confidence, 4),  # Tiếng Việt
+.\voting\aggregator.py:276 - # Thông tin chính (ưu tiên database > pipeline)
+.\voting\aggregator.py:278 - "hieu_de": best_chu_han,  # Hiệu đề = Chu Hán (Vietnamese name)
+.\voting\aggregator.py:281 - "triều_đại": final_trieu_dai,
+.\voting\aggregator.py:284 - "niên_hiệu": final_nien_hieu,
+.\voting\aggregator.py:287 - "hoàng_đế": final_hoang_de,
+.\voting\aggregator.py:296 - "niên_đại": final_nien_dai,
+.\voting\aggregator.py:299 - "tên_việt": final_ten_viet,
+.\voting\aggregator.py:301 - "tên_việt_ngắn": final_ten_viet_short,
+.\voting\aggregator.py:306 - "phiên_âm": final_phien_am,
+.\voting\aggregator.py:309 - "ý_nghĩa": final_y_nghia,
+.\voting\aggregator.py:313 - # Database fields (Mô tả chi tiết - Vietnamese descriptions)
+.\voting\aggregator.py:314 - "mo_ta": db_entry.get("mo_ta", "Đang cập nhật...") if db_entry else "Đang cập nhật...",
+.\voting\aggregator.py:315 - "boi_canh": db_entry.get("mo_ta", "Đang cập nhật...") if db_entry else "Đang cập nhật...",  # Bối cả
+.\voting\aggregator.py:317 - "nghe_thuat": db_entry.get("nghe_thuat", "Đang cập nhật...") if db_entry else "Đang cập nhật...",
+.\voting\aggregator.py:318 - "dac_diem_nghe_thuat": db_entry.get("nghe_thuat", "Đang cập nhật...") if db_entry else "Đang cập nhậ
+.\voting\aggregator.py:320 - "thu_phap": db_entry.get("thu_phap", "Đang cập nhật...") if db_entry else "Đang cập nhật...",
+.\voting\aggregator.py:321 - "thu_phap_dac_biet": db_entry.get("thu_phap", "Đang cập nhật...") if db_entry else "Đang cập nhật...
+.\voting\aggregator.py:324 - "ghi_chu_them": db_entry.get("ghi_chu", "") if db_entry else "",  # Ghi chú thêm
+.\voting\aggregator.py:328 - "pipeline_chinh": best_result.pipeline_name,  # Pipeline chính (Vietnamese)
+.\voting\aggregator.py:331 - "so_pipeline_hop_le": len(valid_results),  # Số pipeline hợp lệ (Vietnamese)
+.\voting\aggregator.py:334 - "cac_nguon_tham_khao": [],  # Các nguồn tham khảo (Vietnamese)
+.\voting\aggregator.py:337 - "giai_thich_llm": best_result.llm_explanation,  # Giải thích LLM (Vietnamese)
+.\voting\aggregator.py:339 - # Nguồn dữ liệu chính
+.\voting\aggregator.py:341 - "nguon_du_lieu": "Cơ sở dữ liệu hiệu đề" if db_entry else "Phân tích AI",
+.\voting\aggregator.py:343 - # Chi tiết từng pipeline
+.\voting\aggregator.py:347 - # Cross-reference: bổ sung thông tin thiếu từ pipeline khác
+.\voting\aggregator.py:351 - final["hoàng_đế"] = r.hoang_de
+.\voting\aggregator.py:354 - final["phiên_âm"] = r.phien_am
+.\voting\aggregator.py:357 - final["ý_nghĩa"] = r.y_nghia
+.\voting\aggregator.py:362 - # Tính confidence tổng hợp
+.\voting\aggregator.py:371 - # Thêm Vietnamese summary field
+.\voting\aggregator.py:374 - summary_parts.append(f"Hiệu đề: {final['chu_han']}")
+.\voting\aggregator.py:376 - summary_parts.append(f"Triều: {final['trieu_dai']}")
+.\voting\aggregator.py:378 - summary_parts.append(f"Niên hiệu: {final['nien_hieu']}")
+.\voting\aggregator.py:380 - summary_parts.append(f"Hoàng đế: {final['hoang_de']}")
+.\voting\aggregator.py:382 - summary_parts.append(f"Giai đoạn: {final['nam_bat_dau']}-{final['nam_ket_thuc']}")
+.\voting\aggregator.py:384 - final["tom_tat_tieng_viet"] = " | ".join(summary_parts) if summary_parts else "Không xác định"
+.\voting\aggregator.py:386 - print(f"\n[Voting] 🗳️ Kết quả tổng hợp:")
+.\voting\aggregator.py:387 - print(f"  Pipeline chính: {best_result.pipeline_name} (score={best_score:.4f})")
+.\voting\aggregator.py:388 - print(f"  Triều đại: {voted_dynasty}")
+.\voting\aggregator.py:389 - print(f"  Tín cậy: {final['confidence']:.2%}")
+.\voting\aggregator.py:390 - print(f"  Pipeline hợp lệ: {len(valid_results)}/{len(results)}")
+.\voting\__init__.py:1 - """Voting package — logic tổng hợp kết quả từ nhiều pipeline."""

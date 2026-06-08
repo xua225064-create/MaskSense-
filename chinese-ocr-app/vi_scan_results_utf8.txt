@@ -1,0 +1,1 @@
+﻿.\pipelines\pipeline_vision_read.py:23 - message = "; ".join(errors[:3]) if errors else "kh⌠ng r⌡ ngu

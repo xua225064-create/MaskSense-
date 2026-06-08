@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MarkSense AI — Admin Panel</title>
+<title>MarkSense — Admin Panel</title>
+<link rel="icon" type="image/png" href="/uploads/favicon.png">
+<link rel="shortcut icon" type="image/png" href="/uploads/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 <style>
@@ -150,6 +152,12 @@ font-size:14px;outline:none;font-family:inherit;transition:.2s}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;
 border-top:1px solid var(--border)}
+.confirm-dialog{width:460px;max-width:92vw;padding:28px}
+.confirm-dialog h3{margin-bottom:10px}
+.confirm-message{color:var(--text2);font-size:14px;line-height:1.6;margin-top:6px}
+.confirm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:26px}
+.btn-danger-solid{background:var(--red);color:#fff}
+.btn-danger-solid:hover{background:#dc2626;transform:translateY(-1px)}
 
 /* TOAST */
 .toast-container{position:fixed;top:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:8px}
@@ -195,10 +203,10 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 <div id="loginOverlay">
 <div class="login-card">
   <div class="logo"><i class="fas fa-shield-halved"></i> MarkSense AI</div>
-  <div class="sub">Bảng điều khiển quản trị hệ thống</div>
-  <input type="text" id="loginUser" placeholder="Tên đăng nhập" autocomplete="off">
-  <input type="password" id="loginPass" placeholder="Mật khẩu">
-  <button onclick="doLogin()"><i class="fas fa-right-to-bracket"></i> Đăng Nhập</button>
+  <div class="sub">System administration dashboard</div>
+  <input type="text" id="loginUser" placeholder="Username" autocomplete="off">
+  <input type="password" id="loginPass" placeholder="Password">
+  <button onclick="doLogin()"><i class="fas fa-right-to-bracket"></i> Sign In</button>
   <div class="login-error" id="loginError"></div>
 </div>
 </div>
@@ -209,31 +217,33 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 <aside class="sidebar">
   <div class="brand">
     <h2><i class="fas fa-shield-halved"></i> Admin Panel</h2>
-    <p>MarkSense AI System</p>
+    <p>MarkSense System</p>
   </div>
   <nav>
     <a class="active" data-page="dashboard" onclick="switchPage('dashboard')">
-      <i class="fas fa-chart-pie"></i><span>Tổng Quan</span></a>
+      <i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
     <a data-page="users" onclick="switchPage('users')">
-      <i class="fas fa-users"></i><span>Người Dùng</span></a>
+      <i class="fas fa-users"></i><span>Users</span></a>
     <a data-page="payments" onclick="switchPage('payments')">
-      <i class="fas fa-credit-card"></i><span>Giao Dịch</span></a>
+      <i class="fas fa-credit-card"></i><span>Transactions</span></a>
     <a data-page="marks" onclick="switchPage('marks')">
-      <i class="fas fa-book-open"></i><span>Từ Điển Hiệu Đề</span></a>
+      <i class="fas fa-book-open"></i><span>Mark Dictionary</span></a>
     <a data-page="scans" onclick="switchPage('scans')">
-      <i class="fas fa-magnifying-glass"></i><span>Lịch Sử Scan</span></a>
+      <i class="fas fa-magnifying-glass"></i><span>Scan History</span></a>
+    <a data-page="pages" onclick="switchPage('pages')">
+      <i class="fas fa-file-lines"></i><span>Page Manager</span></a>
     <a data-page="settings" onclick="switchPage('settings')">
-      <i class="fas fa-gear"></i><span>Cài Đặt</span></a>
+      <i class="fas fa-gear"></i><span>Settings</span></a>
   </nav>
   <div class="logout-area">
-    <button onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</button>
+    <button onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
   </div>
 </aside>
 
 <!-- MAIN CONTENT -->
 <div class="main">
 <div class="main-header">
-  <h1 id="pageTitle">Tổng Quan</h1>
+  <h1 id="pageTitle">Dashboard</h1>
   <div class="admin-badge"><i class="fas fa-user-shield"></i> <span id="adminName">Admin</span></div>
 </div>
 
@@ -244,11 +254,11 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
   <div class="stats-grid" id="statsGrid"></div>
   <div class="charts-row">
     <div class="chart-box">
-      <h3><i class="fas fa-chart-bar" style="color:var(--primary2)"></i> Doanh Thu 7 Ngày</h3>
+      <h3><i class="fas fa-chart-bar" style="color:var(--primary2)"></i> 7-Day Revenue</h3>
       <div class="chart-bars" id="revenueChart"></div>
     </div>
     <div class="chart-box">
-      <h3><i class="fas fa-chart-line" style="color:var(--cyan)"></i> Lượt Scan 7 Ngày</h3>
+      <h3><i class="fas fa-chart-line" style="color:var(--cyan)"></i> 7-Day Scans</h3>
       <div class="chart-bars" id="scansChart"></div>
     </div>
   </div>
@@ -258,14 +268,14 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 <div class="page" id="page-users">
   <div class="table-card">
     <div class="table-header">
-      <h3><i class="fas fa-users" style="color:var(--primary2)"></i> Danh Sách Người Dùng</h3>
+      <h3>User List</h3>
       <div class="actions">
-        <input type="text" id="userSearch" placeholder="🔍 Tìm kiếm..." oninput="filterUsers()">
+        <input type="text" id="userSearch" placeholder="Search..." oninput="filterUsers()">
       </div>
     </div>
     <div style="overflow-x:auto">
     <table>
-      <thead><tr><th>ID</th><th>Username</th><th>Credits</th><th>Lượt Scan</th><th>Chi Tiêu</th><th>Role</th><th>Trạng Thái</th><th>Ngày Tạo</th><th>Thao Tác</th></tr></thead>
+      <thead><tr><th>ID</th><th>Username</th><th>Credits</th><th>Scans</th><th>Spent</th><th>Role</th><th>Status</th><th>Created At</th><th>Actions</th></tr></thead>
       <tbody id="usersBody"></tbody>
     </table>
     </div>
@@ -276,66 +286,66 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 <div class="page" id="page-payments">
   
   <div class="settings-card" style="margin-bottom:24px;">
-    <h3><i class="fas fa-tags" style="color:var(--primary2)"></i> Quản Lý Các Gói Nâng Cấp</h3>
+    <h3>Manage Upgrade Packages</h3>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:16px;">
-      
+
       <div style="background:var(--bg2);padding:16px;border-radius:12px;border:1px solid var(--border)">
-        <h4 style="margin-bottom:12px;color:var(--text);font-size:14px;">Gói Cơ Bản</h4>
+        <h4 style="margin-bottom:12px;color:var(--text);font-size:14px;">Free</h4>
         <div class="form-group">
-          <label>Số tiền (VNĐ)</label>
-          <input type="number" id="setting_pkg_basic_price" value="490000">
+          <label>Amount (VND)</label>
+          <input type="number" id="package_free_price" value="0" disabled>
         </div>
         <div class="form-group">
-          <label>Lượt phân tích</label>
-          <input type="number" id="setting_pkg_basic_credits" value="50">
+          <label>Initial free scans</label>
+          <input type="number" id="package_free_credits" value="10">
         </div>
       </div>
 
       <div style="background:var(--bg2);padding:16px;border-radius:12px;border:1px solid var(--border)">
-        <h4 style="margin-bottom:12px;color:var(--text);font-size:14px;">Gói Phổ Biến</h4>
+        <h4 style="margin-bottom:12px;color:var(--text);font-size:14px;">Pro</h4>
         <div class="form-group">
-          <label>Số tiền (VNĐ)</label>
-          <input type="number" id="setting_pkg_pro_price" value="447712">
+          <label>Amount (VND)</label>
+          <input type="number" id="setting_pkg_pro_price" value="499999">
         </div>
         <div class="form-group">
-          <label>Lượt phân tích</label>
+          <label>Analysis credits</label>
           <input type="number" id="setting_pkg_pro_credits" value="200">
         </div>
       </div>
 
       <div style="background:var(--bg2);padding:16px;border-radius:12px;border:1px solid var(--border)">
-        <h4 style="margin-bottom:12px;color:var(--text);font-size:14px;">Gói Chuyên Nghiệp</h4>
+        <h4 style="margin-bottom:12px;color:var(--text);font-size:14px;">Enterprise</h4>
         <div class="form-group">
-          <label>Số tiền (VNĐ)</label>
+          <label>Amount (VND)</label>
           <input type="number" id="setting_pkg_enterprise_price" value="2490000">
         </div>
         <div class="form-group">
-          <label>Lượt phân tích</label>
+          <label>Analysis credits</label>
           <input type="number" id="setting_pkg_enterprise_credits" value="99999">
         </div>
       </div>
 
     </div>
     <div style="text-align:right;margin-top:16px;">
-      <button class="btn btn-primary" onclick="savePackages()"><i class="fas fa-save"></i> Cập Nhật Các Gói</button>
+      <button class="btn btn-primary" onclick="savePackages()"><i class="fas fa-save"></i> Update Packages</button>
     </div>
   </div>
 
   <div class="table-card">
     <div class="table-header">
-      <h3><i class="fas fa-credit-card" style="color:var(--green2)"></i> Quản Lý Giao Dịch</h3>
+      <h3>Manage Transactions</h3>
       <div class="actions">
         <select id="paymentFilter" onchange="loadPayments()">
-          <option value="all">Tất cả</option>
-          <option value="pending">Chờ xử lý</option>
-          <option value="completed">Hoàn thành</option>
-          <option value="failed">Thất bại</option>
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+          <option value="failed">Failed</option>
         </select>
       </div>
     </div>
     <div style="overflow-x:auto">
     <table>
-      <thead><tr><th>ID</th><th>User</th><th>Số Tiền</th><th>Credits</th><th>Trạng Thái</th><th>Mã GD</th><th>Thời Gian</th></tr></thead>
+      <thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Credits</th><th>Status</th><th>Transaction Code</th><th>Time</th></tr></thead>
       <tbody id="paymentsBody"></tbody>
     </table>
     </div>
@@ -346,15 +356,15 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 <div class="page" id="page-marks">
   <div class="table-card">
     <div class="table-header">
-      <h3><i class="fas fa-book-open" style="color:var(--yellow)"></i> Từ Điển Hiệu Đề</h3>
+      <h3>Mark Dictionary</h3>
       <div class="actions marks-search">
-        <input type="text" id="markSearch" placeholder="🔍 Tìm hiệu đề..." oninput="filterMarks()">
-        <button class="btn btn-primary" onclick="openMarkModal()"><i class="fas fa-plus"></i> Thêm Mới</button>
+        <input type="text" id="markSearch" placeholder="Search marks..." oninput="filterMarks()">
+        <button class="btn btn-primary" onclick="openMarkModal()"><i class="fas fa-plus"></i> Add New</button>
       </div>
     </div>
     <div style="overflow-x:auto">
     <table>
-      <thead><tr><th>ID</th><th>Chữ Hán</th><th>4 Chữ</th><th>Tên Việt</th><th>Triều Đại</th><th>Hoàng Đế</th><th>Niên Đại</th><th>Thao Tác</th></tr></thead>
+      <thead><tr><th>ID</th><th>Chinese Mark</th><th>4 Chars</th><th>Vietnamese Name</th><th>Dynasty</th><th>Emperor</th><th>Period</th><th>Actions</th></tr></thead>
       <tbody id="marksBody"></tbody>
     </table>
     </div>
@@ -365,51 +375,99 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 <div class="page" id="page-scans">
   <div class="table-card">
     <div class="table-header">
-      <h3><i class="fas fa-magnifying-glass" style="color:var(--cyan)"></i> Lịch Sử Phân Tích AI</h3>
+      <h3>AI Analysis History</h3>
       <div class="actions">
-        <input type="text" id="scanSearch" placeholder="🔍 Tìm kiếm..." oninput="filterScans()">
+        <input type="text" id="scanSearch" placeholder="Search..." oninput="filterScans()">
       </div>
     </div>
     <div style="overflow-x:auto">
     <table>
-      <thead><tr><th>ID</th><th>Ảnh</th><th>User</th><th>OCR Text</th><th>Kết Quả</th><th>Thời Gian</th></tr></thead>
+      <thead><tr><th>ID</th><th>Image</th><th>User</th><th>OCR Text</th><th>Result</th><th>Time</th></tr></thead>
       <tbody id="scansBody"></tbody>
     </table>
     </div>
   </div>
 </div>
 
+<!-- ========== PAGES ========== -->
+<div class="page" id="page-pages">
+  <div class="table-card" style="margin-bottom:24px">
+    <div class="table-header">
+      <div>
+        <h3>Page Content Manager</h3>
+        <div style="color:var(--text3);font-size:13px;margin-top:6px">List of current Web pages and App screens in the system</div>
+      </div>
+      <div class="actions">
+        <input type="text" id="pageCatalogSearch" placeholder="Search pages..." oninput="renderPageCatalog()">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;padding:16px 24px;border-bottom:1px solid var(--border)">
+      <button class="btn btn-primary" id="pageSourceWeb" onclick="setPageSource('web')">Web</button>
+      <button class="btn btn-ghost" id="pageSourceApp" onclick="setPageSource('app')">App</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>ID</th><th>Page Name</th><th>Slug / Screen</th><th>Source</th><th>Customized</th><th>Actions</th></tr></thead>
+        <tbody id="pageCatalogBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL: Page Editor -->
+<div class="modal-overlay" id="pageEditorModal">
+<div class="modal" style="width:1100px">
+    <div class="table-header">
+      <div>
+        <h3 id="pageEditorTitle">Page Content</h3>
+        <div id="pageEditorSub" style="color:var(--text3);font-size:13px;margin-top:6px"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="closePageEditor()">Close</button>
+        <button class="btn btn-red" onclick="clearSelectedPageOverrides()">Clear Changes</button>
+        <button class="btn btn-primary" onclick="savePageFieldOverrides()">Save Changes</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Section</th><th>Type</th><th>Current Content</th><th>Edit</th></tr></thead>
+        <tbody id="pageFieldsBody"></tbody>
+      </table>
+    </div>
+</div>
+</div>
 <!-- ========== SETTINGS ========== -->
 <div class="page" id="page-settings">
   <div class="settings-card">
-    <h3><i class="fas fa-coins"></i> Cấu Hình Tín Dụng (Credits)</h3>
+    <h3><i class="fas fa-key"></i> API Key Configuration</h3>
     <div class="setting-row">
       <div class="info">
-        <div class="name">Tỷ giá Credit</div>
-        <div class="desc">Số tiền VNĐ cần trả cho 1 Credit (dùng cho tính toán gói cước)</div>
+        <div class="name">Gemini API Key</div>
+        <div class="desc">Google Gemini API key for image recognition and the primary LLM</div>
       </div>
-      <input type="number" id="setting_credit_rate" value="10000">
-      <button class="btn btn-sm btn-primary" onclick="saveSetting('credit_rate')">Lưu</button>
+      <input type="password" id="setting_gemini_api_key" style="width:320px; text-align:left;" placeholder="AIzaSy...">
+      <button class="btn btn-sm btn-primary" onclick="saveSetting('gemini_api_key')">Save</button>
     </div>
     <div class="setting-row">
       <div class="info">
-        <div class="name">Credits miễn phí mặc định</div>
-        <div class="desc">Số lượt phân tích tặng khi đăng ký tài khoản mới</div>
+        <div class="name">OpenAI API Key</div>
+        <div class="desc">OpenAI API key used as a fallback provider</div>
       </div>
-      <input type="number" id="setting_free_credits" value="10">
-      <button class="btn btn-sm btn-primary" onclick="saveSetting('free_credits')">Lưu</button>
+      <input type="password" id="setting_openai_api_key" style="width:320px; text-align:left;" placeholder="sk-proj-...">
+      <button class="btn btn-sm btn-primary" onclick="saveSetting('openai_api_key')">Save</button>
     </div>
   </div>
   <div class="settings-card">
-    <h3><i class="fas fa-database"></i> Thông Tin Hệ Thống</h3>
+    <h3><i class="fas fa-database"></i> System Information</h3>
     <div class="setting-row">
-      <div class="info"><div class="name">Phiên bản</div><div class="desc">MarkSense AI Admin Panel v1.0</div></div>
+      <div class="info"><div class="name">Version</div><div class="desc">MarkSense AI Admin Panel v1.0</div></div>
     </div>
     <div class="setting-row">
       <div class="info"><div class="name">Backend</div><div class="desc">FastAPI + PaddleOCR + MySQL</div></div>
     </div>
     <div class="setting-row">
-      <div class="info"><div class="name">Tổng hiệu đề</div><div class="desc" id="totalMarksInfo">Đang tải...</div></div>
+      <div class="info"><div class="name">Total marks</div><div class="desc" id="totalMarksInfo">Loading...</div></div>
     </div>
   </div>
 </div>
@@ -417,27 +475,39 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 </div><!-- /.main -->
 </div><!-- /#adminApp -->
 
+<!-- MODAL: Confirm -->
+<div class="modal-overlay" id="confirmModal">
+<div class="modal confirm-dialog">
+  <h3 id="confirmTitle">Confirm</h3>
+  <div class="confirm-message" id="confirmMessage"></div>
+  <div class="confirm-actions">
+    <button class="btn btn-ghost" id="confirmCancelBtn">Cancel</button>
+    <button class="btn btn-danger-solid" id="confirmOkBtn">Confirm</button>
+  </div>
+</div>
+</div>
+
 <!-- MODAL: Credits -->
 <div class="modal-overlay" id="creditModal">
 <div class="modal">
-  <h3><i class="fas fa-coins" style="color:var(--yellow)"></i> Cập Nhật Credits
+  <h3><i class="fas fa-coins" style="color:var(--yellow)"></i> Update Credits
     <button class="close-btn" onclick="closeModal('creditModal')"><i class="fas fa-times"></i></button></h3>
   <input type="hidden" id="creditUserId">
   <div class="form-group">
-    <label>Thao tác</label>
+    <label>Actions</label>
     <select id="creditAction">
-      <option value="add">Cộng thêm</option>
-      <option value="subtract">Trừ bớt</option>
-      <option value="set">Đặt giá trị</option>
+      <option value="add">Add</option>
+      <option value="subtract">Subtract</option>
+      <option value="set">Set value</option>
     </select>
   </div>
   <div class="form-group">
-    <label>Số lượng Credits</label>
+    <label>Credit Amount</label>
     <input type="number" id="creditAmount" value="10" min="0">
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeModal('creditModal')">Hủy</button>
-    <button class="btn btn-primary" onclick="submitCredits()"><i class="fas fa-check"></i> Xác Nhận</button>
+    <button class="btn btn-ghost" onclick="closeModal('creditModal')">Cancel</button>
+    <button class="btn btn-primary" onclick="submitCredits()"><i class="fas fa-check"></i> Confirm</button>
   </div>
 </div>
 </div>
@@ -445,15 +515,15 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 <!-- MODAL: Reset Password -->
 <div class="modal-overlay" id="resetPwdModal">
 <div class="modal">
-  <h3><i class="fas fa-key" style="color:var(--cyan)"></i> Reset Mật Khẩu
+  <h3><i class="fas fa-key" style="color:var(--cyan)"></i> Reset Password
     <button class="close-btn" onclick="closeModal('resetPwdModal')"><i class="fas fa-times"></i></button></h3>
   <input type="hidden" id="resetPwdUserId">
   <div class="form-group">
-    <label>Mật khẩu mới</label>
-    <input type="text" id="newPassword" placeholder="Nhập mật khẩu mới...">
+    <label>New Password</label>
+    <input type="text" id="newPassword" placeholder="Enter new password...">
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeModal('resetPwdModal')">Hủy</button>
+    <button class="btn btn-ghost" onclick="closeModal('resetPwdModal')">Cancel</button>
     <button class="btn btn-primary" onclick="submitResetPwd()"><i class="fas fa-check"></i> Reset</button>
   </div>
 </div>
@@ -462,48 +532,49 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 <!-- MODAL: Mark -->
 <div class="modal-overlay" id="markModal">
 <div class="modal" style="width:700px">
-  <h3><i class="fas fa-book-open" style="color:var(--yellow)"></i> <span id="markModalTitle">Thêm Hiệu Đề</span>
+  <h3><span id="markModalTitle">Add Mark</span>
     <button class="close-btn" onclick="closeModal('markModal')"><i class="fas fa-times"></i></button></h3>
   <input type="hidden" id="markEditId">
   <div class="form-row">
-    <div class="form-group"><label>Chữ Hán (6 chữ)</label><input type="text" id="m_chu_han" placeholder="大清康熙年製"></div>
-    <div class="form-group"><label>Chữ Hán (4 chữ)</label><input type="text" id="m_chu_han_4" placeholder="康熙年製"></div>
+    <div class="form-group"><label>Chinese Mark (6 chars)</label><input type="text" id="m_chu_han" placeholder="大清康熙年製"></div>
+    <div class="form-group"><label>Chinese Mark (4 chars)</label><input type="text" id="m_chu_han_4" placeholder="康熙年製"></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Chữ Hán 6 (biến thể)</label><input type="text" id="m_chu_han_6" placeholder=""></div>
-    <div class="form-group"><label>Biến thể (cách bởi dấu ;)</label><input type="text" id="m_bien_the" placeholder="康熙年造;康熙御製"></div>
+    <div class="form-group"><label>Chinese Mark 6 (variant)</label><input type="text" id="m_chu_han_6" placeholder=""></div>
+    <div class="form-group"><label>Variants (separated by ;)</label><input type="text" id="m_bien_the" placeholder="康熙年造;康熙御製"></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Phiên âm</label><input type="text" id="m_phien_am"></div>
-    <div class="form-group"><label>Tên Việt</label><input type="text" id="m_ten_viet"></div>
+    <div class="form-group"><label>Transliteration</label><input type="text" id="m_phien_am"></div>
+    <div class="form-group"><label>Vietnamese Name</label><input type="text" id="m_ten_viet"></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Hoàng Đế</label><input type="text" id="m_hoang_de"></div>
-    <div class="form-group"><label>Triều Đại</label>
-      <select id="m_trieu_dai">
-        <option value="">-- Chọn --</option>
-        <option value="Minh Triều">Minh Triều</option>
-        <option value="Thanh Triều">Thanh Triều</option>
-        <option value="Nhà Nguyễn (Việt Nam)">Nhà Nguyễn (Việt Nam)</option>
-        <option value="Khác">Khác</option>
+    <div class="form-group"><label>Emperor</label><input type="text" id="m_hoang_de"></div>
+    <div class="form-group"><label>Dynasty</label>
+      <select id="m_trieu_dai" onchange="toggleCustomDynasty()">
+        <option value="">-- Select --</option>
+        <option value="Ming Dynasty">Ming Dynasty</option>
+        <option value="Qing Dynasty">Qing Dynasty</option>
+        <option value="Nguyen Dynasty (Vietnam)">Nguyen Dynasty (Vietnam)</option>
+        <option value="Other">Other</option>
       </select>
+      <input type="text" id="m_trieu_dai_custom" placeholder="Enter dynasty..." style="display:none;margin-top:8px">
     </div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Năm bắt đầu</label><input type="number" id="m_nam_bat_dau"></div>
-    <div class="form-group"><label>Năm kết thúc</label><input type="number" id="m_nam_ket_thuc"></div>
+    <div class="form-group"><label>Start Year</label><input type="number" id="m_nam_bat_dau"></div>
+    <div class="form-group"><label>End Year</label><input type="number" id="m_nam_ket_thuc"></div>
   </div>
   <div class="form-row">
-    <div class="form-group"><label>Niên hiệu</label><input type="text" id="m_nien_hieu"></div>
-    <div class="form-group"><label>Hiệu đề EN</label><input type="text" id="m_hieu_de_en"></div>
+    <div class="form-group"><label>Reign Title</label><input type="text" id="m_nien_hieu"></div>
+    <div class="form-group"><label>Mark EN</label><input type="text" id="m_hieu_de_en"></div>
   </div>
-  <div class="form-group"><label>Ghi chú</label><textarea id="m_ghi_chu" rows="2"></textarea></div>
-  <div class="form-group"><label>Mô tả</label><textarea id="m_mo_ta" rows="2"></textarea></div>
-  <div class="form-group"><label>Thư pháp</label><textarea id="m_thu_phap" rows="2"></textarea></div>
-  <div class="form-group"><label>Nghệ thuật</label><textarea id="m_nghe_thuat" rows="2"></textarea></div>
+  <div class="form-group"><label>Notes</label><textarea id="m_ghi_chu" rows="2"></textarea></div>
+  <div class="form-group"><label>Description</label><textarea id="m_mo_ta" rows="2"></textarea></div>
+  <div class="form-group"><label>Calligraphy</label><textarea id="m_thu_phap" rows="2"></textarea></div>
+  <div class="form-group"><label>Art Style</label><textarea id="m_nghe_thuat" rows="2"></textarea></div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeModal('markModal')">Hủy</button>
-    <button class="btn btn-primary" onclick="submitMark()"><i class="fas fa-save"></i> Lưu</button>
+    <button class="btn btn-ghost" onclick="closeModal('markModal')">Cancel</button>
+    <button class="btn btn-primary" onclick="submitMark()"><i class="fas fa-save"></i> Save</button>
   </div>
 </div>
 </div>
@@ -512,6 +583,12 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
 const API = '';
 let adminToken = localStorage.getItem('admin_token') || '';
 let allUsers = [], allMarks = [], allScans = [];
+const COMMON_LOGIN_URL = '/login?from=admin';
+let pageOverridesCache = null;
+
+function goCommonLogin() {
+  window.location.href = COMMON_LOGIN_URL;
+}
 
 // ===== AUTH =====
 function authHeaders() { return { 'Authorization': `Admin ${adminToken}`, 'Content-Type': 'application/json' } }
@@ -529,17 +606,23 @@ async function doLogin() {
       localStorage.setItem('admin_name', d.username);
       showApp();
     } else {
-      document.getElementById('loginError').textContent = d.message || 'Đăng nhập thất bại';
+      document.getElementById('loginError').textContent = d.message || 'Login failed';
     }
-  } catch (e) { document.getElementById('loginError').textContent = 'Lỗi kết nối server'; }
+  } catch (e) { document.getElementById('loginError').textContent = 'Server connection error'; }
 }
 
 function doLogout() {
   adminToken = '';
   localStorage.removeItem('admin_token');
   localStorage.removeItem('admin_name');
-  document.getElementById('loginOverlay').classList.remove('hidden');
-  document.getElementById('adminApp').classList.remove('active');
+  goCommonLogin();
+}
+
+function clearInvalidAdminSession() {
+  adminToken = '';
+  localStorage.removeItem('admin_token');
+  localStorage.removeItem('admin_name');
+  goCommonLogin();
 }
 
 function showApp() {
@@ -556,16 +639,22 @@ if (adminToken) { showApp(); }
 
 // ===== NAVIGATION =====
 function switchPage(page) {
+  const target = document.getElementById('page-' + page);
+  if (!target) {
+    toast('Admin page not found: ' + page, 'error');
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
+  target.classList.add('active');
   document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.toggle('active', a.dataset.page === page));
-  const titles = { dashboard: 'Tổng Quan', users: 'Quản Lý Người Dùng', payments: 'Quản Lý Giao Dịch', marks: 'Từ Điển Hiệu Đề', scans: 'Lịch Sử Scan AI', settings: 'Cài Đặt Hệ Thống' };
+  const titles = { dashboard: 'Dashboard', users: 'Manage Users', payments: 'Manage Transactions', marks: 'Mark Dictionary', scans: 'Scan History AI', pages: 'Page Manager', settings: 'System Settings' };
   document.getElementById('pageTitle').textContent = titles[page] || page;
   if (page === 'dashboard') loadDashboard();
   else if (page === 'users') loadUsers();
   else if (page === 'payments') loadPayments();
   else if (page === 'marks') loadMarks();
   else if (page === 'scans') loadScans();
+  else if (page === 'pages') loadPageManager();
   else if (page === 'settings') loadSettings();
 }
 
@@ -584,23 +673,52 @@ function toast(msg, type = 'info') {
 function openModal(id) { document.getElementById(id).classList.add('active') }
 function closeModal(id) { document.getElementById(id).classList.remove('active') }
 
+function showConfirmDialog({ title = 'Confirm', message = '', okText = 'Confirm', cancelText = 'Cancel', danger = true } = {}) {
+  return new Promise(resolve => {
+    const modal = document.getElementById('confirmModal');
+    const titleEl = document.getElementById('confirmTitle');
+    const messageEl = document.getElementById('confirmMessage');
+    const okBtn = document.getElementById('confirmOkBtn');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    okBtn.textContent = okText;
+    cancelBtn.textContent = cancelText;
+    okBtn.className = danger ? 'btn btn-danger-solid' : 'btn btn-primary';
+
+    const cleanup = (value) => {
+      modal.classList.remove('active');
+      okBtn.onclick = null;
+      cancelBtn.onclick = null;
+      modal.onclick = null;
+      resolve(value);
+    };
+
+    okBtn.onclick = () => cleanup(true);
+    cancelBtn.onclick = () => cleanup(false);
+    modal.onclick = (e) => { if (e.target === modal) cleanup(false); };
+    modal.classList.add('active');
+  });
+}
+
 // ===== DASHBOARD =====
 async function loadDashboard() {
   try {
     const r = await fetch(API + '/api/admin/dashboard', { headers: authHeaders() });
-    if (r.status === 401) { doLogout(); return; }
+    if (r.status === 401) { clearInvalidAdminSession(); return; }
     const d = await r.json();
     if (!d.success) return;
     const s = d.stats;
     document.getElementById('statsGrid').innerHTML = `
-      <div class="stat-card"><div class="icon blue"><i class="fas fa-users"></i></div><div class="value">${s.total_users||0}</div><div class="label">Tổng Người Dùng</div></div>
-      <div class="stat-card"><div class="icon green"><i class="fas fa-wallet"></i></div><div class="value">${formatVND(s.total_revenue||0)}</div><div class="label">Tổng Doanh Thu</div></div>
-      <div class="stat-card"><div class="icon cyan"><i class="fas fa-search"></i></div><div class="value">${s.total_scans||0}</div><div class="label">Tổng Lượt Scan</div></div>
-      <div class="stat-card"><div class="icon yellow"><i class="fas fa-clock"></i></div><div class="value">${s.pending_payments||0}</div><div class="label">GD Chờ Duyệt</div></div>
-      <div class="stat-card"><div class="icon pink"><i class="fas fa-user-plus"></i></div><div class="value">${s.new_users_today||0}</div><div class="label">User Mới Hôm Nay</div></div>
-      <div class="stat-card"><div class="icon green"><i class="fas fa-chart-line"></i></div><div class="value">${formatVND(s.revenue_this_month||0)}</div><div class="label">Doanh Thu Tháng Này</div></div>
-      <div class="stat-card"><div class="icon cyan"><i class="fas fa-bolt"></i></div><div class="value">${s.scans_today||0}</div><div class="label">Scan Hôm Nay</div></div>
-      <div class="stat-card"><div class="icon blue"><i class="fas fa-book"></i></div><div class="value">${s.total_marks||0}</div><div class="label">Tổng Hiệu Đề</div></div>
+      <div class="stat-card"><div class="icon blue"><i class="fas fa-users"></i></div><div class="value">${s.total_users||0}</div><div class="label">Total Users</div></div>
+      <div class="stat-card"><div class="icon green"><i class="fas fa-wallet"></i></div><div class="value">${formatVND(s.total_revenue||0)}</div><div class="label">Total Revenue</div></div>
+      <div class="stat-card"><div class="icon cyan"><i class="fas fa-search"></i></div><div class="value">${s.total_scans||0}</div><div class="label">Total Scans</div></div>
+      <div class="stat-card"><div class="icon yellow"><i class="fas fa-clock"></i></div><div class="value">${s.pending_payments||0}</div><div class="label">Pending Transactions</div></div>
+      <div class="stat-card"><div class="icon pink"><i class="fas fa-user-plus"></i></div><div class="value">${s.new_users_today||0}</div><div class="label">New Users Today</div></div>
+      <div class="stat-card"><div class="icon green"><i class="fas fa-chart-line"></i></div><div class="value">${formatVND(s.revenue_this_month||0)}</div><div class="label">Revenue This Month</div></div>
+      <div class="stat-card"><div class="icon cyan"><i class="fas fa-bolt"></i></div><div class="value">${s.scans_today||0}</div><div class="label">Scans Today</div></div>
+      <div class="stat-card"><div class="icon blue"><i class="fas fa-book"></i></div><div class="value">${s.total_marks||0}</div><div class="label">Total Marks</div></div>
     `;
     renderChart('revenueChart', s.revenue_chart || [], 'revenue', 'rev');
     renderChart('scansChart', s.scans_chart || [], 'scans', 'scan');
@@ -609,7 +727,7 @@ async function loadDashboard() {
 
 function renderChart(containerId, data, field, cls) {
   const c = document.getElementById(containerId);
-  if (!data.length) { c.innerHTML = '<div class="empty-state"><p>Chưa có dữ liệu</p></div>'; return; }
+  if (!data.length) { c.innerHTML = '<div class="empty-state"><p>No data yet</p></div>'; return; }
   const max = Math.max(...data.map(d => d[field]), 1);
   c.innerHTML = data.map(d => {
     const h = Math.max(4, (d[field] / max) * 140);
@@ -643,19 +761,17 @@ function renderUsers(users) {
       <td>${u.username}</td>
       <td><span class="badge badge-blue">${u.scan_credits ?? 0}</span></td>
       <td>${u.total_scans || 0}</td>
-      <td>${formatVND(u.total_spent || 0)}đ</td>
+      <td>${formatVND(u.total_spent || 0)} VND</td>
       <td><span class="badge ${u.role==='admin'?'badge-yellow':'badge-blue'}">${u.role||'user'}</span></td>
-      <td>${u.locked ? '<span class="badge badge-red">Đã khóa</span>' : '<span class="badge badge-green">Hoạt động</span>'}</td>
+      <td>${u.locked ? '<span class="badge badge-red">Locked</span>' : '<span class="badge badge-green">Active</span>'}</td>
       <td style="font-size:12px">${u.created_at || ''}</td>
       <td>
         <div style="display:flex;gap:4px;flex-wrap:wrap">
-          <button class="btn btn-sm btn-primary" onclick="openCreditModal(${u.id})" title="Credits"><i class="fas fa-coins"></i></button>
-          ${u.locked ? `<button class="btn btn-sm btn-green" onclick="unlockUser(${u.id})" title="Mở khóa"><i class="fas fa-lock-open"></i></button>` : `<button class="btn btn-sm btn-red" onclick="lockUser(${u.id})" title="Khóa"><i class="fas fa-lock"></i></button>`}
-          <button class="btn btn-sm btn-ghost" onclick="openResetPwd(${u.id})" title="Reset mật khẩu"><i class="fas fa-key"></i></button>
+          ${u.role === 'admin' ? '<span class="badge badge-yellow">Admin</span>' : `<button class="btn btn-sm btn-red" onclick="deleteUser(${u.id})" title="Delete"><i class="fas fa-trash"></i></button>`}
         </div>
       </td>
     </tr>
-  `).join('') || '<tr><td colspan="9" class="empty-state">Chưa có người dùng</td></tr>';
+  `).join('') || '<tr><td colspan="9" class="empty-state">No users yet</td></tr>';
 }
 
 function filterUsers() {
@@ -676,22 +792,27 @@ async function submitCredits() {
   try {
     const r = await fetch(API + '/api/admin/users/credits', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ user_id: parseInt(uid), amount, action }) });
     const d = await r.json();
-    if (d.success) { toast('Cập nhật credits thành công!', 'success'); closeModal('creditModal'); loadUsers(); }
-    else toast(d.message || 'Lỗi', 'error');
-  } catch (e) { toast('Lỗi kết nối', 'error'); }
+    if (d.success) { toast('Credits updated successfully!', 'success'); closeModal('creditModal'); loadUsers(); }
+    else toast(d.message || 'Error', 'error');
+  } catch (e) { toast('Connection error', 'error'); }
 }
 
 async function lockUser(id) {
-  if (!confirm('Xác nhận khóa tài khoản này?')) return;
+  const ok = await showConfirmDialog({
+    title: 'Lock Account',
+    message: 'Confirm locking this account?',
+    okText: 'Lock'
+  });
+  if (!ok) return;
   const r = await fetch(API + `/api/admin/users/lock/${id}`, { method: 'POST', headers: authHeaders() });
   const d = await r.json();
-  if (d.success) { toast('Đã khóa tài khoản', 'success'); loadUsers(); } else toast('Lỗi', 'error');
+  if (d.success) { toast('Account locked', 'success'); loadUsers(); } else toast('Error', 'error');
 }
 
 async function unlockUser(id) {
   const r = await fetch(API + `/api/admin/users/unlock/${id}`, { method: 'POST', headers: authHeaders() });
   const d = await r.json();
-  if (d.success) { toast('Đã mở khóa tài khoản', 'success'); loadUsers(); } else toast('Lỗi', 'error');
+  if (d.success) { toast('Account unlocked', 'success'); loadUsers(); } else toast('Error', 'error');
 }
 
 function openResetPwd(userId) {
@@ -703,10 +824,10 @@ function openResetPwd(userId) {
 async function submitResetPwd() {
   const uid = document.getElementById('resetPwdUserId').value;
   const pw = document.getElementById('newPassword').value;
-  if (!pw) { toast('Vui lòng nhập mật khẩu', 'error'); return; }
+  if (!pw) { toast('Please enter a password', 'error'); return; }
   const r = await fetch(API + '/api/admin/users/reset-password', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ user_id: parseInt(uid), new_password: pw }) });
   const d = await r.json();
-  if (d.success) { toast('Đã reset mật khẩu', 'success'); closeModal('resetPwdModal'); } else toast('Lỗi', 'error');
+  if (d.success) { toast('Password reset successfully', 'success'); closeModal('resetPwdModal'); } else toast('Error', 'error');
 }
 
 // ===== PAYMENTS =====
@@ -720,26 +841,47 @@ async function loadPayments() {
       <tr>
         <td><strong>#${p.id}</strong></td>
         <td>${p.username || 'User #'+p.user_id}</td>
-        <td><strong>${Number(p.amount_vnd).toLocaleString('vi-VN')}đ</strong></td>
+        <td><strong>${Number(p.amount_vnd).toLocaleString('vi-VN')} VND</strong></td>
         <td><span class="badge badge-blue">${p.credits}</span></td>
-        <td>${p.status==='completed' ? '<span class="badge badge-green">Thành công</span>' : p.status==='pending' ? '<span class="badge badge-yellow">Chờ xử lý</span>' : '<span class="badge badge-red">Thất bại</span>'}</td>
+        <td>${p.status==='completed' ? '<span class="badge badge-green">Success</span>' : p.status==='pending' ? '<span class="badge badge-yellow">Pending</span>' : '<span class="badge badge-red">Failed</span>'}</td>
         <td style="font-size:12px">${p.sepay_tx_id || '—'}</td>
         <td style="font-size:12px">${p.created_at || ''}</td>
       </tr>
-    `).join('') || '<tr><td colspan="7" class="empty-state">Chưa có giao dịch</td></tr>';
+    `).join('') || '<tr><td colspan="7" class="empty-state">No transactions yet</td></tr>';
   } catch (e) { console.error(e); }
 }
 
 async function savePackages() {
-  const keys = ['pkg_basic_price', 'pkg_basic_credits', 'pkg_pro_price', 'pkg_pro_credits', 'pkg_enterprise_price', 'pkg_enterprise_credits'];
+  const entries = [
+    { key: 'free_credits', id: 'package_free_credits' },
+    { key: 'pkg_pro_price', id: 'setting_pkg_pro_price' },
+    { key: 'pkg_pro_credits', id: 'setting_pkg_pro_credits' },
+    { key: 'pkg_enterprise_price', id: 'setting_pkg_enterprise_price' },
+    { key: 'pkg_enterprise_credits', id: 'setting_pkg_enterprise_credits' },
+  ];
   try {
-    const promises = keys.map(key => {
-      const val = document.getElementById('setting_' + key).value;
+    const promises = entries.map(({ key, id }) => {
+      const val = document.getElementById(id).value;
       return fetch(API + '/api/admin/settings', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ key, value: val }) });
     });
     const results = await Promise.all(promises);
-    toast('Đã cập nhật cấu hình các gói thành công!', 'success');
-  } catch (e) { toast('Lỗi kết nối khi lưu các gói', 'error'); }
+    toast('Packages updated successfully!', 'success');
+  } catch (e) { toast('Connection error while saving packages', 'error'); }
+}
+
+async function deleteUser(id) {
+  const ok = await showConfirmDialog({
+    title: 'Delete User',
+    message: 'Confirm deleting this user? Related scan history and transactions will also be deleted.',
+    okText: 'Delete'
+  });
+  if (!ok) return;
+  try {
+    const r = await fetch(API + `/api/admin/users/${id}`, { method: 'DELETE', headers: authHeaders() });
+    const d = await r.json();
+    if (d.success) { toast(d.message || 'User deleted', 'success'); loadUsers(); loadDashboard(); }
+    else toast(d.message || 'Error deleting user', 'error');
+  } catch (e) { toast('Connection error', 'error'); }
 }
 
 // ===== MARKS =====
@@ -765,12 +907,12 @@ function renderMarks(marks) {
       <td style="font-size:12px">${m.nam_bat_dau||''} - ${m.nam_ket_thuc||''}</td>
       <td>
         <div style="display:flex;gap:4px">
-          <button class="btn btn-sm btn-primary" onclick="editMark(${m.id})" title="Sửa"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-sm btn-red" onclick="deleteMark(${m.id})" title="Xóa"><i class="fas fa-trash"></i></button>
+          <button class="btn btn-sm btn-primary" onclick="editMark(${m.id})" title="Edit"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-sm btn-red" onclick="deleteMark(${m.id})" title="Delete"><i class="fas fa-trash"></i></button>
         </div>
       </td>
     </tr>
-  `).join('') || '<tr><td colspan="8" class="empty-state">Chưa có hiệu đề</td></tr>';
+  `).join('') || '<tr><td colspan="8" class="empty-state">No marks yet</td></tr>';
 }
 
 function filterMarks() {
@@ -782,15 +924,45 @@ function filterMarks() {
   ));
 }
 
+function toggleCustomDynasty() {
+  const select = document.getElementById('m_trieu_dai');
+  const custom = document.getElementById('m_trieu_dai_custom');
+  const isCustom = select.value === 'Other';
+  custom.style.display = isCustom ? 'block' : 'none';
+  if (!isCustom) custom.value = '';
+}
+
+function setDynastyValue(value = '') {
+  const select = document.getElementById('m_trieu_dai');
+  const custom = document.getElementById('m_trieu_dai_custom');
+  const knownValues = Array.from(select.options).map(option => option.value);
+  if (value && !knownValues.includes(value)) {
+    select.value = 'Other';
+    custom.value = value;
+  } else {
+    select.value = value || '';
+    custom.value = '';
+  }
+  toggleCustomDynasty();
+}
+
+function getDynastyValue() {
+  const selectValue = document.getElementById('m_trieu_dai').value;
+  if (selectValue === 'Other') {
+    return document.getElementById('m_trieu_dai_custom').value.trim() || 'Other';
+  }
+  return selectValue;
+}
+
 function openMarkModal(mark = null) {
   const fields = ['chu_han','chu_han_4','chu_han_6','phien_am','ten_viet','hoang_de','nien_hieu','hieu_de_en','ghi_chu','mo_ta','thu_phap','nghe_thuat'];
   fields.forEach(f => { const el = document.getElementById('m_' + f); if (el) el.value = mark ? (mark[f] || '') : '' });
-  document.getElementById('m_trieu_dai').value = mark ? (mark.trieu_dai || '') : '';
+  setDynastyValue(mark ? (mark.trieu_dai || '') : '');
   document.getElementById('m_nam_bat_dau').value = mark ? (mark.nam_bat_dau || '') : '';
   document.getElementById('m_nam_ket_thuc').value = mark ? (mark.nam_ket_thuc || '') : '';
   document.getElementById('m_bien_the').value = mark && mark.bien_the ? (Array.isArray(mark.bien_the) ? mark.bien_the.join(';') : mark.bien_the) : '';
   document.getElementById('markEditId').value = mark ? mark.id : '';
-  document.getElementById('markModalTitle').textContent = mark ? 'Sửa Hiệu Đề' : 'Thêm Hiệu Đề Mới';
+  document.getElementById('markModalTitle').textContent = mark ? 'Edit Mark' : 'Add New Mark';
   openModal('markModal');
 }
 
@@ -811,7 +983,7 @@ async function submitMark() {
     phien_am: document.getElementById('m_phien_am').value,
     ten_viet: document.getElementById('m_ten_viet').value,
     hoang_de: document.getElementById('m_hoang_de').value,
-    trieu_dai: document.getElementById('m_trieu_dai').value,
+    trieu_dai: getDynastyValue(),
     nam_bat_dau: parseInt(document.getElementById('m_nam_bat_dau').value) || null,
     nam_ket_thuc: parseInt(document.getElementById('m_nam_ket_thuc').value) || null,
     ghi_chu: document.getElementById('m_ghi_chu').value,
@@ -833,15 +1005,20 @@ async function submitMark() {
     }
     const d = await r.json();
     if (d.success) { toast(d.message, 'success'); closeModal('markModal'); loadMarks(); }
-    else toast(d.message || 'Lỗi', 'error');
-  } catch (e) { toast('Lỗi kết nối', 'error'); }
+    else toast(d.message || 'Error', 'error');
+  } catch (e) { toast('Connection error', 'error'); }
 }
 
 async function deleteMark(id) {
-  if (!confirm('Xác nhận xóa hiệu đề này? Hành động không thể hoàn tác!')) return;
+  const ok = await showConfirmDialog({
+    title: 'Delete Mark',
+    message: 'Confirm deleting this mark? This action cannot be undone!',
+    okText: 'Delete'
+  });
+  if (!ok) return;
   const r = await fetch(API + `/api/admin/marks/${id}`, { method: 'DELETE', headers: authHeaders() });
   const d = await r.json();
-  if (d.success) { toast('Đã xóa hiệu đề', 'success'); loadMarks(); } else toast('Lỗi', 'error');
+  if (d.success) { toast('Mark deleted', 'success'); loadMarks(); } else toast('Error', 'error');
 }
 
 // ===== SCANS =====
@@ -860,7 +1037,7 @@ function renderScans(scans) {
     let matchInfo = '—';
     if (s.match_result) {
       const mr = typeof s.match_result === 'string' ? JSON.parse(s.match_result) : s.match_result;
-      matchInfo = mr.top_mark || mr.chu_han || (mr.matched ? 'Có kết quả' : 'Không khớp');
+      matchInfo = mr.top_mark || mr.chu_han || (mr.matched ? 'Matched' : 'No match');
     }
     const imgSrc = s.image_path ? `/${s.image_path}` : '';
     return `
@@ -873,12 +1050,391 @@ function renderScans(scans) {
         <td style="font-size:12px">${s.created_at || ''}</td>
       </tr>
     `;
-  }).join('') || '<tr><td colspan="6" class="empty-state">Chưa có lịch sử scan</td></tr>';
+  }).join('') || '<tr><td colspan="6" class="empty-state">No scan history yet</td></tr>';
 }
 
 function filterScans() {
   const q = document.getElementById('scanSearch').value.toLowerCase();
   renderScans(allScans.filter(s => (s.username||'').toLowerCase().includes(q) || (s.ocr_text||'').includes(q) || String(s.id).includes(q)));
+}
+
+// ===== PAGE MANAGER =====
+const PAGE_ROOTS = {
+  home: '#pg-home',
+  auth: '#pg-auth',
+  history: '#pg-history',
+  library: '#pg-library',
+  pricing: '#pg-pricing',
+  checkout: '#pg-checkout',
+  profile: '#pg-profile',
+  'tx-history': '#pg-tx-history',
+  about: '#pg-about',
+  contact: '#pg-contact',
+  guide: '#pg-guide',
+  privacy: '#pg-privacy',
+  terms: '#pg-terms',
+  faq: '#pg-faq',
+  header: 'body > nav',
+  footer: '.site-footer',
+};
+const WEB_PAGES = [
+  { id: 'home', name: 'Home', slug: '/home', root: '#pg-home' },
+  { id: 'auth', name: 'Login / Register', slug: '/login, /register', root: '#pg-auth' },
+  { id: 'history', name: 'Analysis History', slug: '/history', root: '#pg-history' },
+  { id: 'library', name: 'Mark Library', slug: '/library', root: '#pg-library' },
+  { id: 'pricing', name: 'Pricing', slug: '/pricing', root: '#pg-pricing' },
+  { id: 'checkout', name: 'Checkout', slug: '/checkout', root: '#pg-checkout' },
+  { id: 'profile', name: 'User Profile', slug: '/profile', root: '#pg-profile' },
+  { id: 'tx-history', name: 'Transaction History', slug: '/tx-history', root: '#pg-tx-history' },
+  { id: 'about', name: 'About Us', slug: '/about', root: '#pg-about' },
+  { id: 'contact', name: 'Contact', slug: '/contact', root: '#pg-contact' },
+  { id: 'guide', name: 'Guide', slug: '/guide', root: '#pg-guide' },
+  { id: 'privacy', name: 'Privacy Policy', slug: '/privacy', root: '#pg-privacy' },
+  { id: 'terms', name: 'Terms of Service', slug: '/terms', root: '#pg-terms' },
+  { id: 'faq', name: 'FAQ', slug: '/faq', root: '#pg-faq' },
+  { id: 'header', name: 'Header', slug: '/header', root: 'body > nav' },
+  { id: 'footer', name: 'Footer', slug: '/footer', root: '.site-footer' },
+];
+const APP_PAGES = [
+  { id: 'app-home', name: 'Home', slug: 'HomeScreen.js' },
+  { id: 'app-login', name: 'Login', slug: 'LoginScreen.js' },
+  { id: 'app-register', name: 'Register', slug: 'RegisterScreen.js' },
+  { id: 'app-library', name: 'Library', slug: 'LibraryScreen.js' },
+  { id: 'app-history', name: 'History', slug: 'HistoryScreen.js' },
+  { id: 'app-pricing', name: 'Pricing', slug: 'PricingScreen.js' },
+  { id: 'app-checkout', name: 'Checkout', slug: 'CheckoutScreen.js' },
+  { id: 'app-profile', name: 'Profile', slug: 'ProfileScreen.js' },
+  { id: 'app-settings', name: 'Settings', slug: 'SettingsScreen.js' },
+  { id: 'app-language', name: 'Language', slug: 'LanguageScreen.js' },
+  { id: 'app-chat', name: 'Chat', slug: 'ChatScreen.js' },
+  { id: 'app-about', name: 'About', slug: 'AboutScreen.js' },
+  { id: 'app-terms', name: 'Terms', slug: 'TermsScreen.js' },
+  { id: 'app-privacy', name: 'Privacy', slug: 'PrivacyScreen.js' },
+];
+let pageSource = 'web';
+let selectedPageId = '';
+let selectedPageSource = 'web';
+let selectedPageFields = [];
+
+function getPageOverrides() {
+  if (pageOverridesCache) return pageOverridesCache;
+  try { return JSON.parse(localStorage.getItem('admin_page_overrides') || '{}'); }
+  catch (e) { return {}; }
+}
+
+function setPageOverrides(overrides) {
+  pageOverridesCache = overrides;
+  localStorage.setItem('admin_page_overrides', JSON.stringify(overrides));
+}
+
+async function loadPageOverridesFromServer() {
+  try {
+    const r = await fetch(API + '/api/page-overrides?t=' + Date.now(), { cache: 'no-store' });
+    const d = await r.json();
+    if (d.success) setPageOverrides(d.overrides || {});
+  } catch (e) {
+    console.warn('Khong doc duoc page overrides tu server', e);
+  }
+}
+
+async function savePageOverridesToServer(overrides) {
+  const r = await fetch(API + '/api/admin/page-overrides', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ overrides })
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || !d.success) throw new Error(d.message || 'Loi luu noi dung page');
+}
+
+async function loadPageManager() {
+  await loadPageOverridesFromServer();
+  renderPageCatalog();
+  closePageEditor();
+}
+
+function setPageSource(source) {
+  pageSource = source;
+  document.getElementById('pageSourceWeb').className = source === 'web' ? 'btn btn-primary' : 'btn btn-ghost';
+  document.getElementById('pageSourceApp').className = source === 'app' ? 'btn btn-primary' : 'btn btn-ghost';
+  closePageEditor();
+  renderPageCatalog();
+}
+
+function pageOverrideCount(id) {
+  return (getPageOverrides()[id] || []).length;
+}
+
+function renderPageCatalog() {
+  const q = (document.getElementById('pageCatalogSearch')?.value || '').toLowerCase().trim();
+  const data = pageSource === 'web' ? WEB_PAGES : APP_PAGES;
+  const rows = data.filter(page => !q || page.name.toLowerCase().includes(q) || page.slug.toLowerCase().includes(q));
+  document.getElementById('pageCatalogBody').innerHTML = rows.map((page, index) => {
+    const count = pageSource === 'web' ? pageOverrideCount(page.id) : 0;
+    const status = count ? `<span class="badge badge-yellow">${count} items</span>` : '<span style="color:var(--text3)">Default</span>';
+    const action = pageSource === 'web'
+      ? `<button class="btn btn-sm btn-ghost" onclick="editCatalogPage('${page.id}')">Edit</button>
+         <button class="btn btn-sm btn-red" onclick="clearCatalogPage('${page.id}')">Delete</button>`
+      : `<button class="btn btn-sm btn-ghost" onclick="editAppCatalogPage('${page.id}')">Edit</button>`;
+    return `
+      <tr>
+        <td>#${index + 1}</td>
+        <td><strong>${page.name}</strong></td>
+        <td style="font-family:monospace;color:var(--primary2)">${page.slug}</td>
+        <td><span class="badge ${pageSource === 'web' ? 'badge-blue' : 'badge-green'}">${pageSource === 'web' ? 'Web' : 'App'}</span></td>
+        <td>${status}</td>
+        <td>${action}</td>
+      </tr>
+    `;
+  }).join('') || '<tr><td colspan="6" class="empty-state">No matching pages found</td></tr>';
+}
+
+function closePageEditor() {
+  document.getElementById('pageEditorModal').classList.remove('active');
+  selectedPageId = '';
+  selectedPageSource = 'web';
+  selectedPageFields = [];
+}
+
+async function editCatalogPage(id) {
+  pageSource = 'web';
+  selectedPageId = id;
+  selectedPageSource = 'web';
+  document.getElementById('pageEditorModal').classList.add('active');
+  document.getElementById('pageEditorTitle').textContent = 'Loading content...';
+  document.getElementById('pageEditorSub').textContent = '';
+  document.getElementById('pageFieldsBody').innerHTML = '<tr><td colspan="4" class="empty-state">Reading page content...</td></tr>';
+  renderPageCatalog();
+  try {
+    const page = WEB_PAGES.find(item => item.id === id);
+    const doc = await fetchIndexDocument();
+    selectedPageFields = collectPageFields(doc, page);
+    renderPageFields(page);
+  } catch (e) {
+    console.error(e);
+    document.getElementById('pageFieldsBody').innerHTML = '<tr><td colspan="4" class="empty-state">Could not read page content</td></tr>';
+  }
+}
+
+function showAppPageInfo(id) {
+  const page = APP_PAGES.find(item => item.id === id);
+  toast(page ? `App screen: ${page.slug}` : 'App screen not found', 'info');
+}
+
+async function editAppCatalogPage(id) {
+  const page = APP_PAGES.find(item => item.id === id);
+  if (!page) return toast('Khong tim thay man App', 'error');
+  pageSource = 'app';
+  selectedPageId = id;
+  selectedPageSource = 'app';
+  document.getElementById('pageEditorModal').classList.add('active');
+  document.getElementById('pageEditorTitle').textContent = 'Dang tai man App...';
+  document.getElementById('pageEditorSub').textContent = page.slug;
+  document.getElementById('pageFieldsBody').innerHTML = '<tr><td colspan="4" class="empty-state">Dang doc noi dung App...</td></tr>';
+  renderPageCatalog();
+  try {
+    const r = await fetch(API + `/api/admin/app-pages/${id}?t=${Date.now()}`, { headers: authHeaders(), cache: 'no-store' });
+    const d = await r.json();
+    if (!r.ok || !d.success) throw new Error(d.message || 'Khong doc duoc man App');
+    selectedPageFields = (d.fields || []).map(field => ({ ...field, source: 'app' }));
+    renderPageFields({ ...page, slug: d.file || page.slug });
+  } catch (e) {
+    console.error(e);
+    document.getElementById('pageFieldsBody').innerHTML = `<tr><td colspan="4" class="empty-state">${e.message || 'Khong doc duoc man App'}</td></tr>`;
+  }
+}
+
+async function clearCatalogPage(id) {
+  const ok = await showConfirmDialog({ title: 'Clear Page Changes', message: 'Clear all edited content for this page?', okText: 'Delete' });
+  if (!ok) return;
+  const overrides = getPageOverrides();
+  delete overrides[id];
+  setPageOverrides(overrides);
+  await savePageOverridesToServer(overrides);
+  renderPageCatalog();
+  if (selectedPageId === id) closePageEditor();
+  toast('Page changes cleared', 'success');
+}
+
+async function fetchIndexDocument() {
+  const resp = await fetch('/?admin_page_scan=' + Date.now(), { cache: 'no-store' });
+  const html = await resp.text();
+  return new DOMParser().parseFromString(html, 'text/html');
+}
+
+function cssPath(root, el) {
+  if (el.id) return '#' + CSS.escape(el.id);
+  const dataI18n = el.getAttribute('data-i18n') || el.getAttribute('data-i18n-placeholder');
+  if (dataI18n) return `[${el.hasAttribute('data-i18n') ? 'data-i18n' : 'data-i18n-placeholder'}="${CSS.escape(dataI18n)}"]`;
+  const parts = [];
+  let node = el;
+  while (node && node !== root && node.nodeType === 1) {
+    const tag = node.tagName.toLowerCase();
+    const siblings = Array.from(node.parentElement?.children || []).filter(item => item.tagName === node.tagName);
+    const index = siblings.indexOf(node) + 1;
+    parts.unshift(siblings.length > 1 ? `${tag}:nth-of-type(${index})` : tag);
+    node = node.parentElement;
+  }
+  return parts.join(' > ');
+}
+
+function directText(el) {
+  return Array.from(el.childNodes)
+    .filter(node => node.nodeType === Node.TEXT_NODE)
+    .map(node => node.textContent)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function fieldKey(field) {
+  return `${field.type}|${field.rootSelector}|${field.path}`;
+}
+
+function escapeAttr(value) {
+  return String(value || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function mediaPreviewSrc(value) {
+  const src = String(value || '').trim();
+  if (!src) return '';
+  if (/^(https?:|data:|\/uploads\/)/i.test(src)) return src;
+  const normalized = src.replace(/\\/g, '/');
+  const marker = '/assets/';
+  const markerIndex = normalized.indexOf(marker);
+  if (normalized.startsWith('../../assets/')) return '/api/app-assets/' + encodeURIComponent(normalized.replace('../../assets/', ''));
+  if (normalized.startsWith('../assets/')) return '/api/app-assets/' + encodeURIComponent(normalized.replace('../assets/', ''));
+  if (normalized.startsWith('assets/')) return '/api/app-assets/' + encodeURIComponent(normalized.replace('assets/', ''));
+  if (markerIndex >= 0) return '/api/app-assets/' + encodeURIComponent(normalized.slice(markerIndex + marker.length));
+  return '';
+}
+
+function mediaPreviewHtml(field) {
+  if (field.type !== 'media' && field.type !== 'background') return '';
+  const src = mediaPreviewSrc(field.current || field.value);
+  if (!src) return '<div style="font-size:11px;color:var(--text3);margin-bottom:6px">No preview available for this dynamic path</div>';
+  return `<img src="${escapeAttr(src)}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" style="width:140px;height:92px;object-fit:cover;border-radius:8px;border:1px solid var(--border);display:block;margin-bottom:8px;background:#0b1220">
+          <div style="display:none;font-size:11px;color:var(--text3);margin-bottom:6px">Could not load image preview</div>`;
+}
+
+function collectPageFields(doc, page) {
+  const rootSelector = page.root || PAGE_ROOTS[page.id];
+  const root = doc.querySelector(rootSelector);
+  if (!root) return [];
+  const existing = getPageOverrides()[page.id] || [];
+  const existingMap = new Map(existing.map(item => [`${item.type}|${item.rootSelector}|${item.path}`, item.value]));
+  const fields = [];
+  const pushField = (field) => {
+    if (!field.path || !field.value) return;
+    const key = fieldKey(field);
+    if (fields.some(item => fieldKey(item) === key)) return;
+    fields.push({ ...field, current: existingMap.has(key) ? existingMap.get(key) : field.value });
+  };
+
+  root.querySelectorAll('h1,h2,h3,h4,h5,p,button,label,a,span,.pg-ttl,.pg-sub,.sp-title,.sp-sub,.hero-title').forEach(el => {
+    if (el.closest('script,style')) return;
+    const value = directText(el);
+    if (!value || value.length > 260) return;
+    pushField({ type: 'text', rootSelector, path: cssPath(root, el), label: el.tagName.toLowerCase(), value });
+  });
+
+  root.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(el => {
+    pushField({ type: 'placeholder', rootSelector, path: cssPath(root, el), label: 'placeholder', value: el.getAttribute('placeholder') || '' });
+  });
+
+  root.querySelectorAll('img[src],video[poster],video[src],source[src]').forEach(el => {
+    const value = el.getAttribute(el.tagName === 'VIDEO' && el.getAttribute('poster') ? 'poster' : 'src') || '';
+    pushField({ type: 'media', rootSelector, path: cssPath(root, el), label: el.tagName.toLowerCase(), value });
+  });
+
+  root.querySelectorAll('[style*="background-image"],[style*="background:"]').forEach(el => {
+    const style = el.getAttribute('style') || '';
+    const match = style.match(/url\((['"]?)(.*?)\1\)/i);
+    if (!match || !match[2]) return;
+    pushField({ type: 'background', rootSelector, path: cssPath(root, el), label: 'background image', value: match[2] });
+  });
+
+  return fields;
+}
+
+function renderPageFields(page) {
+  const clearBtn = document.querySelector('[onclick="clearSelectedPageOverrides()"]');
+  if (clearBtn) clearBtn.style.display = selectedPageSource === 'app' ? 'none' : 'inline-flex';
+  document.getElementById('pageEditorTitle').textContent = `Edit: ${page.name}`;
+  document.getElementById('pageEditorSub').textContent = `${page.slug} • ${selectedPageFields.length} editable items`;
+  document.getElementById('pageFieldsBody').innerHTML = selectedPageFields.map((field, index) => `
+    <tr>
+      <td>
+        <strong>${field.label}</strong>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">${field.path}</div>
+      </td>
+      <td><span class="badge ${field.type === 'media' || field.type === 'background' ? 'badge-green' : 'badge-blue'}">${field.type === 'background' ? 'media' : field.type}</span></td>
+      <td style="max-width:360px;color:var(--text2)">${field.value}</td>
+      <td>
+        ${mediaPreviewHtml(field)}
+        <textarea data-page-field="${index}" rows="${field.type === 'media' || field.type === 'background' ? 1 : 2}" style="min-width:360px">${field.current || ''}</textarea>
+        ${field.type === 'media' || field.type === 'background' ? '<div style="font-size:11px;color:var(--text3);margin-top:6px">Enter an image URL, /uploads/image-name.png, or an App asset path</div>' : ''}
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" class="empty-state">No editable content found on this page</td></tr>';
+}
+
+async function savePageFieldOverrides() {
+  if (!selectedPageId) return;
+  if (selectedPageSource === 'app') {
+    const edits = selectedPageFields.map((field, index) => {
+      const input = document.querySelector(`[data-page-field="${index}"]`);
+      const value = input ? input.value : field.current;
+      if (value === field.value) return null;
+      return { start: field.start, end: field.end, value };
+    }).filter(Boolean);
+    if (!edits.length) return toast('Chua co noi dung thay doi', 'info');
+    try {
+      const r = await fetch(API + `/api/admin/app-pages/${selectedPageId}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ edits })
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.success) throw new Error(d.message || 'Loi luu man App');
+      selectedPageFields = (d.fields || []).map(field => ({ ...field, source: 'app' }));
+      const page = APP_PAGES.find(item => item.id === selectedPageId);
+      renderPageFields({ ...(page || {}), slug: page?.slug || '' });
+      renderPageCatalog();
+      toast('Da luu man App. Hay reload lai app de thay doi.', 'success');
+    } catch (e) {
+      toast(e.message || 'Loi luu man App', 'error');
+    }
+    return;
+  }
+  const overrides = getPageOverrides();
+  const retained = (overrides[selectedPageId] || []).filter(item => !selectedPageFields.some(field => fieldKey(field) === `${item.type}|${item.rootSelector}|${item.path}`));
+  const edited = selectedPageFields.map((field, index) => {
+    const input = document.querySelector(`[data-page-field="${index}"]`);
+    const value = input ? input.value : field.current;
+    if (value === field.value) return null;
+    return { type: field.type, rootSelector: field.rootSelector, path: field.path, value };
+  }).filter(Boolean);
+  overrides[selectedPageId] = [...retained, ...edited];
+  if (!overrides[selectedPageId].length) delete overrides[selectedPageId];
+  setPageOverrides(overrides);
+  await savePageOverridesToServer(overrides);
+  renderPageCatalog();
+  toast('Page changes saved', 'success');
+}
+
+async function clearSelectedPageOverrides() {
+  if (!selectedPageId) return;
+  const ok = await showConfirmDialog({ title: 'Clear Page Changes', message: 'Clear all edited content for this page?', okText: 'Delete' });
+  if (!ok) return;
+  const overrides = getPageOverrides();
+  delete overrides[selectedPageId];
+  setPageOverrides(overrides);
+  await savePageOverridesToServer(overrides);
+  renderPageCatalog();
+  const page = WEB_PAGES.find(item => item.id === selectedPageId);
+  if (page) editCatalogPage(selectedPageId);
+  toast('Page changes cleared', 'success');
 }
 
 // ===== SETTINGS =====
@@ -888,12 +1444,11 @@ async function loadSettings() {
     const d = await r.json();
     if (!d.success) return;
     const s = d.settings;
-    if (s.credit_rate) document.getElementById('setting_credit_rate').value = s.credit_rate;
-    if (s.free_credits) document.getElementById('setting_free_credits').value = s.free_credits;
+    if (s.free_credits) document.getElementById('package_free_credits').value = s.free_credits;
+    if (s.gemini_api_key) document.getElementById('setting_gemini_api_key').value = s.gemini_api_key;
+    if (s.openai_api_key) document.getElementById('setting_openai_api_key').value = s.openai_api_key;
     
     // Load packages UI
-    if (s.pkg_basic_price) document.getElementById('setting_pkg_basic_price').value = s.pkg_basic_price;
-    if (s.pkg_basic_credits) document.getElementById('setting_pkg_basic_credits').value = s.pkg_basic_credits;
     if (s.pkg_pro_price) document.getElementById('setting_pkg_pro_price').value = s.pkg_pro_price;
     if (s.pkg_pro_credits) document.getElementById('setting_pkg_pro_credits').value = s.pkg_pro_credits;
     if (s.pkg_enterprise_price) document.getElementById('setting_pkg_enterprise_price').value = s.pkg_enterprise_price;
@@ -902,7 +1457,7 @@ async function loadSettings() {
     // Load total marks
     const r2 = await fetch(API + '/api/admin/dashboard', { headers: authHeaders() });
     const d2 = await r2.json();
-    if (d2.success) document.getElementById('totalMarksInfo').textContent = `${d2.stats.total_marks || 0} hiệu đề trong hệ thống`;
+    if (d2.success) document.getElementById('totalMarksInfo').textContent = `${d2.stats.total_marks || 0} marks in the system`;
   } catch (e) { console.error(e); }
 }
 
@@ -911,8 +1466,8 @@ async function saveSetting(key) {
   try {
     const r = await fetch(API + '/api/admin/settings', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ key, value }) });
     const d = await r.json();
-    if (d.success) toast('Đã lưu cài đặt!', 'success'); else toast('Lỗi', 'error');
-  } catch (e) { toast('Lỗi kết nối', 'error'); }
+    if (d.success) toast('Settings saved!', 'success'); else toast('Error', 'error');
+  } catch (e) { toast('Connection error', 'error'); }
 }
 </script>
 </body>

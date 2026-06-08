@@ -24,26 +24,45 @@ from services.web_scraper import scrape_multiple_urls
 
 # Prompt riêng để LLM tạo search keyword
 PROMPT_GENERATE_KEYWORDS = """Từ text chữ Hán dưới đây (được OCR từ đáy gốm sứ), 
-hãy tạo 2-3 câu tìm kiếm Google để tra cứu thông tin về hiệu đề này.
+hãy tạo 3-5 câu tìm kiếm Google để tra cứu thông tin về hiệu đề này.
 
 **Chữ Hán OCR:** "{ocr_text}"
+
+QUAN TRỌNG — Character disambiguation context:
+OCR trên gốm sứ thường đọc nhầm các ký tự sau:
+  杜 ↔ 右, 社 ↔ 礼, 侍 ↔ 待, 石 ↔ 北, 内 ↔ 肉, 府 ↔ 付
+  
+Nếu text chứa 内府 / 內府:
+  → Đây là hiệu đề xưởng gốm Nội Phủ (Imperial Household Bureau), triều Nguyễn Việt Nam
+  → Tạo keyword cả dạng gốc VÀ các biến thể sửa lỗi OCR
 
 Trả về JSON:
 ```json
 {{
     "keywords": [
-        "câu tìm kiếm 1 (tiếng Việt hoặc tiếng Anh)",
-        "câu tìm kiếm 2",
-        "câu tìm kiếm 3"
+        "câu tìm kiếm 1 (chữ Hán + tiếng Anh)",
+        "câu tìm kiếm 2 (phiên âm Hán-Việt)",
+        "câu tìm kiếm 3 (tiếng Việt)",
+        "câu tìm kiếm 4 (biến thể OCR nếu có)",
+        "câu tìm kiếm 5 (ngữ cảnh triều đại)"
     ],
-    "chu_han_clean": "chữ Hán đã sửa lỗi OCR nếu có"
+    "chu_han_clean": "chữ Hán đã sửa lỗi OCR nếu có",
+    "ocr_corrections": ["ký tự gốc → ký tự sửa", "..."]
 }}
 ```
 
-Gợi ý keyword hiệu quả:
-- "{ocr_text} ceramic reign mark"
-- "{ocr_text} gốm sứ hiệu đề"  
-- "{ocr_text} porcelain mark meaning"
+Ví dụ với "內府侍東":
+  → "內府侍東 ceramic mark Vietnamese"
+  → "Nội Phủ Thị Đông hiệu đề gốm sứ"
+  → "內府侍東 gốm sứ triều Nguyễn"
+  → "内府 Nguyen dynasty ceramic workshop mark"
+  → "Vietnamese imperial kiln marks 内府"
+
+Ví dụ với "大清康熙年製":
+  → "大清康熙年製 ceramic reign mark"
+  → "Kangxi period porcelain mark"
+  → "Đại Thanh Khang Hy niên chế gốm sứ"
+
 Trả về JSON hợp lệ, không markdown.
 """
 
@@ -70,6 +89,7 @@ class PipelineOcrSearch(BasePipeline):
         """
         ocr_text = kwargs.get("ocr_text", "")
         search_method = kwargs.get("search_method", None)
+        database = kwargs.get("database") or []
 
         # =============================================
         # Bước 1: Lấy OCR text (nếu chưa có)
@@ -87,6 +107,11 @@ class PipelineOcrSearch(BasePipeline):
         
         print(f"[{self.name}] 📝 OCR text: '{ocr_text}'")
 
+        db_match, match_type = self._match_database(ocr_text, database)
+        if db_match:
+            print(f"[{self.name}] Database short-circuit: {db_match.get('ten_viet', '')} ({match_type})")
+            return self._build_result_from_db(db_match, match_type, ocr_text)
+
         # =============================================
         # Bước 2: LLM tạo search keywords
         # =============================================
@@ -94,11 +119,19 @@ class PipelineOcrSearch(BasePipeline):
         
         keywords = await self._generate_search_keywords(ocr_text)
         if not keywords:
-            # Fallback: dùng OCR text trực tiếp
+            # Fallback: dùng OCR text trực tiếp với nhiều biến thể
             keywords = [
                 f"{ocr_text} ceramic reign mark",
                 f"{ocr_text} gốm sứ hiệu đề",
+                f"{ocr_text} porcelain mark meaning",
             ]
+            # Special 内府 workshop mark queries
+            has_neifu = any(ch in ocr_text for ch in ("内", "內")) and "府" in ocr_text
+            if has_neifu:
+                keywords.extend([
+                    "Nội Phủ hiệu đề gốm sứ triều Nguyễn",
+                    f"{ocr_text} Nguyen dynasty ceramic workshop mark",
+                ])
         
         print(f"[{self.name}] 🔑 Keywords: {keywords}")
 
@@ -108,7 +141,7 @@ class PipelineOcrSearch(BasePipeline):
         print(f"[{self.name}] 🌐 Bước 3: Google Search...")
         
         all_search_results = []
-        for keyword in keywords[:3]:
+        for keyword in keywords[:5]:  # Tăng lên 5 keywords cho coverage tốt hơn
             results = await search_google(keyword, num_results=3, prefer_method=search_method)
             all_search_results.extend(results)
         
@@ -149,6 +182,7 @@ class PipelineOcrSearch(BasePipeline):
             articles_text = "\n\n".join(
                 f"### {a.title}\n**URL:** {a.url}\n{a.content}" for a in articles
             )
+        web_sources = self._build_web_sources(unique_results[:5], articles)
 
         # =============================================
         # Bước 5: LLM tổng hợp thông tin
@@ -170,6 +204,7 @@ class PipelineOcrSearch(BasePipeline):
                 raw_ocr_text=ocr_text,
                 chu_han=ocr_text,
                 search_sources=[r.url for r in unique_results[:5]],
+                extra_data={"web_sources": web_sources, "keywords_used": keywords},
                 error_message="LLM Synthesize không phản hồi",
             )
         
@@ -183,6 +218,7 @@ class PipelineOcrSearch(BasePipeline):
                 chu_han=ocr_text,
                 search_sources=[r.url for r in unique_results[:5]],
                 llm_explanation=synth_response[:500],
+                extra_data={"web_sources": web_sources, "keywords_used": keywords},
                 error_message="Không parse được JSON từ LLM Synthesize",
             )
 
@@ -210,6 +246,7 @@ class PipelineOcrSearch(BasePipeline):
             extra_data={
                 "num_articles_scraped": len(articles) if articles else 0,
                 "keywords_used": keywords,
+                "web_sources": web_sources,
             },
         )
 
@@ -242,6 +279,83 @@ class PipelineOcrSearch(BasePipeline):
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, _ocr_sync)
 
+    def _match_database(self, ocr_text: str, database: List[Dict[str, Any]]) -> tuple:
+        query = self._norm_cjk(ocr_text)
+        if not query or not database:
+            return None, "none"
+
+        generic_partials = {"年製", "年制", "年造", "大清", "大明", "大南"}
+        partial_matches = []
+
+        for entry in database:
+            for target in self._entry_targets(entry):
+                target_norm = self._norm_cjk(target)
+                if target_norm == query:
+                    return entry, "exact"
+
+            if len(query) >= 3 and query not in generic_partials:
+                for target in self._entry_targets(entry):
+                    target_norm = self._norm_cjk(target)
+                    if target_norm and query in target_norm:
+                        score = len(query) / max(len(target_norm), 1)
+                        partial_matches.append((score, entry))
+
+        if partial_matches:
+            partial_matches.sort(key=lambda x: x[0], reverse=True)
+            return partial_matches[0][1], "partial"
+        return None, "none"
+
+    def _build_result_from_db(
+        self,
+        match: Dict[str, Any],
+        match_type: str,
+        ocr_text: str,
+    ) -> PipelineResult:
+        confidence_map = {
+            "exact": 0.90,
+            "partial": 0.72,
+        }
+        return PipelineResult(
+            pipeline_name=self.name,
+            status=PipelineStatus.SUCCESS,
+            confidence=confidence_map.get(match_type, 0.65),
+            chu_han=ocr_text,
+            trieu_dai=match.get("trieu_dai", ""),
+            nien_hieu=match.get("nien_hieu", ""),
+            hoang_de=match.get("hoang_de", ""),
+            nam_bat_dau=self._safe_int(match.get("nam_bat_dau")),
+            nam_ket_thuc=self._safe_int(match.get("nam_ket_thuc")),
+            phien_am=match.get("phien_am", ""),
+            y_nghia=match.get("ghi_chu", ""),
+            raw_ocr_text=ocr_text,
+            extra_data={
+                "match_type": match_type,
+                "source": "database_short_circuit",
+            },
+        )
+
+    @staticmethod
+    def _norm_cjk(value: str) -> str:
+        normalized = "".join(ch for ch in (value or "") if "\u4e00" <= ch <= "\u9fff")
+        return normalized.translate(str.maketrans({
+            "绪": "緒",
+            "统": "統",
+            "历": "曆",
+            "万": "萬",
+            "制": "製",
+            "内": "內",
+        }))
+
+    @staticmethod
+    def _entry_targets(entry: Dict[str, Any]) -> List[str]:
+        fields = [
+            entry.get("chu_han", ""),
+            entry.get("chu_han_4", ""),
+            entry.get("chu_han_6", ""),
+        ]
+        fields.extend([bt for bt in (entry.get("bien_the") or []) if bt])
+        return [field for field in fields if field]
+
     @staticmethod
     def _safe_int(value) -> Optional[int]:
         if value is None:
@@ -250,3 +364,18 @@ class PipelineOcrSearch(BasePipeline):
             return int(value)
         except (ValueError, TypeError):
             return None
+
+    @staticmethod
+    def _build_web_sources(search_results, articles) -> List[Dict[str, str]]:
+        article_by_url = {a.url: a for a in articles or []}
+        payload = []
+        for result in search_results or []:
+            article = article_by_url.get(result.url)
+            payload.append({
+                "title": result.title,
+                "url": result.url,
+                "snippet": result.snippet,
+                "content": (article.content[:1800] if article else ""),
+                "source_pipeline": "ocr_search",
+            })
+        return payload

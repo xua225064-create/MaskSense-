@@ -22,9 +22,29 @@ bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 # Ngưỡng (Threshold) cấu hình: Mức độ tương đồng tối thiểu để xác nhận là 1 ảnh.
 # Hạ nhẹ để nhận diện được ảnh chụp nghiêng/thiếu sáng.
 MIN_GOOD_MATCHES = 18
+MIN_ORB_UNIQUE_GAP = 30
+MIN_ORB_UNIQUE_RATIO = 1.25
+ORB_TEXT_ROI_RATIO = 0.62
+
+
+def _center_roi(image: np.ndarray, ratio: float = ORB_TEXT_ROI_RATIO) -> np.ndarray:
+    """Use the center mark area so ORB does not match mostly on bowl rims/background."""
+    if image is None or image.size == 0:
+        return image
+    h, w = image.shape[:2]
+    if h < 80 or w < 80:
+        return image
+    ratio = min(max(ratio, 0.35), 1.0)
+    y1 = int((1.0 - ratio) * 0.5 * h)
+    y2 = int((1.0 + ratio) * 0.5 * h)
+    x1 = int((1.0 - ratio) * 0.5 * w)
+    x2 = int((1.0 + ratio) * 0.5 * w)
+    roi = image[y1:y2, x1:x2]
+    return roi if roi.size else image
 
 def _extract_orb(image: np.ndarray):
     """Trích xuất keypoints và descriptors từ ảnh bằng hệ quy chiếu xám"""
+    image = _center_roi(image)
     if len(image.shape) == 3:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     else:
@@ -113,6 +133,8 @@ def match_image(input_img_bytes: bytes) -> Optional[Dict[str, Any]]:
     best_match_count = 0
     second_best_count = 0
     best_json_data = None
+    best_filename = ""
+    second_filename = ""
     
     for filename, ref_data in _reference_cache.items():
         ref_descriptors = ref_data["descriptors"]
@@ -129,10 +151,13 @@ def match_image(input_img_bytes: bytes) -> Optional[Dict[str, Any]]:
             
             if count > best_match_count:
                 second_best_count = best_match_count
+                second_filename = best_filename
                 best_match_count = count
                 best_json_data = ref_data["json_data"]
+                best_filename = filename
             elif count > second_best_count:
                 second_best_count = count
+                second_filename = filename
                 
         except Exception as e:
             continue
@@ -140,6 +165,20 @@ def match_image(input_img_bytes: bytes) -> Optional[Dict[str, Any]]:
     print(f"ORB Match Result: best={best_match_count}, second_best={second_best_count} (Threshold {MIN_GOOD_MATCHES})")
             
     if best_match_count >= MIN_GOOD_MATCHES and best_json_data:
+        gap = best_match_count - second_best_count
+        ratio = best_match_count / max(second_best_count, 1)
+        if (
+            second_best_count >= MIN_GOOD_MATCHES
+            and (gap < MIN_ORB_UNIQUE_GAP or ratio < MIN_ORB_UNIQUE_RATIO)
+        ):
+            print(
+                "[WARN] Ambiguous ORB match ignored: "
+                f"best={best_filename} ({best_match_count}), "
+                f"second={second_filename} ({second_best_count}), "
+                f"gap={gap}, ratio={ratio:.2f}"
+            )
+            return None
+
         print(f"[OK] Reference match found!")
         # Chỉnh match_type để front-end biết là nhận diện từ Memory
         best_json_data["match_type"] = "exact_orb_memory"

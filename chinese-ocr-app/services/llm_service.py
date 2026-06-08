@@ -26,6 +26,13 @@ if sys.platform == "win32":
 _gemini_client = None
 _openai_client = None
 
+# Import Ollama service
+try:
+    from services.ollama_service import call_ollama as _call_ollama_impl
+    _ollama_available = True
+except ImportError:
+    _ollama_available = False
+
 
 def _get_gemini_client():
     """Lazy init Gemini client (google-genai SDK mới)."""
@@ -174,13 +181,21 @@ async def call_openai(prompt: str, temperature: float = 0.3, max_tokens: int = 2
         )
         
         if response and response.choices:
-            return response.choices[0].message.content.strip()
+            content = response.choices[0].message.content
+            return content.strip() if content else None
         return None
         
     except Exception as e:
         print(f"[LLM/OpenAI] ❌ Error: {e}")
         traceback.print_exc()
         return None
+
+
+async def call_ollama_wrapper(prompt: str, temperature: float = 0.3, max_tokens: int = 2048) -> Optional[str]:
+    """Wrapper để gọi Ollama service."""
+    if not _ollama_available:
+        return None
+    return await _call_ollama_impl(prompt, temperature=temperature, max_tokens=max_tokens)
 
 
 async def call_llm(
@@ -194,16 +209,17 @@ async def call_llm(
     Gọi LLM với fallback tự động.
     
     Nếu provider chính lỗi, tự động thử provider phụ.
+    Hỗ trợ: Ollama (local), Gemini (cloud), OpenAI (cloud)
     
     Args:
         prompt: Nội dung prompt
-        provider: "gemini", "openai", hoặc None (dùng PRIMARY_LLM từ config)
+        provider: "ollama", "gemini", "openai", hoặc None (dùng PRIMARY_LLM từ config)
         temperature: Override nhiệt độ (None = dùng config)
         max_tokens: Override max tokens (None = dùng config)
         retry: Số lần retry khi lỗi
         
     Returns:
-        Text response hoặc None nếu cả 2 provider đều lỗi
+        Text response hoặc None nếu cả 3 provider đều lỗi
     """
     from config import PRIMARY_LLM, LLM_TEMPERATURE, LLM_MAX_TOKENS
     
@@ -211,26 +227,45 @@ async def call_llm(
     _temp = temperature if temperature is not None else LLM_TEMPERATURE
     _max = max_tokens if max_tokens is not None else LLM_MAX_TOKENS
     
-    # Xác định thứ tự thử
-    if _provider == "openai":
-        providers = [("openai", call_openai), ("gemini", call_gemini)]
-    else:
-        providers = [("gemini", call_gemini), ("openai", call_openai)]
+    # Xác định thứ tự thử (primary provider trước, sau đó fallback)
+    if _provider == "ollama":
+        providers = [
+            ("ollama", call_ollama_wrapper),
+            ("gemini", call_gemini),
+            ("openai", call_openai),
+        ]
+    elif _provider == "openai":
+        providers = [
+            ("openai", call_openai),
+            ("gemini", call_gemini),
+            ("ollama", call_ollama_wrapper),
+        ]
+    else:  # gemini (default)
+        providers = [
+            ("gemini", call_gemini),
+            ("openai", call_openai),
+            ("ollama", call_ollama_wrapper),
+        ]
     
     for name, call_fn in providers:
         for attempt in range(retry + 1):
-            result = await call_fn(prompt, temperature=_temp, max_tokens=_max)
-            if result:
-                if name != _provider:
-                    print(f"[LLM] Fallback sang {name} thanh cong")
-                return result
+            try:
+                result = await call_fn(prompt, temperature=_temp, max_tokens=_max)
+                if result:
+                    if name != _provider:
+                        print(f"[LLM] ⚠ Fallback sang {name} thành công")
+                    else:
+                        print(f"[LLM] ✅ {name.upper()} response ok")
+                    return result
+            except Exception as e:
+                print(f"[LLM/{name}] Error: {e}")
             
             if attempt < retry:
                 wait = 3 * (attempt + 1)  # 3s, 6s...
-                print(f"[LLM/{name}] Retry sau {wait}s...")
+                print(f"[LLM/{name}] ⏳ Retry sau {wait}s...")
                 await asyncio.sleep(wait)
     
-    print("[LLM] Tat ca provider deu loi!")
+    print("[LLM] ❌ Tất cả provider đều lỗi!")
     return None
 
 
@@ -240,6 +275,45 @@ async def call_llm(
 
 PROMPT_EXTRACT_INFO = """Bạn là chuyên gia phân tích hiệu đề (reign marks) trên gốm sứ cổ Trung Quốc và Việt Nam.
 
+CRITICAL LAYOUT RULE:
+Chinese reign marks on ceramic bases are ALWAYS written in vertical columns, read RIGHT-TO-LEFT, TOP-TO-BOTTOM.
+- 4-character mark: Column RIGHT (char1 top + char2 bottom), Column LEFT (char3 top + char4 bottom)
+- 6-character mark: Column RIGHT (char1, char2, char3), Column LEFT (char4, char5, char6)
+NEVER read left-to-right as horizontal text.
+
+CERAMIC OCR CONFUSION TABLE (common misreads on small blue-and-white script):
+  杜 ↔ 右 (stroke density similar)    社 ↔ 礼 (radical confusion)
+  内 ↔ 肉 (nearly identical)          府 ↔ 付 (missing strokes)
+  侍 ↔ 待 ↔ 停 ↔ 仃 ↔ 亭 (bộ 亻, PaddleOCR rất hay nhầm — 停 trên gốm LUÔN là 侍)
+  石 ↔ 北 (stroke pattern)            大 ↔ 太/天 (extra/missing stroke)
+  製 ↔ 制 ↔ 装 ↔ 裝 (variant forms)   緒 ↔ 绪 ↔ 结 ↔ 結 (variant forms)
+  康 ↔ 泰 (PaddleOCR thường đọc sai)  造 ↔ 遣 (radical similarity)
+  南 ↔ 男 (stroke similarity)          旨 ↔ 宕 (radical confusion)
+  統 ↔ 统 (traditional/simplified)     曆 ↔ 历 (traditional/simplified)
+
+CRITICAL INCOMPLETE OCR RECOVERY:
+  OCR engines frequently MISS characters, especially:
+  - The 4th character of 4-char marks (內府侍X → OCR reads only 內府侍 or 府停内)
+  - The 3rd-4th characters of 6-char marks (大清XX年製 → OCR reads 大清年製)
+  - Characters at the edge of the image or in blurred areas
+
+  When OCR text is SHORTER than expected mark length:
+  - If 2-3 chars contain 內/府 → this is likely 內府侍X (4-char workshop mark), find the missing suffix
+  - If 4-5 chars contain 大清/大明/大南 + 年/製 → this is likely 6-char dynasty mark, find the missing reign chars
+  - ALWAYS return the COMPLETE mark in "chu_han", inferring missing characters from context
+  - Flag inferred characters in "ghi_chu"
+
+KNOWN MARK TYPES to validate against:
+  - 大明XX年製 / 大清XX年製 / 大南XX年製 = Dynasty reign marks (6 chars)
+  - 内府侍X = Vietnamese Nguyễn dynasty Imperial workshop marks:
+    內府侍東, 內府侍南, 內府侍北, 內府侍右, 內府侍左, 內府侍中, 內府侍從, 內府侍旨, 內府侍兌
+  - 停 trên gốm sứ Huế LUÔN LUÔN là 侍 bị OCR đọc sai. Không tồn tại hiệu đề nào chứa 停.
+  - Nếu OCR text dạng 府停内 / 内府停 / 停内府 → đây là 內府侍X bị sai thứ tự + thiếu ký tự cuối
+  - Với nhóm 內府侍X, KHÔNG đổi 東 thành 從 nếu OCR/ảnh vẫn thấy nét của chữ 東
+  - 4-char marks: XX年製, XX年造, 天下太平, 萬壽無疆, 福壽康寧, 若深珍藏, etc.
+  - 2-char marks: 內府, 御製, 清玩, 珍玩, 雅玉, etc.
+  - If assembled mark is NOT found in known types → flag which characters are uncertain
+
 Dưới đây là text chữ Hán được OCR đọc từ đáy một món gốm sứ:
 
 **Chữ Hán OCR: "{ocr_text}"**
@@ -248,22 +322,25 @@ Hãy phân tích và trả về thông tin dưới dạng JSON (CHỈNH SỬA TR
 
 ```json
 {{
-    "chu_han": "Chữ Hán đúng (đã sửa lỗi OCR nếu có)",
-    "trieu_dai": "Triều đại (Minh / Thanh / Nguyễn / Khác)",
-    "nien_hieu": "Niên hiệu (ví dụ: Tuyên Đức, Khang Hy, Càn Long...)",
+    "chu_han": "Chữ Hán đúng (đã sửa lỗi OCR + KHÔI PHỤC ký tự thiếu nếu có)",
+    "trieu_dai": "Triều đại (Minh Triều / Thanh Triều / Nhà Nguyễn (Việt Nam) / Đặc biệt - Cung đình / Khác)",
+    "nien_hieu": "Niên hiệu (ví dụ: Tuyên Đức, Khang Hy, Càn Long, Nội Phủ Thị Tòng...)",
     "hoang_de": "Tên hoàng đế",
     "nam_bat_dau": "Năm bắt đầu niên hiệu (số nguyên hoặc null)",
     "nam_ket_thuc": "Năm kết thúc niên hiệu (số nguyên hoặc null)",
     "phien_am": "Phiên âm Hán-Việt đầy đủ",
     "y_nghia": "Ý nghĩa của hiệu đề, mô tả ngắn gọn",
     "do_tin_cay": "Độ tin cậy của phân tích (0.0 → 1.0)",
-    "ghi_chu": "Ghi chú thêm nếu có (lỗi OCR đã sửa, biến thể, etc.)"
+    "ghi_chu": "Ghi chú thêm (lỗi OCR đã sửa, ký tự đã khôi phục, ký tự không chắc chắn)",
+    "layout": "2-col vertical / 3-col vertical / horizontal / unknown"
 }}
 ```
 
 Lưu ý:
-- Nếu text quá ngắn hoặc không rõ, hãy cố gắng suy luận từ ngữ cảnh hiệu đề gốm sứ.
-- Nếu phát hiện lỗi OCR phổ biến (ví dụ: 得→德, 請→靖, 厤→曆), hãy sửa trong "chu_han".
+- Nếu text quá ngắn hoặc thiếu ký tự, hãy CỐ GẮNG SUY LUẬN mark đầy đủ từ ngữ cảnh hiệu đề gốm sứ.
+- Nếu phát hiện lỗi OCR phổ biến (ví dụ: 得→德, 請→靖, 厤→曆, 杜→右, 待→侍, 停→侍), hãy sửa trong "chu_han".
+- Nếu mark chứa 内府 hoặc 內府, đây là hiệu đề xưởng gốm Nội Phủ (Imperial Household Bureau) thuộc triều Nguyễn Việt Nam.
+- QUAN TRỌNG: chu_han phải trả về ĐÚNG SỐ KÝ TỰ theo dạng mark (4 hoặc 6 ký tự), không được thiếu.
 - Trả về JSON hợp lệ, không thêm markdown hay text thừa bên ngoài JSON.
 """
 

@@ -2,8 +2,10 @@ import cv2
 import numpy as np
 import re
 import os
+import json
 from paddleocr import PaddleOCR
 from typing import List, Tuple
+from ocr_corrections import correct_ocr_text, is_valid_char, get_correction_stats
 
 DEBUG_DIR = "debug"
 os.makedirs(DEBUG_DIR, exist_ok=True)
@@ -22,13 +24,85 @@ ocr = PaddleOCR(
 print("PaddleOCR ready!")
 
 MAX_OCR_DIM = 1600
-MIN_CONF = 0.50  # Ngưỡng chuẩn: 0.50 đủ để vớt '康' nhưng không quá rác
-MIN_CONF_FALLBACK = 0.35  # Ảnh mờ: nới ngưỡng để tránh mất toàn bộ ký tự
-EARLY_ACCEPT_SCORE = 3.0  # Hạ ngưỡng để dừng sớm hơn, tiết kiệm thời gian
-EARLY_ACCEPT_LEN = 4
-MAX_VARIANTS_PER_REQUEST = 8  # Giới hạn số variant OCR để giảm độ trễ
-DEEP_EXTRA_VARIANTS = 4  # Giảm từ 6 → 4, chỉ dùng khi pass nhanh không đọc được
+MIN_CONF = 0.35  # Lowered: base threshold to capture all characters (was 0.55)
+MIN_CONF_FALLBACK = 0.28  # Lowered: fallback for blurry images (was 0.45)
+MIN_CONF_AMBIGUOUS = 0.50  # Lowered: still strict for confusable characters (was 0.72)
+EARLY_ACCEPT_SCORE = 5.0  # Increased: require higher score before early stopping
+EARLY_ACCEPT_LEN = 6  # Six-character reign marks are complete enough to stop early.
+MAX_VARIANTS_PER_REQUEST = 12  # Increased: allow more variants for better results (was 8)
+DEEP_EXTRA_VARIANTS = 6  # Increased: more deep variants (was 4)
 SAVE_DEBUG_VARIANTS = False  # Tắt ghi file debug để tăng tốc
+
+# ============================================================
+# Bản đồ ký tự tương tự để tránh nhầm lẫn
+# ============================================================
+SIMILAR_CHAR_GROUPS = {
+    # Các ký tự tương tự cần confidence cao
+    frozenset(['内', '乾', '干', '土']): 0.45,      # 内(nội) vs 乾(kiền/khiền)
+    frozenset(['府', '甲', '甲', '申']): 0.45,      # 府(phủ) vs các ký tự tương tự
+    frozenset(['蓝', '篮', '监']): 0.45,            # Các ký tự "blue-like"
+    frozenset(['蒙', '蒙', '艹']): 0.45,            # Các ký tự với "艹" radical
+    frozenset(['康', '吊', '口']): 0.45,            # 康 vs các ký tự khác
+    frozenset(['正', '止', '工']): 0.45,            # 正(chính) vs các ký tự khác
+    frozenset(['嘉', '嘉', '口']): 0.45,            # 嘉(gia) vs các ký tự khác
+    
+    # Nội Phủ Thị series - ký tự từ hệ thống kiểu Nguyễn
+    frozenset(['侍', '佚', '待', '寺', '停', '仃', '亭']): 0.50,  # 侍(thị) - cực kỳ dễ nhầm (停/亭/仃 cùng bộ 亻)
+    frozenset(['北', '石', '北', '白']): 0.50,      # 北(bắc) vs 石(thạch) - dễ nhầm
+    frozenset(['東', '东', '夫']): 0.50,            # 東(đông) - traditional vs simplified
+    frozenset(['南', '男', '闵']): 0.50,            # 南(nam) vs 男(nam - khác nghĩa)
+    frozenset(['中', '巾', '中']): 0.48,            # 中(trung) - viết dễ bị mờ
+    frozenset(['右', '右', '左']): 0.48,            # 右(hữu/tây)
+    frozenset(['左', '左', '右']): 0.48,            # 左(tả/đông)
+    frozenset(['兌', '兑', '充']): 0.50,            # 兌(đoài) - traditional vs simplified
+}
+
+
+def _attempt_ocr_correction(ocr_text: str) -> str:
+    """
+    Sửa hiệu đề OCR nhầm sử dụng module ocr_corrections.
+    
+    Chiến lược:
+    1. Kiểm tra ký tự valid
+    2. Nếu có ký tự invalid → suggest corrections
+    3. Validate với database
+    4. Return best candidate
+    
+    Args:
+        ocr_text: Text từ OCR
+    
+    Returns:
+        str: Text đã sửa hoặc text gốc
+    """
+    if not ocr_text:
+        return ocr_text
+    
+    try:
+        # Load database
+        db_path = os.path.join(os.path.dirname(__file__), "data", "hieu_de_database.json")
+        with open(db_path, 'r', encoding='utf-8') as f:
+            database = json.load(f)
+    except Exception as e:
+        print(f"  [Correction] Lỗi load database: {e}")
+        database = []
+    
+    # Sử dụng module ocr_corrections
+    correction_result = correct_ocr_text(ocr_text, database)
+    
+    # Log chi tiết
+    if correction_result["invalid_chars"]:
+        print(f"  [Validation] '{ocr_text}' chứa ký tự invalid: {correction_result['invalid_chars']}")
+        print(f"  [Suggestions] {correction_result['suggestions'][:3]}")
+    
+    if correction_result["matched_in_db"]:
+        print(f"  [✓ Database Match] '{ocr_text}' → '{correction_result['corrected']}' (tín cậy: {correction_result['confidence']:.2f})")
+        return correction_result["corrected"]
+    
+    if correction_result["corrected"] != ocr_text:
+        print(f"  [⚠ Corrected] '{ocr_text}' → '{correction_result['corrected']}' (tín cậy: {correction_result['confidence']:.2f})")
+        return correction_result["corrected"]
+    
+    return ocr_text
 
 
 def _plausible_reign_ocr_string(s: str) -> bool:
@@ -48,6 +122,158 @@ def _plausible_reign_ocr_string(s: str) -> bool:
     return False
 
 
+def _is_incomplete_dynasty_mark(text: str) -> bool:
+    clean = _canonicalize_reign_mark_text(text)
+    clean = re.sub(r"[^\u4e00-\u9fff]", "", clean or "")
+    return clean in {"大明年製", "大清年製", "大南年製"}
+
+
+def _derive_qing_guangxu_from_ocr_evidence(texts: List[str]) -> str:
+    """
+    Recover common Qing six-character marks when OCR sees the right glyphs in
+    separate blocks. This is conservative: require dynasty + reign evidence +
+    year/manufacture evidence, and avoid conflicting reign signals.
+    """
+    normalized = [_canonicalize_reign_mark_text(t) for t in texts if t]
+    joined = "".join(normalized).translate(_OCR_CANONICAL_CHARS)
+    has_qing = "大清" in joined or ("大" in joined and "清" in joined)
+    has_year_mark = "年" in joined and "製" in joined
+    guangxu_conflicts = any(ch in joined for ch in "康熙雍正乾隆嘉慶道咸豐同治宣統")
+    if has_qing and "光" in joined and "緒" in joined and has_year_mark:
+        return "大清光緒年製"
+    if has_qing and "光" in joined and "緒" in joined and "年" in joined and not guangxu_conflicts:
+        return "大清光緒年製"
+    if has_qing and "光" in joined and has_year_mark and not guangxu_conflicts:
+        return "大清光緒年製"
+
+    kangxi_conflicts = any(ch in joined for ch in "雍正乾隆嘉慶道光緒咸豐同治宣統")
+    has_kang_hint = "康" in joined or "泰" in joined  # Paddle often reads 康 as 泰 in small marks.
+    if has_qing and "熙" in joined and has_year_mark and not kangxi_conflicts:
+        return "大清康熙年製"
+    if has_qing and "熙" in joined and "年" in joined and has_kang_hint and not kangxi_conflicts:
+        return "大清康熙年製"
+    return ""
+
+
+_EVIDENCE_CANONICAL_CHARS = str.maketrans({
+    "装": "製",
+    "裝": "製",
+    "制": "製",
+    "万": "萬",
+    "历": "曆",
+    "暦": "曆",
+    "歴": "曆",
+    "厤": "曆",
+    "结": "緒",
+    "結": "緒",
+    "绪": "緒",
+    "泰": "康",
+})
+
+
+_WANLI_EVIDENCE_CANONICAL_CHARS = str.maketrans({
+    "万": "萬",
+    "历": "曆",
+    "暦": "曆",
+    "歴": "曆",
+    "厤": "曆",
+    "唐": "曆",  # PaddleOCR often reads the top-left 萬曆 glyph as 唐 on blue marks.
+    "装": "製",
+    "裝": "製",
+    "制": "製",
+})
+
+
+def _derive_ming_wanli_from_ocr_evidence(texts: List[str]) -> str:
+    """
+    Recover 大明萬曆年製 when OCR sees enough scattered glyph evidence.
+
+    Blue underglaze Wanli marks often split into columns and the 曆 glyph is
+    read as 唐/暦/歴 or dropped. Require dynasty + 萬 + 年 + 製 and reject
+    obvious conflicting Ming reign signals.
+    """
+    normalized = [_canonicalize_reign_mark_text(t) for t in texts if t]
+    evidence = re.sub(r"[^\u4e00-\u9fff]", "", "".join(normalized))
+    evidence = evidence.translate(_WANLI_EVIDENCE_CANONICAL_CHARS)
+    if not evidence:
+        return ""
+
+    evidence_set = set(evidence)
+    has_ming = "大明" in evidence or {"大", "明"}.issubset(evidence_set)
+    has_year_mark = "年" in evidence_set and any(ch in evidence_set for ch in ("製", "造"))
+    if not (has_ming and "萬" in evidence_set and has_year_mark):
+        return ""
+
+    conflicting_ming_reigns = set("洪武永樂宣德正統景泰天順成化弘治正德嘉靖隆慶泰昌天啟崇禎")
+    if conflicting_ming_reigns & evidence_set:
+        return ""
+
+    # Prefer explicit 曆 evidence, but allow recovery when OCR missed only that
+    # one hard glyph and all other required Wanli mark characters are present.
+    if "曆" in evidence_set or len(set("大明萬年製") & evidence_set) >= 5:
+        return "大明萬曆年製"
+    return ""
+
+
+def _derive_database_mark_from_ocr_evidence(texts: List[str]) -> str:
+    """
+    Recover a known database mark from scattered OCR glyph evidence.
+
+    This is intentionally stricter than normal fuzzy matching: it requires the
+    dynasty characters, 年, a manufacture marker, and most unique characters of
+    the target to appear in the combined OCR evidence.
+    """
+    evidence = "".join(_canonicalize_reign_mark_text(t) for t in texts if t)
+    evidence = re.sub(r"[^\u4e00-\u9fff]", "", evidence).translate(_EVIDENCE_CANONICAL_CHARS)
+    if not evidence or "年" not in evidence:
+        return ""
+
+    try:
+        db_path = os.path.join(os.path.dirname(__file__), "data", "hieu_de_database.json")
+        with open(db_path, "r", encoding="utf-8") as f:
+            database = json.load(f)
+    except Exception:
+        return ""
+
+    evidence_set = set(evidence)
+    best = ("", 0.0)
+    qing_reign_chars = set("康熙雍正乾隆嘉慶道光緒咸豐同治宣統")
+
+    for entry in database:
+        target = entry.get("chu_han", "")
+        target_norm = _canonicalize_reign_mark_text(target)
+        target_norm = re.sub(r"[^\u4e00-\u9fff]", "", target_norm).translate(_EVIDENCE_CANONICAL_CHARS)
+        if len(target_norm) < 4 or "年" not in target_norm:
+            continue
+        if not any(marker in target_norm for marker in ("製", "造", "玩")):
+            continue
+        dynasty = target_norm[:2] if target_norm.startswith(("大清", "大明", "大南")) else ""
+        if dynasty and not set(dynasty).issubset(evidence_set):
+            continue
+        if not any(marker in evidence_set for marker in ("製", "造", "玩")):
+            continue
+
+        target_set = set(target_norm)
+        coverage = len(target_set & evidence_set) / max(len(target_set), 1)
+        if coverage < 0.82:
+            continue
+
+        if target_norm.startswith("大清"):
+            target_reigns = qing_reign_chars & target_set
+            evidence_reigns = qing_reign_chars & evidence_set
+            unrelated = evidence_reigns - target_reigns
+            if unrelated:
+                continue
+            if target_reigns and len(target_reigns & evidence_set) < max(1, min(2, len(target_reigns))):
+                continue
+
+        score = coverage + (0.1 if target_norm in evidence else 0.0)
+        if score > best[1]:
+            best = (target_norm, score)
+
+    return best[0]
+
+
 def _variant_sort_key(text: str, score: float) -> Tuple[int, int, float]:
     """
     (tier, -len_cjk, -score):
@@ -55,9 +281,352 @@ def _variant_sort_key(text: str, score: float) -> Tuple[int, int, float]:
     - tier 1: chưa đủ — ưu tiên chuỗi DÀI hơn (OCR lộn cột vẫn còn nhiều ký tự để khớp DB),
       tránh chọn mẫu quá ngắn kiểu 「派大年」.
     """
-    t = re.sub(r"[^\u4e00-\u9fff]", "", text or "")
-    tier = 0 if _plausible_reign_ocr_string(text) else 1
+    canonical = _canonicalize_reign_mark_text(text)
+    t = re.sub(r"[^\u4e00-\u9fff]", "", canonical or "")
+    if _is_incomplete_dynasty_mark(canonical):
+        tier = 2
+    else:
+        tier = 0 if _plausible_reign_ocr_string(canonical) else 1
     return (tier, -len(t), -score)
+
+
+_OCR_CANONICAL_CHARS = str.maketrans({
+    "绪": "緒",
+    "结": "緒",
+    "結": "緒",
+    "统": "統",
+    "历": "曆",
+    "暦": "曆",
+    "歴": "曆",
+    "厤": "曆",
+    "万": "萬",
+    "制": "製",
+    "装": "製",
+    "裝": "製",
+    "内": "內",
+})
+
+_NEIFU_MARK_SUFFIXES = {"旨", "中", "右", "左", "東", "东", "南", "北", "兌", "兑", "從", "从"}
+_NEIFU_OCR_CONFUSIONS = {
+    "内": "內",
+    "待": "侍",
+    "特": "侍",
+    "持": "侍",
+    "停": "侍",    # PaddleOCR rất hay nhầm 侍→停 (cùng bộ 亻)
+    "仃": "侍",    # 仃 vs 侍
+    "亭": "侍",    # 亭 vs 侍 (phần dưới giống)
+    "杜": "右",
+    "社": "右",
+    "赶": "右",
+    "柱": "右",    # 柱 bị nhầm khi nét mờ
+    "石": "北",
+    "白": "北",
+    "东": "東",
+    "兑": "兌",
+    "从": "從",
+    "男": "南",    # 男 vs 南 trên men mờ
+    "宕": "旨",    # 宕 vs 旨
+}
+
+
+def _canonicalize_neifu_mark_text(raw: str) -> str:
+    """Normalize common OCR order/noise for Nguyen Nội Phủ workshop marks."""
+    if not raw:
+        return ""
+
+    mapped = "".join(_NEIFU_OCR_CONFUSIONS.get(ch, ch) for ch in raw)
+
+    def _pick_suffix(text: str) -> str:
+        candidates = [ch for ch in text if ch in _NEIFU_MARK_SUFFIXES]
+        if not candidates:
+            return ""
+        s = candidates[0]
+        if s == "东":
+            s = "東"
+        elif s == "兑":
+            s = "兌"
+        elif s == "从":
+            s = "從"
+        return s
+
+    # Case 1: Đủ 3 ký tự core 內 + 府 + 侍
+    if "內" in mapped and "府" in mapped and "侍" in mapped:
+        suffix = _pick_suffix(mapped)
+        if suffix:
+            return "內府侍" + suffix
+        # Chỉ có 內府侍 không suffix (3 char mark)
+        cjk_only = [ch for ch in mapped if '\u4e00' <= ch <= '\u9fff']
+        if len(cjk_only) == 3:
+            return "內府侍"
+        return ""
+
+    # Case 2: OCR thiếu 侍 — chỉ đọc 內 + 府 + 1 suffix
+    # → Suy luận đây là 內府侍X bị thiếu chữ thứ 3
+    if "內" in mapped and "府" in mapped and "侍" not in mapped:
+        suffix = _pick_suffix(mapped)
+        if suffix:
+            cjk_only = [ch for ch in mapped if '\u4e00' <= ch <= '\u9fff']
+            if len(cjk_only) <= 3:
+                return "內府侍" + suffix
+
+    return ""
+
+
+def _canonicalize_reign_mark_text(text: str) -> str:
+    """
+    Normalize common PaddleOCR output for vertical reign marks.
+
+    Six-character marks are written in two vertical columns and read from the
+    right column first. OCR often concatenates the left column before the right,
+    e.g. 緒年製大清光 -> 大清光緒年製.
+    """
+    raw = re.sub(r"[^\u4e00-\u9fff]", "", text or "").translate(_OCR_CANONICAL_CHARS)
+    if not raw:
+        return text
+
+    neifu_mark = _canonicalize_neifu_mark_text(raw)
+    if neifu_mark:
+        return neifu_mark
+
+    for prefix in ("大清", "大明", "大南"):
+        pos = raw.find(prefix)
+        if pos > 0:
+            rotated = raw[pos:] + raw[:pos]
+            if len(rotated) >= 6:
+                raw = rotated
+            break
+
+    # Common OCR order for two columns: 大清製光緒年 -> 大清光緒年製.
+    for prefix in ("大清", "大明", "大南"):
+        if raw.startswith(prefix) and len(raw) == 6 and raw[2] in {"製", "造"} and raw[-1] == "年":
+            raw = raw[:2] + raw[3:5] + raw[-1] + raw[2]
+            break
+
+    # Keep incomplete 5-char dynasty marks intact for evidence/database
+    # recovery later. Example: 大清光年製 may still recover to 大清光緒年製
+    # when other OCR variants provide the missing reign character.
+    if len(raw) == 5:
+        for prefix in ("大清", "大明", "大南"):
+            if raw.startswith(prefix) and "年" in raw and ("製" in raw or "造" in raw):
+                break
+
+    return raw
+
+
+def _is_ambiguous_char(char: str) -> bool:
+    """
+    Kiểm tra xem ký tự có phải là ký tự tương tự/nhầm lẫn cao không.
+    Các ký tự này cần confidence cao hơn bình thường.
+    """
+    for group in SIMILAR_CHAR_GROUPS:
+        if char in group:
+            return True
+    return False
+
+
+def _get_required_confidence(text: str) -> float:
+    """
+    Tính toán confidence threshold cần thiết cho text dựa trên ký tự trong đó.
+    Nếu có ký tự tương tự, cần confidence cao hơn.
+    
+    Strategy:
+    - Kiểm tra TẤT CẢ ký tự
+    - Trả về threshold CAO NHẤT cần thiết
+    - Ký tự "cực kỳ nguy hiểm" (侍, 北, etc.) → 0.50
+    - Ký tự "tương tự" khác → 0.48
+    - Bình thường → 0.35
+    """
+    # Ký tự cực kỳ nguy hiểm (thường nhầm lẫn)
+    ultra_risky_chars = {'侍', '北', '東', '东', '兌', '兑'}
+    
+    max_required = MIN_CONF
+    
+    for c in text:
+        if '\u4e00' <= c <= '\u9fff':  # Chữ Hán
+            if c in ultra_risky_chars:
+                max_required = max(max_required, 0.50)  # More permissive now
+            elif _is_ambiguous_char(c):
+                max_required = max(max_required, 0.48)  # Slightly stricter than normal
+    
+    return max_required
+
+
+def _find_database_matches(ocr_text: str, max_results: int = 5) -> List[dict]:
+    """
+    Tìm các khớp trong database theo tiêu chí:
+    1. Khớp chính xác
+    2. Khớp trong biến thể (bien_the)
+    3. Khớp fuzzy (cho phép sai 1-2 ký tự - dành cho OCR nhầm lẫn)
+    
+    Returns:
+        List[dict] với structure: [{'match': 'exact'|'variant'|'fuzzy', 'entry': {...}, 'score': float}]
+    """
+    if not ocr_text:
+        return []
+    
+    try:
+        db_path = os.path.join(os.path.dirname(__file__), "data", "hieu_de_database.json")
+        with open(db_path, 'r', encoding='utf-8') as f:
+            database = json.load(f)
+        
+        matches = []
+        ocr_len = len(ocr_text)
+        
+        for entry in database:
+            chu_han = entry.get('chu_han', '')
+            bien_the = entry.get('bien_the', [])
+            
+            # 1. Khớp chính xác
+            if ocr_text == chu_han:
+                matches.append({
+                    'match_type': 'exact',
+                    'entry': entry,
+                    'score': 1.0,
+                    'matched_text': chu_han
+                })
+                continue
+            
+            # 2. Khớp trong biến thể
+            for variant in bien_the:
+                if ocr_text == variant:
+                    matches.append({
+                        'match_type': 'variant',
+                        'entry': entry,
+                        'score': 0.95,
+                        'matched_text': variant
+                    })
+                    continue
+            
+            # 3. Khớp fuzzy - cho phép sai 1 ký tự (OCR nhầm)
+            if len(chu_han) == ocr_len:
+                diff_count = 0
+                for i in range(ocr_len):
+                    if chu_han[i] != ocr_text[i]:
+                        diff_count += 1
+                
+                if diff_count == 1:  # Chỉ sai 1 ký tự
+                    # Kiểm tra xem ký tự bị nhầm có nằm trong SIMILAR_CHAR_GROUPS không
+                    wrong_pos = -1
+                    for i in range(ocr_len):
+                        if chu_han[i] != ocr_text[i]:
+                            wrong_pos = i
+                            break
+                    
+                    if wrong_pos >= 0:
+                        correct_char = chu_han[wrong_pos]
+                        wrong_char = ocr_text[wrong_pos]
+                        # Kiểm tra xem đây có phải là cặp ký tự dễ nhầm không
+                        is_confusable = False
+                        for group in SIMILAR_CHAR_GROUPS:
+                            if correct_char in group and wrong_char in group:
+                                is_confusable = True
+                                break
+                        
+                        if is_confusable:
+                            matches.append({
+                                'match_type': 'fuzzy_confusable',
+                                'entry': entry,
+                                'score': 0.85,  # Độ tin cậy cao hơn fuzzy thường
+                                'matched_text': chu_han,
+                                'wrong_char': wrong_char,
+                                'correct_char': correct_char,
+                                'position': wrong_pos
+                            })
+                        else:
+                            matches.append({
+                                'match_type': 'fuzzy_other',
+                                'entry': entry,
+                                'score': 0.70,  # Độ tin cậy thấp hơn
+                                'matched_text': chu_han,
+                                'wrong_char': wrong_char,
+                                'correct_char': correct_char,
+                                'position': wrong_pos
+                            })
+        
+        # Sắp xếp theo score (cao nhất trước)
+        matches.sort(key=lambda x: x['score'], reverse=True)
+        
+        return matches[:max_results]
+    
+    except Exception as e:
+        print(f"  [DB] Lỗi tìm kiếm: {e}")
+        return []
+
+
+def _validate_against_database(ocr_text: str) -> dict:
+    """
+    Kiểm tra xem OCR text có khớp với database không.
+    
+    Returns:
+        dict với:
+        - database_valid: bool
+        - warning: str (cảnh báo nếu có)
+        - best_match: dict hoặc None
+        - suggestions: list[dict] (các gợi ý nếu không khớp chính xác)
+    """
+    if not ocr_text:
+        return {
+            'database_valid': False,
+            'warning': 'Không có OCR result',
+            'best_match': None,
+            'suggestions': []
+        }
+    
+    try:
+        matches = _find_database_matches(ocr_text)
+        
+        if not matches:
+            return {
+                'database_valid': False,
+                'warning': f"Hiệu đề '{ocr_text}' không tìm thấy trong cơ sở dữ liệu",
+                'best_match': None,
+                'suggestions': []
+            }
+        
+        best = matches[0]
+        
+        if best['match_type'] == 'exact':
+            return {
+                'database_valid': True,
+                'warning': '',
+                'best_match': best,
+                'suggestions': []
+            }
+        
+        elif best['match_type'] == 'variant':
+            return {
+                'database_valid': True,
+                'warning': f"Là biến thể của '{best['matched_text']}'",
+                'best_match': best,
+                'suggestions': []
+            }
+        
+        elif best['match_type'] == 'fuzzy_confusable':
+            # Đây là trường hợp OCR nhầm ký tự dễ nhầm lẫn
+            suggestion_text = f"OCR đọc '{best['wrong_char']}' nhưng có thể là '{best['correct_char']}'?"
+            return {
+                'database_valid': False,
+                'warning': suggestion_text,
+                'best_match': best,
+                'suggestions': matches[1:] if len(matches) > 1 else []
+            }
+        
+        else:  # fuzzy_other
+            return {
+                'database_valid': False,
+                'warning': f"Gợi ý: Có thể là '{best['matched_text']}' (sai ký tự vị trí {best['position']})?",
+                'best_match': best,
+                'suggestions': matches[1:] if len(matches) > 1 else []
+            }
+    
+    except Exception as e:
+        print(f"  [DB] Lỗi validate: {e}")
+        return {
+            'database_valid': False,
+            'warning': f'Database validation error: {str(e)}',
+            'best_match': None,
+            'suggestions': []
+        }
 
 
 # ============================================================
@@ -137,6 +706,60 @@ def enhance_image_for_ocr(image):
     except Exception:
         pass
     return image
+
+
+def detect_google_image(image: np.ndarray) -> bool:
+    """
+    Phát hiện xem ảnh có phải từ Google Search không.
+    Google images thường có:
+    - Watermark ở góc
+    - Compression artifacts
+    - Chất lượng khác nhau
+    """
+    h, w = image.shape[:2]
+    # Kiểm tra watermark ở góc
+    corner_size = int(min(h, w) * 0.15)
+    corners = [
+        image[:corner_size, :corner_size],
+        image[:corner_size, w-corner_size:],
+        image[h-corner_size:, :corner_size],
+        image[h-corner_size:, w-corner_size:],
+    ]
+    
+    # Nếu nhiều góc có pixel rất sáng/trắng → có thể là watermark Google
+    bright_corners = 0
+    for corner in corners:
+        bright_ratio = np.mean(corner) > 200
+        if bright_ratio:
+            bright_corners += 1
+    
+    return bright_corners >= 2
+
+
+def preprocess_google_image(image: np.ndarray) -> np.ndarray:
+    """
+    Preprocessing tối ưu cho ảnh Google Search.
+    - Giảm watermark
+    - Cải thiện contrast
+    - Khử nhiễu compression
+    """
+    # Khử nhiễu bilateral filter (giữ cạnh)
+    denoised = cv2.bilateralFilter(image, d=9, sigmaColor=75, sigmaSpace=75)
+    
+    # Cải thiện contrast với CLAHE trên LAB
+    lab = cv2.cvtColor(denoised, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+    
+    clahe = cv2.createCLAHE(clipLimit=3.5, tileGridSize=(8, 8))
+    l_clahe = clahe.apply(l)
+    
+    enhanced = cv2.cvtColor(cv2.merge([l_clahe, a, b]), cv2.COLOR_LAB2BGR)
+    
+    # Slight unsharp mask để làm nét chữ
+    blur = cv2.GaussianBlur(enhanced, (0, 0), 1.0)
+    sharpened = cv2.addWeighted(enhanced, 1.5, blur, -0.5, 0)
+    
+    return np.clip(sharpened, 0, 255).astype(np.uint8)
 
 
 # ============================================================
@@ -657,26 +1280,31 @@ def run_ocr(img: np.ndarray, name: str = "") -> Tuple[str, float]:
             if chars:
                 fallback_pool.append((chars, conf))
 
-            # Pass 1: ngưỡng chuẩn
-            if conf < MIN_CONF:
-                print(f"    -> SKIP '{text}' conf={conf:.2f} (< {MIN_CONF})")
+            # Pass 1: ngưỡng chuẩn - kiểm tra strict hơn cho ký tự tương tự
+            required_conf = _get_required_confidence(chars)
+            if conf < required_conf:
+                print(f"    -> SKIP '{text}' conf={conf:.2f} (< required {required_conf:.2f})")
                 continue
 
             if chars:
                 all_chinese += chars
                 total_conf += conf * len(chars)
                 char_count += len(chars)
-                print(f"    -> '{chars}' conf={conf:.2f}")
+                print(f"    -> '{chars}' conf={conf:.2f} (required: {required_conf:.2f})")
 
-        # Pass 2: ảnh mờ - nếu chưa lấy được gì, nới ngưỡng.
+        # Pass 2: ảnh mờ - nếu chưa lấy được gì, nới ngưỡng nhưng vẫn kiểm tra ký tự tương tự.
         if not all_chinese and fallback_pool:
             for chars, conf in fallback_pool:
                 if conf < MIN_CONF_FALLBACK:
                     continue
+                # Để fallback vẫn strict cho ký tự tương tự/nguy hiểm
+                required_conf = _get_required_confidence(chars)
+                if conf < required_conf:
+                    continue
                 all_chinese += chars
                 total_conf += conf * len(chars)
                 char_count += len(chars)
-                print(f"    -> fallback '{chars}' conf={conf:.2f}")
+                print(f"    -> fallback '{chars}' conf={conf:.2f} (required: {required_conf:.2f})")
 
         quality = total_conf  # sum(conf * char_len) — thưởng cả số chữ lẫn conf
         return all_chinese, quality
@@ -687,14 +1315,202 @@ def run_ocr(img: np.ndarray, name: str = "") -> Tuple[str, float]:
 
 
 # ============================================================
+# Kiểm tra xem ảnh có phải ảnh gốm sứ với hiệu đề không
+# ============================================================
+def is_ceramic_mark_image(img: np.ndarray) -> bool:
+    """
+    CÙNG CẮT: Chỉ accept ảnh hiệu đề HOÀN HẢO.
+    Reject tất cả ảnh tượng, con người, hoa văn phức tạp.
+    
+    Returns:
+        bool: True ONLY nếu 100% confirm là mark
+    """
+    try:
+        h, w = img.shape[:2]
+        
+        # Size check
+        if h < 150 or w < 150 or h > 2400 or w > 2400:
+            print("[VALIDATION] ❌ Size reject")
+            return False
+        
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        # === STEP 1: KIỂM TRA KẾT CẤU ===
+        # Tính Laplacian để đo độ chi tiết
+        laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+        texture_score = np.mean(np.abs(laplacian))
+        
+        # NGẶT: texture > 5.0 = reject ngay (không phải mark)
+        if texture_score > 45.0:
+            print(f"[VALIDATION] Reject: texture too high ({texture_score:.2f})")
+            return False
+        if texture_score > 5.0:
+            print(f"[VALIDATION] Texture high but continuing ({texture_score:.2f})")
+        
+        # === STEP 2: BINARY THRESHOLD NGẶT ===
+        # Chỉ lấy pixel RẤT tối (< 100)
+        _, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV)
+        
+        # Xóa nhiễu MẠNH
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel, iterations=3)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel, iterations=2)
+        
+        # === STEP 3: TÌM CONTOUR ===
+        contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        if not contours or len(contours) == 0:
+            print("[VALIDATION] No contours found; allowing OCR fallback")
+            return texture_score < 25.0
+        
+        # === STEP 4: FILTER CONTOUR NGẶT ===
+        char_regions = []
+        for c in contours:
+            area = cv2.contourArea(c)
+            if area < 150:  # quá nhỏ
+                continue
+            if area > (h * w) * 0.08:  # quá lớn
+                continue
+            
+            x, y, cw, ch = cv2.boundingRect(c)
+            aspect = cw / max(ch, 1)
+            
+            # Aspect ratio NGẶT
+            if aspect < 0.5 or aspect > 2.0:
+                continue
+            
+            # Solidity NGẶT (> 0.5)
+            hull = cv2.convexHull(c)
+            hull_area = cv2.contourArea(hull)
+            if hull_area > 0:
+                solidity = area / hull_area
+                if solidity < 0.50:  # NGẶT
+                    continue
+            
+            char_regions.append((x, y, cw, ch, area, solidity))
+        
+        num_chars = len(char_regions)
+        print(f"[VALIDATION] Found {num_chars} chars")
+        
+        # === STEP 5: SỐ LƯỢNG NGẶT ===
+        # Hiệu đề: 2-6 ký tự (KHÔNG 7-8)
+        if num_chars < 1:
+            print(f"[VALIDATION] ❌ Char count invalid: {num_chars}")
+            return texture_score < 25.0
+        if num_chars > 18:
+            print(f"[VALIDATION] Many contours ({num_chars}); allowing OCR fallback")
+        
+        # === STEP 6: KIỂM TRA ALIGNMENT NGẶT ===
+        ys = [r[1] for r in char_regions]
+        y_std = np.std(ys)
+        avg_height = np.mean([r[3] for r in char_regions])
+        
+        # Y alignment NGẶT: y_std < 15% height
+        if y_std > avg_height * 0.18:
+            print(f"[VALIDATION] Y alignment loose for vertical mark: std={y_std:.1f}")
+        
+        # === STEP 7: KẾ THỐNG KHOẢNG CÁCH ===
+        xs = sorted([r[0] for r in char_regions])
+        x_gaps = [xs[i+1] - xs[i] for i in range(len(xs)-1)] if len(xs) > 1 else []
+        
+        if x_gaps:
+            min_gap = min(x_gaps)
+            avg_width = np.mean([r[2] for r in char_regions])
+            
+            # Khoảng cách tối thiểu > 20% width
+            if min_gap < avg_width * 0.18:
+                print(f"[VALIDATION] Close character contours: gap={min_gap:.0f}")
+        
+        # === STEP 8: KIỂM TRA TỈ LỆ ===
+        min_x = min(r[0] for r in char_regions)
+        max_x = max(r[0] + r[2] for r in char_regions)
+        min_y = min(r[1] for r in char_regions)
+        max_y = max(r[1] + r[3] for r in char_regions)
+        
+        text_width = max_x - min_x
+        text_height = max_y - min_y
+        text_area = text_width * text_height
+        image_area = h * w
+        text_ratio = text_area / image_area
+        
+        # Hiệu đề trong ảnh gốc thường nhỏ, nhưng ảnh upload có thể là crop cận
+        # cảnh/screenshot đã phóng to. Không loại các ảnh này chỉ vì chữ lớn.
+        if text_ratio < 0.0002:
+            print(f"[VALIDATION] ❌ Text too small: {text_ratio:.4f}")
+            return False
+        if text_ratio > 0.65:
+            print(f"[VALIDATION] ❌ Text dominates image: {text_ratio:.4f}")
+            return False
+        if text_ratio > 0.25:
+            print(f"[VALIDATION] Text large/cropped but allowed: {text_ratio:.4f}")
+        
+        # === STEP 9: KIỂM TRA VÀNH TRÒN ===
+        blurred = cv2.GaussianBlur(gray, (13, 13), 2)
+        circles = cv2.HoughCircles(
+            blurred,
+            cv2.HOUGH_GRADIENT,
+            dp=1.2,
+            minDist=min(h, w) * 0.25,
+            param1=140,
+            param2=30,
+            minRadius=int(min(h, w) * 0.12),
+            maxRadius=int(min(h, w) * 0.42),
+        )
+        
+        has_circle = circles is not None and len(circles[0]) > 0
+        
+        # === STEP 10: VỊ TRÍ ===
+        text_center_x = (min_x + max_x) * 0.5
+        text_center_y = (min_y + max_y) * 0.5
+        
+        img_center_x = w * 0.5
+        img_center_y = h * 0.5
+        
+        dist = ((text_center_x - img_center_x) ** 2 + (text_center_y - img_center_y) ** 2) ** 0.5
+        
+        is_centered = dist < max(h, w) * 0.35
+        is_bottom = text_center_y > h * 0.58 and text_center_y < h * 0.85
+        
+        # === KẾT LUẬN ===
+        if has_circle:
+            print("[VALIDATION] ✅ PASS: Has circle base")
+            return True
+        
+        if is_centered or is_bottom:
+            print(f"[VALIDATION] ✅ PASS: Position OK (centered:{is_centered}, bottom:{is_bottom})")
+            return True
+        
+        print(f"[VALIDATION] ❌ Position bad (dist:{dist:.0f})")
+        return False
+        
+    except Exception as e:
+        print(f"[VALIDATION] ❌ Exception: {str(e)[:100]}")
+        return False
+
+
+# ============================================================
 # Hàm chính: đọc hiệu đề từ ảnh gốm sứ
 # ============================================================
-def read_chinese_mark(img_bytes: bytes, deep_mode: bool = False) -> dict:
+def read_chinese_mark(img_bytes: bytes, deep_mode: bool = False, cancel_event=None) -> dict:
     try:
         nparr = np.frombuffer(img_bytes, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         if img is None:
             return {"error": "Invalid image format"}
+
+        # === VALIDATION: chỉ dùng làm tín hiệu cảnh báo, không chặn OCR ===
+        validation_warning = ""
+        if not is_ceramic_mark_image(img):
+            validation_warning = (
+                "Ảnh không giống bố cục hiệu đề chuẩn, hệ thống vẫn thử OCR "
+                "vì có thể là ảnh crop cận cảnh hoặc screenshot."
+            )
+            print(f"[VALIDATION] ⚠ {validation_warning}")
+
+        # Phát hiện và xử lý ảnh Google Search
+        if detect_google_image(img):
+            print("[Google Image Detected] Áp dụng preprocessing tối ưu...")
+            img = preprocess_google_image(img)
 
         img = remove_red_stamp(img)
         cv2.imwrite(os.path.join(DEBUG_DIR, "00_original.jpg"), img)
@@ -863,9 +1679,21 @@ def read_chinese_mark(img_bytes: bytes, deep_mode: bool = False) -> dict:
             circle_text_region, _ = auto_detect_text_region(circle_big)
             variants["circle_raw"] = circle_big
             variants["circle_gray"] = gray_contrast(circle_big)
+            variants["circle_blue"] = blue_channel_best(circle_big)
             variants["circle_denoise"] = denoise_sharpen(circle_big)
             variants["circle_blackhat"] = blackhat_text_boost(circle_big)
             variants["circle_text_adapt"] = adaptive_threshold(circle_text_region)
+            try:
+                cbh, cbw = circle_big.shape[:2]
+                margin_y = int(cbh * 0.17)
+                margin_x = int(cbw * 0.17)
+                circle_core = circle_big[margin_y:cbh - margin_y, margin_x:cbw - margin_x]
+                if circle_core.size:
+                    variants["circle_core_raw"] = circle_core
+                    variants["circle_core_gray"] = gray_contrast(circle_core)
+                    variants["circle_core_blue"] = blue_channel_best(circle_core)
+            except Exception:
+                pass
 
         for name, roi in (("center_box", center_box_roi), ("center_box_small", center_box_roi_small)):
             if roi is None:
@@ -879,6 +1707,7 @@ def read_chinese_mark(img_bytes: bytes, deep_mode: bool = False) -> dict:
             )
             variants[f"{name}_raw"] = box_big
             variants[f"{name}_gray"] = gray_contrast(box_big)
+            variants[f"{name}_blue"] = blue_channel_best(box_big)
             variants[f"{name}_denoise"] = denoise_sharpen(box_big)
             variants[f"{name}_blackhat"] = blackhat_text_boost(box_big)
 
@@ -958,11 +1787,12 @@ def read_chinese_mark(img_bytes: bytes, deep_mode: bool = False) -> dict:
 
         # Ưu tiên ROI vòng tròn / mực chữ (đáy sứ) trước crop 25–75% để tránh OCR lộn khi chữ xếp 2 cột.
         priority_names = [
-            "center_box_raw", "center_box_gray", "center_box_denoise", "center_box_blackhat",
-            "center_box_small_raw", "center_box_small_gray", "center_box_small_denoise", "center_box_small_blackhat",
+            "center_box_raw", "center_box_gray", "center_box_blue", "center_box_denoise", "center_box_blackhat",
+            "center_box_small_raw", "center_box_small_gray", "center_box_small_blue", "center_box_small_denoise", "center_box_small_blackhat",
+            "circle_core_blue", "circle_core_gray", "circle_core_raw",
             "tiny_upscale",
             "square_raw", "square_gray", "square_adapt", "square_blackhat",
-            "circle_raw", "circle_denoise", "circle_gray", "circle_blackhat", "circle_text_adapt",
+            "circle_raw", "circle_blue", "circle_denoise", "circle_gray", "circle_blackhat", "circle_text_adapt",
             "ink_raw", "ink_gray", "ink_denoise", "ink_blackhat",
             "center_clahe", "center_gray", "center_denoise",
             "full_raw", "full_denoise", "full_blue",
@@ -998,6 +1828,9 @@ def read_chinese_mark(img_bytes: bytes, deep_mode: bool = False) -> dict:
         _SKIP_THRESHOLD = 2  # Skip các variant cùng prefix nếu 2 liên tiếp rỗng
 
         for idx, (vname, vimg) in enumerate(ordered_variants[:fast_phase_cut]):
+            if cancel_event and cancel_event.is_set():
+                print(f"  [{vname}] SKIPPED (Client disconnected)")
+                break
             # Smart skip: nếu cùng 1 ROI prefix đã trống 2 lần liên tiếp, bỏ qua
             prefix = vname.rsplit('_', 1)[0] if '_' in vname else vname
             if _empty_streak.get(prefix, 0) >= _SKIP_THRESHOLD:
@@ -1013,17 +1846,37 @@ def read_chinese_mark(img_bytes: bytes, deep_mode: bool = False) -> dict:
                 print(f"  [{vname}] text='{text}' score={score:.2f}")
                 _empty_streak[prefix] = 0  # reset streak
                 # Dừng sớm: KHÔNG yêu cầu _plausible (để dừng cho cả hiệu đề Nội Phủ, Khánh Xuân...)
-                if score >= EARLY_ACCEPT_SCORE and len(text) >= EARLY_ACCEPT_LEN:
+                cjk_len = len(re.sub(r"[^\u4e00-\u9fff]", "", text))
+                if (
+                    score >= EARLY_ACCEPT_SCORE
+                    and len(text) >= EARLY_ACCEPT_LEN
+                    and not _is_incomplete_dynasty_mark(text)
+                    and cjk_len >= 4  # Không dừng sớm nếu chưa đủ 4 ký tự CJK
+                ):
                     print(f"  [early-stop] accept '{text}' from '{vname}' score={score:.2f}")
                     break
             else:
                 _empty_streak[prefix] = _empty_streak.get(prefix, 0) + 1
 
         # Nếu pass nhanh không đủ thông tin thì mới chạy pass sâu (nặng hơn) cho ảnh mờ.
-        best_len_fast = max((len(t) for t, _, _ in variant_results), default=0)
-        if best_len_fast < 3 and fast_phase_cut < deep_phase_cut:
-            print(f"  [deep-pass] fast result weak (len={best_len_fast}), trying extra variants")
+        fast_texts = [t for t, _, _ in variant_results]
+        best_len_fast = max((len(re.sub(r"[^\u4e00-\u9fff]", "", t or "")) for t in fast_texts), default=0)
+        fast_canonical = [_canonicalize_reign_mark_text(t) for t in fast_texts]
+        has_complete_fast = any(
+            len(re.sub(r"[^\u4e00-\u9fff]", "", t or "")) >= 6 and _plausible_reign_ocr_string(t)
+            for t in fast_canonical
+        )
+        has_reign_signal_fast = any(
+            any(ch in t for ch in "大明清南萬曆年製造光緒康熙乾隆嘉慶宣統")
+            for t in fast_canonical
+        )
+        needs_more_reign_evidence = has_reign_signal_fast and not has_complete_fast and best_len_fast < 6
+        if (best_len_fast < 3 or needs_more_reign_evidence) and fast_phase_cut < deep_phase_cut:
+            print(f"  [deep-pass] fast result weak/incomplete (len={best_len_fast}), trying extra variants")
             for vname, vimg in ordered_variants[fast_phase_cut:deep_phase_cut]:
+                if cancel_event and cancel_event.is_set():
+                    print(f"  [{vname}] SKIPPED (Client disconnected)")
+                    break
                 if SAVE_DEBUG_VARIANTS:
                     cv2.imwrite(os.path.join(DEBUG_DIR, f"03_{vname}.jpg"), vimg)
                 text, score = run_ocr(vimg, vname)
@@ -1031,17 +1884,33 @@ def read_chinese_mark(img_bytes: bytes, deep_mode: bool = False) -> dict:
                     all_candidates.append(text)
                     variant_results.append((text, score, vname))
                     print(f"  [{vname}] text='{text}' score={score:.2f}")
-                    if score >= EARLY_ACCEPT_SCORE and len(text) >= EARLY_ACCEPT_LEN:
+                    deep_cjk_len = len(re.sub(r"[^\u4e00-\u9fff]", "", text))
+                    if (
+                        score >= EARLY_ACCEPT_SCORE
+                        and len(text) >= EARLY_ACCEPT_LEN
+                        and not _is_incomplete_dynasty_mark(text)
+                        and deep_cjk_len >= 4  # Không dừng sớm nếu chưa đủ 4 ký tự CJK
+                    ):
                         print(f"  [deep-early-stop] accept '{text}' from '{vname}' score={score:.2f}")
                         break
 
         # FIX 3 & 5: Chọn best_text — ưu tiên chuỗi có 年製/年造, rồi mới theo score
         best_text = ""
         best_score = -1.0
+        recovered_mark = _derive_ming_wanli_from_ocr_evidence(all_candidates)
+        if not recovered_mark:
+            recovered_mark = _derive_database_mark_from_ocr_evidence(all_candidates)
+        recovered_guangxu = _derive_qing_guangxu_from_ocr_evidence(all_candidates)
+        if not recovered_mark:
+            recovered_mark = recovered_guangxu
         if variant_results:
             variant_results.sort(key=lambda x: _variant_sort_key(x[0], x[1]))
             best_text, best_score, best_name = variant_results[0]
             print(f"WINNER: '{best_text}' from '{best_name}' score={best_score:.2f}")
+        if recovered_mark:
+            print(f"[EVIDENCE-RECOVERED] OCR glyph evidence -> '{recovered_mark}'")
+            best_text = recovered_mark
+            best_score = max(best_score, 5.0)
 
         print(f"FINAL: '{best_text}'")
 
@@ -1055,17 +1924,50 @@ def read_chinese_mark(img_bytes: bytes, deep_mode: bool = False) -> dict:
                 "confidence": 0,
                 "candidates": all_candidates,
                 "all_results": [],
+                "database_valid": False,
+                "warning": validation_warning or "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
             }
+
+        # === NEW: Cố gắng sửa chữ OCR nhầm ===
+        canonical_text = _canonicalize_reign_mark_text(best_text)
+        if canonical_text != best_text:
+            print(f"[ORDER-CORRECTED] OCR column order: '{best_text}' -> '{canonical_text}'")
+            best_text = canonical_text
+
+        corrected_text = _attempt_ocr_correction(best_text)
+        if corrected_text != best_text:
+            best_text = corrected_text
+            print(f"[AUTO-CORRECTED] OCR nhầm, sửa thành: '{best_text}'")
+
+        # Kiểm tra kết quả với database (bao gồm gợi ý sửa nếu OCR nhầm ký tự)
+        db_validation = _validate_against_database(best_text)
 
         # Confidence estimate dựa trên score tương đối
         max_possible = best_score if best_score > 0 else 1.0
         conf_estimate = min(0.99, best_score / (max_possible + 0.001 * 10))
+
+        # Xây dựng thông điệp cảnh báo chi tiết
+        warning_msg = db_validation.get('warning', '')
+        if validation_warning and not warning_msg:
+            warning_msg = validation_warning
+        suggestions = db_validation.get('suggestions', [])
+        
+        # Nếu có gợi ý (là fuzzy match hoặc không tìm thấy), thêm vào warning
+        if suggestions:
+            best_suggestion = suggestions[0]
+            suggestion_text = best_suggestion.get('entry', {}).get('chu_han', '')
+            if suggestion_text:
+                warning_msg += f"\n💡 Gợi ý: Có thể là '{suggestion_text}' (score: {best_suggestion.get('score', 0):.2f})"
 
         return {
             "text": best_text,
             "confidence": round(conf_estimate, 3),
             "candidates": list(dict.fromkeys(all_candidates)),  # deduplicate, giữ thứ tự
             "all_results": [{"text": t, "confidence": s, "variant": n} for t, s, n in variant_results],
+            "database_valid": db_validation.get('database_valid', False),
+            "warning": warning_msg,
+            "best_match": db_validation.get('best_match', None),
+            "suggestions": [{"text": s.get('matched_text', ''), "score": s.get('score', 0)} for s in suggestions],
         }
 
     except Exception as e:

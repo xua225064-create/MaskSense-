@@ -3,14 +3,18 @@ import { Platform } from 'react-native';
 // Đối với Android Emulator: dùng 10.0.2.2
 // Đối với thiết bị thật: thay bằng IP LAN máy tính (vd: 192.168.1.X)
 // Đối với Web: dùng localhost
-const DEV_LAN_BASE_URL = 'http://192.168.100.2:8000';
+const DEV_LAN_BASE_URLS = [
+  'http://10.215.74.132:8000',
+  'http://192.168.100.8:8000',
+];
 
 const getBaseUrl = () => {
   if (Platform.OS === 'web') return 'http://localhost:8000';
-  return DEV_LAN_BASE_URL;
+  return DEV_LAN_BASE_URLS[0];
 };
 
 export const BASE_URL = getBaseUrl();
+export const API_BASE_URLS = Platform.OS === 'web' ? [BASE_URL] : DEV_LAN_BASE_URLS;
 
 // Design tokens (matching web app CSS variables - unified #60a5fa blue)
 export const COLORS = {

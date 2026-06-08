@@ -6,8 +6,7 @@ import { uiText } from '../i18n';
 import AppDialog from '../components/AppDialog';
 
 const FALLBACK_PACKAGES = {
-  basic: { name: 'Basic Package', credits: 50, amount: 490000 },
-  pro: { name: 'Popular Package', credits: 200, amount: 447712 },
+  pro: { name: 'Popular Package', credits: 200, amount: 499999 },
   enterprise: { name: 'Professional Package', credits: 99999, amount: 2490000 },
 };
 
