@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="920" viewBox="0 0 1400 920">
+  <defs>
+    <style>
+      .bg { fill: #f6f8fc; }
+      .title { font: 700 34px Arial, Helvetica, sans-serif; fill: #10213f; }
+      .subtitle { font: 400 18px Arial, Helvetica, sans-serif; fill: #526276; }
+      .box { fill: #ffffff; stroke: #cdd8e8; stroke-width: 2; rx: 18; }
+      .box-blue { fill: #eaf3ff; stroke: #7db4ff; stroke-width: 2; rx: 18; }
+      .box-green { fill: #ecfdf5; stroke: #6ee7b7; stroke-width: 2; rx: 18; }
+      .box-yellow { fill: #fff7ed; stroke: #fdba74; stroke-width: 2; rx: 18; }
+      .box-red { fill: #fff1f2; stroke: #fda4af; stroke-width: 2; rx: 18; }
+      .box-purple { fill: #f5f3ff; stroke: #b8a7ff; stroke-width: 2; rx: 18; }
+      .label { font: 700 19px Arial, Helvetica, sans-serif; fill: #132238; }
+      .small { font: 400 14px Arial, Helvetica, sans-serif; fill: #405068; }
+      .tag { font: 700 12px Arial, Helvetica, sans-serif; fill: #2563eb; letter-spacing: 1px; }
+      .arrow { stroke: #526276; stroke-width: 2.4; fill: none; marker-end: url(#arrowhead); }
+      .arrow-soft { stroke: #7b8aa0; stroke-width: 2; fill: none; marker-end: url(#arrowhead-soft); stroke-dasharray: 6 6; }
+      .section { fill: #10213f; opacity: 0.06; rx: 24; }
+      .decision { fill: #ffffff; stroke: #64748b; stroke-width: 2; }
+      .yesno { font: 700 13px Arial, Helvetica, sans-serif; fill: #2563eb; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 Z" fill="#526276"/>
+    </marker>
+    <marker id="arrowhead-soft" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 Z" fill="#7b8aa0"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="920"/>
+  <text class="title" x="70" y="62">Proposed Multi-Agent Ceramic Reign Mark Recognition Workflow</text>
+  <text class="subtitle" x="70" y="94">OCR, Vision AI, reference matching, weighted consensus, and evidence-based verification</text>
+
+  <rect class="section" x="50" y="126" width="1300" height="190"/>
+  <rect class="section" x="50" y="350" width="1300" height="250"/>
+  <rect class="section" x="50" y="634" width="1300" height="220"/>
+
+  <!-- Input and preprocessing -->
+  <rect class="box-blue" x="80" y="165" width="250" height="96" rx="18"/>
+  <text class="tag" x="110" y="194">INPUT</text>
+  <text class="label" x="110" y="223">Ceramic mark image</text>
+  <text class="small" x="110" y="247">Base mark, seal, or inscription</text>
+
+  <rect class="box-blue" x="410" y="165" width="270" height="96" rx="18"/>
+  <text class="tag" x="440" y="194">PREPROCESSING</text>
+  <text class="label" x="440" y="223">Image enhancement</text>
+  <text class="small" x="440" y="247">Crop, denoise, contrast, normalize</text>
+
+  <path class="arrow" d="M330 213 C360 213, 380 213, 410 213"/>
+
+  <!-- Agents -->
+  <rect class="box" x="80" y="390" width="230" height="122" rx="18"/>
+  <text class="tag" x="110" y="419">AGENT 1</text>
+  <text class="label" x="110" y="448">OCR Extraction</text>
+  <text class="small" x="110" y="473">Multi-variant OCR candidates</text>
+  <text class="small" x="110" y="494">Character-level hypotheses</text>
+
+  <rect class="box-purple" x="350" y="390" width="230" height="122" rx="18"/>
+  <text class="tag" x="380" y="419">AGENT 2</text>
+  <text class="label" x="380" y="448">Vision AI Reading</text>
+  <text class="small" x="380" y="473">Direct visual interpretation</text>
+  <text class="small" x="380" y="494">Seal-script and degraded marks</text>
+
+  <rect class="box-green" x="620" y="390" width="230" height="122" rx="18"/>
+  <text class="tag" x="650" y="419">AGENT 3</text>
+  <text class="label" x="650" y="448">DB / Fuzzy Match</text>
+  <text class="small" x="650" y="473">Reference database lookup</text>
+  <text class="small" x="650" y="494">Confusion-aware string matching</text>
+
+  <rect class="box-yellow" x="890" y="390" width="230" height="122" rx="18"/>
+  <text class="tag" x="920" y="419">AGENT 4</text>
+  <text class="label" x="920" y="448">Image Matching</text>
+  <text class="small" x="920" y="473">Reference image comparison</text>
+  <text class="small" x="920" y="494">Visual feature matching</text>
+
+  <rect class="box-red" x="1160" y="390" width="150" height="122" rx="18"/>
+  <text class="tag" x="1188" y="419">AGENT 5</text>
+  <text class="label" x="1188" y="448">Web Evidence</text>
+  <text class="small" x="1188" y="473">Relevant source links</text>
+  <text class="small" x="1188" y="494">Verification support</text>
+
+  <path class="arrow" d="M545 261 C545 310, 195 330, 195 390"/>
+  <path class="arrow" d="M545 261 C545 320, 465 332, 465 390"/>
+  <path class="arrow" d="M545 261 C545 320, 735 332, 735 390"/>
+  <path class="arrow" d="M545 261 C545 320, 1005 332, 1005 390"/>
+  <path class="arrow-soft" d="M735 512 C760 550, 1185 545, 1235 512"/>
+
+  <!-- Aggregator -->
+  <rect class="box-blue" x="420" y="665" width="360" height="120" rx="18"/>
+  <text class="tag" x="455" y="694">WEIGHTED CONSENSUS</text>
+  <text class="label" x="455" y="723">Voting Aggregator</text>
+  <text class="small" x="455" y="748">Confidence weighting, conflict checks,</text>
+  <text class="small" x="455" y="770">OCR/Vision agreement and override rules</text>
+
+  <path class="arrow" d="M195 512 C195 610, 420 610, 500 665"/>
+  <path class="arrow" d="M465 512 C465 595, 500 625, 540 665"/>
+  <path class="arrow" d="M735 512 C735 595, 695 625, 660 665"/>
+  <path class="arrow" d="M1005 512 C1005 615, 800 620, 710 665"/>
+
+  <!-- Candidate and verification -->
+  <rect class="box-green" x="850" y="665" width="230" height="120" rx="18"/>
+  <text class="tag" x="880" y="694">SELECTION</text>
+  <text class="label" x="880" y="723">Candidate mark</text>
+  <text class="small" x="880" y="748">Best-supported inscription</text>
+  <text class="small" x="880" y="770">Metadata from curated DB</text>
+  <path class="arrow" d="M780 725 C810 725, 825 725, 850 725"/>
+
+  <path class="arrow" d="M1080 725 C1120 725, 1145 660, 1235 512"/>
+
+  <polygon class="decision" points="1180,678 1265,725 1180,772 1095,725"/>
+  <text class="label" x="1130" y="718">Evidence</text>
+  <text class="label" x="1131" y="741">sufficient?</text>
+  <path class="arrow" d="M1080 725 C1090 725, 1090 725, 1095 725"/>
+  <path class="arrow-soft" d="M1235 512 C1245 570, 1235 630, 1210 690"/>
+
+  <!-- Outputs -->
+  <rect class="box-green" x="940" y="825" width="190" height="58" rx="14"/>
+  <text class="label" x="975" y="858">Verified report</text>
+  <path class="arrow" d="M1165 765 C1120 805, 1075 825, 1040 825"/>
+  <text class="yesno" x="1110" y="804">YES</text>
+
+  <rect class="box-yellow" x="1160" y="825" width="190" height="58" rx="14"/>
+  <text class="label" x="1192" y="858">Unverified report</text>
+  <path class="arrow" d="M1210 765 C1240 795, 1250 810, 1250 825"/>
+  <text class="yesno" x="1260" y="804">NO</text>
+
+  <rect class="box" x="180" y="825" width="560" height="58" rx="14"/>
+  <text class="label" x="215" y="858">Final output: mark, dynasty/reign title, confidence, metadata, and source links</text>
+  <path class="arrow" d="M1035 854 C920 895, 800 895, 740 854"/>
+  <path class="arrow" d="M1255 854 C1030 910, 820 905, 740 854"/>
+
+  <!-- Legend -->
+  <text class="small" x="70" y="895">Note: Web evidence supports verification but does not replace the weighted consensus result. Unsupported candidates are displayed as unverified.</text>
+</svg>

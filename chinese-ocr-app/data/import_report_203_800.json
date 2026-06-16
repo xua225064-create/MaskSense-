@@ -1,0 +1,161 @@
+{
+  "created_at": "2026-06-09T19:27:43",
+  "incoming": 505,
+  "added_to_json": 487,
+  "duplicates_skipped": 18,
+  "mysql_added": 487,
+  "mysql_skipped": 0,
+  "json_total": 689,
+  "duplicates": [
+    {
+      "id": 281,
+      "chu_han": "大日本",
+      "ten_viet": "Đại Nhật Bản",
+      "reasons": [
+        "duplicate_chu_han_years_inside_attachment",
+        "duplicate_context_inside_attachment"
+      ]
+    },
+    {
+      "id": 284,
+      "chu_han": "薩摩",
+      "ten_viet": "Satsuma",
+      "reasons": [
+        "duplicate_chu_han_years_inside_attachment",
+        "duplicate_context_inside_attachment"
+      ]
+    },
+    {
+      "id": 286,
+      "chu_han": "有田製",
+      "ten_viet": "Arita Chế",
+      "reasons": [
+        "duplicate_chu_han_years_inside_attachment",
+        "duplicate_context_inside_attachment"
+      ]
+    },
+    {
+      "id": 288,
+      "chu_han": "伊萬里",
+      "ten_viet": "Imari",
+      "reasons": [
+        "duplicate_chu_han_years_inside_attachment",
+        "duplicate_context_inside_attachment"
+      ]
+    },
+    {
+      "id": 294,
+      "chu_han": "香蘭社",
+      "ten_viet": "Hương Lan Xã",
+      "reasons": [
+        "duplicate_chu_han_years_inside_attachment",
+        "duplicate_context_inside_attachment"
+      ]
+    },
+    {
+      "id": 324,
+      "chu_han": "儲秀宮製",
+      "ten_viet": "Trữ Tú Cung Chế",
+      "reasons": [
+        "duplicate_chu_han_years_inside_attachment",
+        "duplicate_context_inside_attachment"
+      ]
+    },
+    {
+      "id": 325,
+      "chu_han": "養心殿製",
+      "ten_viet": "Dưỡng Tâm Điện Chế",
+      "reasons": [
+        "duplicate_chu_han_years_inside_attachment"
+      ]
+    },
+    {
+      "id": 724,
+      "chu_han": "順天年製",
+      "ten_viet": "Thuận Thiên niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 725,
+      "chu_han": "天成年製",
+      "ten_viet": "Thiên Thành niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 731,
+      "chu_han": "龍瑞太平年製",
+      "ten_viet": "Long Thụy Thái Bình niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 756,
+      "chu_han": "天應政平年製",
+      "ten_viet": "Thiên Ứng Chính Bình niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 760,
+      "chu_han": "紹寶年製",
+      "ten_viet": "Thiệu Bảo niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 762,
+      "chu_han": "興隆年製",
+      "ten_viet": "Hưng Long niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 764,
+      "chu_han": "開泰年製",
+      "ten_viet": "Khai Thái niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 772,
+      "chu_han": "紹成年製",
+      "ten_viet": "Thiệu Thành niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 781,
+      "chu_han": "順天年製",
+      "ten_viet": "Thuận Thiên niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 787,
+      "chu_han": "光順年製",
+      "ten_viet": "Quang Thuận niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    },
+    {
+      "id": 788,
+      "chu_han": "洪德年製",
+      "ten_viet": "Hồng Đức niên chế",
+      "reasons": [
+        "same_chu_han_and_years_in_db"
+      ]
+    }
+  ]
+}

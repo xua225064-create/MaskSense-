@@ -14,6 +14,8 @@ import CheckoutScreen from './src/screens/CheckoutScreen';
 import AboutScreen from './src/screens/AboutScreen';
 import TermsScreen from './src/screens/TermsScreen';
 import PrivacyScreen from './src/screens/PrivacyScreen';
+import DataDeletionScreen from './src/screens/DataDeletionScreen';
+import SupportScreen from './src/screens/SupportScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import LanguageScreen from './src/screens/LanguageScreen';
 import ChatScreen from './src/screens/ChatScreen';
@@ -102,6 +104,8 @@ export default function App() {
       case 'About':     return <AboutScreen {...props} />;
       case 'Terms':     return <TermsScreen {...props} />;
       case 'Privacy':   return <PrivacyScreen {...props} />;
+      case 'DataDeletion': return <DataDeletionScreen {...props} />;
+      case 'Support':   return <SupportScreen {...props} />;
       case 'Settings':  return <SettingsScreen {...props} />;
       case 'Language':  return <LanguageScreen {...props} />;
       case 'Chat':      return <ChatScreen {...props} />;

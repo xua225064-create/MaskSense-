@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -209,7 +210,7 @@ export default function RegisterScreen({ handleLogin, setScreen, language }) {
 
         <View style={s.brandBlock}>
           <View style={s.logoMark}>
-            <Feather name="layers" size={24} color="#065f46" />
+            <Image source={require('../../assets/brand-mark.png')} style={s.logoImage} resizeMode="contain" />
           </View>
           <Text style={s.brand}>MarkSense</Text>
           <Text style={s.title}>{L('Create account', 'Tạo tài khoản')}</Text>
@@ -330,17 +331,17 @@ const s = StyleSheet.create({
   },
   brandBlock: { alignItems: 'center', marginBottom: 26 },
   logoMark: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#ecfdf5',
-    borderWidth: 1,
-    borderColor: '#bbf7d0',
+    width: 74,
+    height: 74,
+    borderRadius: 37,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 14,
   },
-  brand: { color: '#065f46', fontSize: 24, fontFamily: 'serif', fontWeight: '900', marginBottom: 12 },
+  logoImage: { width: 74, height: 74 },
+  brand: { color: '#444444', fontSize: 25, fontWeight: '900', letterSpacing: 1.2, marginBottom: 12, textTransform: 'uppercase' },
   title: { color: '#1c1917', fontSize: 30, fontWeight: '900' },
   form: { width: '100%', maxWidth: 420, alignSelf: 'center' },
   field: { marginBottom: 14 },

@@ -1,0 +1,15 @@
+[
+  {
+    "image": "55ae3424-6f61-4e7f-a6c4-edee40f96797.png",
+    "relative_path": "ảnh thực nghiệm\\55ae3424-6f61-4e7f-a6c4-edee40f96797.png",
+    "system_text": "大明順天年製",
+    "system_confidence": 0.88,
+    "system_aggregated_confidence": 0.904,
+    "system_primary_pipeline": "vision_gemini",
+    "system_valid_pipelines": "ocr_llm;ocr_search;vision_gemini",
+    "system_num_valid_pipelines": 3,
+    "system_latency": 88.236,
+    "system_status": "success",
+    "system_error": "Chuoi chu duoc doc bang voting OCR/Vision. He thong se tra cuu web; neu khong co nguon xac thuc thi khong hien thong tin chi tiet."
+  }
+]

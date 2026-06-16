@@ -26,11 +26,39 @@ __pycache__/
 # Debug & uploads
 chinese-ocr-app/debug/
 chinese-ocr-app/uploads/
+debug/
+debug_*.jpg
+debug_crop.jpg
+*shot.png
 *.log
+*.err.log
+*.out.log
+*.sqlite3
+chinese-ocr-app/data/contact_messages.jsonl
+
+# Local cleanup/archive artifacts
+_cleanup_archive/
+.tmp-chrome-*/
+*.apk
+
+# Tool/runtime caches
+.opencode-runtime/
+chinese-ocr-app/.opencode-runtime/
 
 # Mobile build artifacts
+hieude_mobile/node_modules/
+hieude_mobile/.expo/
+hieude_mobile/.expo-web-localhost/
+hieude_mobile/dist/
+hieude_mobile/build/
 hieude_mobile/.expo-export-test/
 hieude_mobile/*.apk
+
+# Node cache
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # OS
 .DS_Store

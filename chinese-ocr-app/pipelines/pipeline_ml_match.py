@@ -221,6 +221,10 @@ class PipelineMlMatch(BasePipeline):
                 "orb_best": match.get("_orb_best"),
                 "orb_second": match.get("_orb_second"),
                 "match_score": match.get("match_score"),
+                "ten_viet": match.get("ten_viet", ""),
+                "hien_thi_chinh": match.get("hien_thi_chinh", ""),
+                "hieu_de_vi": match.get("hieu_de_vi", ""),
+                "nien_hieu": match.get("nien_hieu", ""),
             },
         )
 
@@ -248,11 +252,31 @@ class PipelineMlMatch(BasePipeline):
             "制": "製",
             "内": "內",
         }))
-        return norm in {"大明", "大清", "大南", "年製", "年造", "大明年製", "大清年製", "大南年製"}
+        return norm in {
+            "大明",
+            "大清",
+            "大南",
+            "年製",
+            "年造",
+            "大明年製",
+            "大清年製",
+            "大南年製",
+            "內府",
+            "內府侍",
+        }
 
     @staticmethod
     def _extract_nien_hieu(match: Dict[str, Any]) -> str:
         """Trích xuất niên hiệu từ kết quả match."""
+        explicit = (
+            match.get("nien_hieu")
+            or match.get("hien_thi_chinh")
+            or match.get("hieu_de_vi")
+            or match.get("ten_viet")
+            or match.get("phien_am")
+        )
+        if explicit:
+            return explicit
         base = match.get("chu_han_4") or match.get("chu_han") or ""
         base = base.replace("大明", "").replace("大清", "").replace("大南", "")
         for suffix in ["年製", "年造", "年玩"]:

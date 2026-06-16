@@ -32,8 +32,12 @@ PRIMARY_LLM = os.getenv("PRIMARY_LLM", "ollama")
 # Ollama Configuration (Local LLM)
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "neural-chat")  # hoặc mistral, llama2, etc.
-OLLAMA_VISION_MODEL = os.getenv("OLLAMA_VISION_MODEL", "llava")
+OLLAMA_VISION_MODEL = os.getenv("OLLAMA_VISION_MODEL", "qwen3-vl:4b")
 OLLAMA_TIMEOUT = int(os.getenv("OLLAMA_TIMEOUT", "120"))  # 2 minutes for local inference
+
+# OpenCode Vision Configuration
+OPENCODE_VISION_MODEL = os.getenv("OPENCODE_VISION_MODEL", "opencode/mimo-v2.5-free")
+OPENCODE_TIMEOUT = int(os.getenv("OPENCODE_TIMEOUT", "120"))
 
 # Nhiệt độ LLM (0.0 = deterministic, 1.0 = creative)
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.3"))
@@ -91,6 +95,10 @@ CHROME_USER_AGENT = (
 # ============================================================
 PIPELINE_WEIGHTS = {
     "vision_read": float(os.getenv("WEIGHT_VISION_READ", "0.35")),
+    "vision_gemini": float(os.getenv("WEIGHT_VISION_GEMINI", "0.40")),
+    "vision_opencode": float(os.getenv("WEIGHT_VISION_OPENCODE", "0.40")),
+    "vision_ollama": float(os.getenv("WEIGHT_VISION_OLLAMA", "0.38")),
+    "text_vote": float(os.getenv("WEIGHT_TEXT_VOTE", "0.55")),
     "ocr_llm": float(os.getenv("WEIGHT_OCR_LLM", "0.30")),
     "ocr_search": float(os.getenv("WEIGHT_OCR_SEARCH", "0.30")),
     "img_search": float(os.getenv("WEIGHT_IMG_SEARCH", "0.20")),
@@ -108,3 +116,13 @@ MIN_PIPELINE_RESPONSES = int(os.getenv("MIN_PIPELINE_RESPONSES", "2"))
 # ============================================================
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 LOG_PIPELINE_DETAILS = os.getenv("LOG_PIPELINE_DETAILS", "true").lower() == "true"
+
+# ============================================================
+# Contact Form Email
+# ============================================================
+CONTACT_RECIPIENT = os.getenv("CONTACT_RECIPIENT", "xuatruong30@gmail.com").strip()
+CONTACT_SMTP_HOST = os.getenv("CONTACT_SMTP_HOST", "smtp.gmail.com").strip()
+CONTACT_SMTP_PORT = int(os.getenv("CONTACT_SMTP_PORT", "587"))
+CONTACT_SMTP_USER = os.getenv("CONTACT_SMTP_USER", "").strip()
+CONTACT_SMTP_PASSWORD = os.getenv("CONTACT_SMTP_PASSWORD", "").strip()
+CONTACT_FROM_EMAIL = os.getenv("CONTACT_FROM_EMAIL", CONTACT_SMTP_USER).strip()

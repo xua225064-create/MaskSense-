@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="1180" viewBox="0 0 980 1180">
+  <defs>
+    <style>
+      .bg { fill: #181a1b; }
+      .box { fill: #1b1d1f; stroke: #34383b; stroke-width: 1.4; }
+      .decision { fill: #1b1d1f; stroke: #34383b; stroke-width: 1.4; }
+      .text { font: 400 15px Arial, Helvetica, sans-serif; fill: #e6e6e6; }
+      .small { font: 400 13px Arial, Helvetica, sans-serif; fill: #e6e6e6; }
+      .arrow { stroke: #777; stroke-width: 1.35; fill: none; marker-end: url(#arrow); }
+      .arrow-soft { stroke: #777; stroke-width: 1.25; fill: none; marker-end: url(#arrow); }
+      .label { font: 400 13px Arial, Helvetica, sans-serif; fill: #e6e6e6; }
+    </style>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#777"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="980" height="1180"/>
+
+  <!-- Top input -->
+  <rect class="box" x="365" y="42" width="250" height="54"/>
+  <text class="text" x="414" y="74">Input ceramic mark image</text>
+
+  <path class="arrow" d="M490 96 L490 144"/>
+
+  <rect class="box" x="385" y="144" width="210" height="54"/>
+  <text class="text" x="430" y="176">Image preprocessing</text>
+
+  <!-- Agent row -->
+  <path class="arrow-soft" d="M385 178 C265 190, 185 205, 150 245"/>
+  <path class="arrow" d="M490 198 L490 245"/>
+  <path class="arrow-soft" d="M595 178 C715 190, 795 205, 830 245"/>
+
+  <rect class="box" x="65" y="245" width="205" height="72"/>
+  <text class="small" x="103" y="276">Agent 1: OCR text</text>
+  <text class="small" x="123" y="294">extraction</text>
+
+  <rect class="box" x="365" y="245" width="250" height="72"/>
+  <text class="small" x="410" y="286">Agent 2: Vision AI reading</text>
+
+  <rect class="box" x="705" y="245" width="220" height="72"/>
+  <text class="small" x="745" y="276">Agent 3: Image/reference</text>
+  <text class="small" x="783" y="294">matching</text>
+
+  <!-- Candidate row -->
+  <path class="arrow" d="M168 317 L168 365"/>
+  <path class="arrow" d="M490 317 L490 365"/>
+  <path class="arrow" d="M815 317 L815 365"/>
+
+  <rect class="box" x="75" y="365" width="185" height="54"/>
+  <text class="small" x="118" y="398">OCR candidates</text>
+
+  <rect class="box" x="385" y="365" width="210" height="54"/>
+  <text class="small" x="428" y="398">Vision candidates</text>
+
+  <rect class="box" x="690" y="365" width="250" height="54"/>
+  <text class="small" x="730" y="398">Visual match candidates</text>
+
+  <!-- Local DB fuzzy -->
+  <rect class="box" x="295" y="482" width="250" height="72"/>
+  <text class="small" x="346" y="512">Local database and fuzzy</text>
+  <text class="small" x="390" y="530">matching</text>
+
+  <path class="arrow-soft" d="M168 419 C165 470, 215 490, 295 512"/>
+  <path class="arrow" d="M490 419 C455 445, 430 455, 420 482"/>
+  <path class="arrow-soft" d="M815 419 C720 445, 620 470, 545 512"/>
+
+  <!-- Aggregator -->
+  <rect class="box" x="405" y="620" width="190" height="72"/>
+  <text class="small" x="440" y="650">Weighted Voting</text>
+  <text class="small" x="462" y="668">Aggregator</text>
+
+  <path class="arrow-soft" d="M168 419 C155 570, 300 600, 405 650"/>
+  <path class="arrow" d="M420 554 C420 585, 450 596, 475 620"/>
+  <path class="arrow-soft" d="M490 419 C610 475, 650 565, 595 650"/>
+  <path class="arrow-soft" d="M815 419 C835 575, 690 610, 595 650"/>
+
+  <!-- Selection -->
+  <path class="arrow" d="M500 692 L500 745"/>
+  <rect class="box" x="375" y="745" width="250" height="54"/>
+  <text class="small" x="428" y="778">Candidate mark selection</text>
+
+  <!-- Web verification -->
+  <path class="arrow" d="M500 799 L500 852"/>
+  <rect class="box" x="370" y="852" width="260" height="54"/>
+  <text class="small" x="425" y="885">Web-source verification</text>
+
+  <!-- Decision arrow circle style -->
+  <path class="arrow" d="M500 906 L500 952"/>
+  <circle cx="500" cy="952" r="38" fill="#161819" stroke="#34383b" stroke-width="1.4"/>
+  <path d="M500 928 L500 970" stroke="#d7d7d7" stroke-width="3" fill="none"/>
+  <path d="M482 954 L500 972 L518 954" stroke="#d7d7d7" stroke-width="3" fill="none"/>
+
+  <path class="arrow" d="M500 990 L500 1024"/>
+  <polygon class="decision" points="500,1024 615,1139 500,1254 385,1139" transform="translate(0,-85)"/>
+  <text class="small" x="433" y="1057">Evidence sufficient?</text>
+
+  <!-- Outputs -->
+  <path class="arrow" d="M438 1115 C390 1160, 340 1165, 290 1165"/>
+  <path class="arrow" d="M562 1115 C610 1160, 660 1165, 710 1165"/>
+  <text class="label" x="332" y="1136">Yes</text>
+  <text class="label" x="626" y="1136">No</text>
+
+  <rect class="box" x="130" y="1132" width="260" height="54"/>
+  <text class="small" x="186" y="1165">Final verified report</text>
+
+  <rect class="box" x="590" y="1132" width="260" height="54"/>
+  <text class="small" x="640" y="1165">Final unverified report</text>
+
+  <!-- Bottom display box, shifted upward by using viewbox clipping? keep visible -->
+  <path class="arrow-soft" d="M260 1186 C265 1225, 405 1240, 500 1240"/>
+  <path class="arrow-soft" d="M720 1186 C715 1225, 595 1240, 500 1240"/>
+</svg>

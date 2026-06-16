@@ -1,7 +1,8 @@
 import React from 'react';
-import { Platform, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image, Platform, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { normalizeLanguage, t, uiText } from '../i18n';
+import markSenseIcon from '../../assets/brand-mark-clean.png';
 
 const HEADER_LABELS = {
   en: { credits: 'credits', pro: 'PRO' },
@@ -25,7 +26,10 @@ export function AppHeader({ setScreen, credits, language }) {
 
   return (
     <View style={s.dashHeader}>
-      <Text style={s.brandSerif} numberOfLines={1}>MarkSense</Text>
+      <TouchableOpacity style={s.brandLockup} onPress={() => setScreen('Home')} activeOpacity={0.85}>
+        <Image source={markSenseIcon} style={s.brandLogo} />
+        <Text style={s.brandSerif} numberOfLines={1}>MarkSense</Text>
+      </TouchableOpacity>
       <View style={s.dashHeadRight}>
         {hasCredits && (
           <TouchableOpacity style={s.creditPill} onPress={() => setScreen('Pricing')}>
@@ -46,11 +50,11 @@ export function AppFooter({ current, setScreen, onCenterPress, language }) {
     <View style={s.bottomNavWrap}>
       <View style={s.bottomNav}>
         <TouchableOpacity style={s.tabItem} onPress={() => setScreen('Home')}>
-          <Feather name="home" size={24} color={current === 'Home' ? '#065f46' : '#78716c'} style={s.tabIco} />
+          <Feather name="home" size={24} color={current === 'Home' ? '#080808' : '#78716c'} style={s.tabIco} />
           <Text style={[s.tabLbl, current === 'Home' && s.tabActive]} numberOfLines={1}>{t(language, 'home')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={s.tabItem} onPress={() => setScreen('Library')}>
-          <Ionicons name="copy-outline" size={24} color={current === 'Library' ? '#065f46' : '#78716c'} style={s.tabIco} />
+          <Ionicons name="copy-outline" size={24} color={current === 'Library' ? '#080808' : '#78716c'} style={s.tabIco} />
           <Text style={[s.tabLbl, current === 'Library' && s.tabActive]} numberOfLines={1}>{t(language, 'library')}</Text>
         </TouchableOpacity>
         
@@ -63,11 +67,11 @@ export function AppFooter({ current, setScreen, onCenterPress, language }) {
         </View>
 
         <TouchableOpacity style={s.tabItem} onPress={() => setScreen('History')}>
-          <MaterialCommunityIcons name="file-document-edit-outline" size={26} color={current === 'History' ? '#065f46' : '#78716c'} style={s.tabIco} />
+          <MaterialCommunityIcons name="file-document-edit-outline" size={26} color={current === 'History' ? '#080808' : '#78716c'} style={s.tabIco} />
           <Text style={[s.tabLbl, current === 'History' && s.tabActive]} numberOfLines={1}>{t(language, 'history')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={s.tabItem} onPress={() => setScreen('Profile')}>
-          <Feather name="user" size={24} color={current === 'Profile' ? '#065f46' : '#78716c'} style={s.tabIco} />
+          <Feather name="user" size={24} color={current === 'Profile' ? '#080808' : '#78716c'} style={s.tabIco} />
           <Text style={[s.tabLbl, current === 'Profile' && s.tabActive]} numberOfLines={1}>{t(language, 'account')}</Text>
         </TouchableOpacity>
       </View>
@@ -77,20 +81,55 @@ export function AppFooter({ current, setScreen, onCenterPress, language }) {
 
 const s = StyleSheet.create({
   // HEADER
-  dashHeader: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, paddingTop: 20, marginBottom: 20, gap: 8 },
-  brandSerif: { flex: 1, minWidth: 0, fontSize: 21, color: '#065f46', fontFamily: 'serif', fontWeight: '800' },
+  dashHeader: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, paddingTop: 20, marginBottom: 20, gap: 10 },
+  brandLockup: {
+    flex: 1,
+    minWidth: 0,
+    height: 44,
+    borderRadius: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 10,
+    paddingRight: 12,
+    backgroundColor: 'rgba(255,255,255,0.72)',
+    borderWidth: 1,
+    borderColor: '#eee8df',
+  },
+  brandLogo: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 9,
+  },
+  brandSerif: { flex: 1, minWidth: 0, fontSize: 18, color: '#444444', fontWeight: '900', letterSpacing: 0.8, textTransform: 'uppercase' },
   dashHeadRight: { flexDirection: 'row', alignItems: 'center', flexShrink: 0, gap: 8 },
   searchBtn: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
-  creditPill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#ecfdf5', borderWidth: 1, borderColor: '#bbf7d0', paddingHorizontal: 8, paddingVertical: 7, borderRadius: 999 },
-  creditText: { color: '#065f46', fontSize: 12, fontWeight: '900' },
-  creditLabel: { color: '#047857', fontSize: 9, fontWeight: '800', textTransform: 'uppercase' },
-  proBtnBig: { backgroundColor: '#065f46', minWidth: 76, maxWidth: 92, paddingHorizontal: 10, paddingVertical: 8, borderRadius: 16, shadowColor: '#065f46', shadowOpacity: 0.3, shadowRadius: 6, shadowOffset: {width: 0, height: 2}, elevation: 3, alignItems: 'center' },
-  proTextBig: { color: '#fff', fontSize: 12, fontWeight: '900' },
+  creditPill: {
+    minHeight: 42,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#f7f5f0',
+    borderWidth: 1,
+    borderColor: '#e7e5e4',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 999,
+    shadowColor: '#1c1917',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+  },
+  creditText: { color: '#444444', fontSize: 13, fontWeight: '900' },
+  creditLabel: { color: '#57534e', fontSize: 9, fontWeight: '900', textTransform: 'uppercase' },
+  proBtnBig: { backgroundColor: '#f5f5f5', minWidth: 76, maxWidth: 92, paddingHorizontal: 10, paddingVertical: 8, borderRadius: 16, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 6, shadowOffset: {width: 0, height: 2}, elevation: 3, alignItems: 'center' },
+  proTextBig: { color: '#080808', fontSize: 12, fontWeight: '900' },
 
   // BOTTOM NAV
   tabIco: { marginBottom: 4 },
   tabLbl: { fontSize: 10, fontWeight: '900', color: '#a8a29e', textTransform: 'uppercase', letterSpacing: 0.5 },
-  tabActive: { color: '#065f46' },
+  tabActive: { color: '#080808' },
   bottomNavWrap: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'transparent', paddingHorizontal: 0 },
   bottomNav: {
     backgroundColor: '#ffffff', flexDirection: 'row',
@@ -103,5 +142,5 @@ const s = StyleSheet.create({
   tabItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   centerTabWrap: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 0 },
   centerScanWrap: { width: 86, height: 86, borderRadius: 43, backgroundColor: '#ffffff', justifyContent: 'center', alignItems: 'center', marginTop: -50 },
-  centerScanBtn: { backgroundColor: '#065f46', width: 68, height: 68, borderRadius: 34, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#065f46', shadowOpacity: 0.5, shadowRadius: 10, shadowOffset: {width: 0, height: 4} }
+  centerScanBtn: { backgroundColor: '#080808', width: 68, height: 68, borderRadius: 34, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 10, shadowOffset: {width: 0, height: 4} }
 });

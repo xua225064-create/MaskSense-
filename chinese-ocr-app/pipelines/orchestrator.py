@@ -21,6 +21,9 @@ from config import PIPELINE_TIMEOUT
 _pipeline_ocr_llm = PipelineOcrLlm()
 _pipeline_ocr_search = PipelineOcrSearch()
 _pipeline_vision_read = PipelineVisionRead()
+_pipeline_vision_gemini = PipelineVisionRead(provider="gemini", pipeline_name="vision_gemini")
+_pipeline_vision_opencode = PipelineVisionRead(provider="opencode", pipeline_name="vision_opencode")
+_pipeline_vision_ollama = PipelineVisionRead(provider="ollama", pipeline_name="vision_ollama")
 _pipeline_img_search = PipelineImgSearch()
 _pipeline_ml_match = PipelineMlMatch()
 
@@ -54,7 +57,7 @@ async def analyze_image(
     print("=" * 70)
     
     # Xác định pipeline nào cần chạy
-    active_pipelines = pipelines or ["ocr_llm", "vision_read", "img_search", "ml_match"]
+    active_pipelines = pipelines or ["ocr_llm", "ocr_search", "vision_gemini", "vision_opencode", "img_search", "ml_match"]
     shared_ocr_text, shared_ocr_candidates = await _run_shared_ocr(image_bytes)
     shared_db_entry, shared_db_match_type = _find_database_entry_for_text(shared_ocr_text, database or [])
     strong_local_match = bool(shared_db_entry and shared_db_match_type == "exact")
@@ -82,7 +85,7 @@ async def analyze_image(
                 ocr_candidates=shared_ocr_candidates,
                 allow_db_short_circuit=True,
             ),
-            min(_timeout, 60),
+            min(_timeout, 120),
             "ocr_llm",
         ))
         task_names.append("ocr_llm")
@@ -94,20 +97,40 @@ async def analyze_image(
                 database=database or [],
                 ocr_text=shared_ocr_text,
             ),
-            min(_timeout, 75),
+            min(_timeout, 180),
             "ocr_search",
         ))
         task_names.append("ocr_search")
 
-    if "vision_read" in active_pipelines:
+    if "vision_read" in active_pipelines or "vision_gemini" in active_pipelines:
         tasks.append(_run_with_timeout(
-            _pipeline_vision_read.execute(
+            _pipeline_vision_gemini.execute(
                 image_bytes,
             ),
             min(_timeout, 75),
-            "vision_read",
+            "vision_gemini",
         ))
-        task_names.append("vision_read")
+        task_names.append("vision_gemini")
+
+    if "vision_read" in active_pipelines or "vision_opencode" in active_pipelines:
+        tasks.append(_run_with_timeout(
+            _pipeline_vision_opencode.execute(
+                image_bytes,
+            ),
+            min(_timeout, 150),
+            "vision_opencode",
+        ))
+        task_names.append("vision_opencode")
+
+    if "vision_read" in active_pipelines or "vision_ollama" in active_pipelines:
+        tasks.append(_run_with_timeout(
+            _pipeline_vision_ollama.execute(
+                image_bytes,
+            ),
+            min(_timeout, 180),
+            "vision_ollama",
+        ))
+        task_names.append("vision_ollama")
     
     if "img_search" in active_pipelines:
         tasks.append(_run_with_timeout(
@@ -116,7 +139,7 @@ async def analyze_image(
                 fallback_ocr_text=shared_ocr_text,
                 database=database or [],
             ),
-            min(_timeout, 90),
+            min(_timeout, 180),
             "img_search",
         ))
         task_names.append("img_search")
@@ -162,6 +185,16 @@ async def analyze_image(
                 status=PipelineStatus.FAILED,
                 error_message=str(result),
             ))
+
+    text_vote_result = _build_text_vote_result(shared_ocr_text, pipeline_results)
+    if text_vote_result:
+        print(
+            "[TextVote] Consensus text: "
+            f"{text_vote_result.chu_han} "
+            f"({text_vote_result.extra_data.get('vote_count')}/"
+            f"{text_vote_result.extra_data.get('total_votes')})"
+        )
+        pipeline_results.append(text_vote_result)
     
     # Voting
     print(f"\n🗳️ Bắt đầu Voting với {len(pipeline_results)} kết quả...")
@@ -205,6 +238,122 @@ async def analyze_image(
     print(f"{'=' * 70}\n")
     
     return final
+
+
+def _build_text_vote_result(
+    shared_ocr_text: str,
+    pipeline_results: List[PipelineResult],
+) -> Optional[PipelineResult]:
+    """Vote on raw Han text before database lookup can pull the answer."""
+    generic_marks = {
+        "大明",
+        "大清",
+        "大南",
+        "年製",
+        "年制",
+        "年造",
+        "大明年製",
+        "大清年製",
+        "大南年製",
+    }
+
+    def clean_text(value: str) -> str:
+        text = _normalize_cjk(value)
+        return "" if text in generic_marks else text
+
+    votes: List[Dict[str, Any]] = []
+
+    ocr_text = clean_text(shared_ocr_text)
+    if ocr_text:
+        votes.append({"source": "ocr", "text": ocr_text, "confidence": 0.52})
+
+    for result in pipeline_results:
+        if result.pipeline_name not in {"vision_gemini", "vision_opencode", "vision_ollama"}:
+            continue
+        if not result.is_valid:
+            continue
+        text = clean_text(result.chu_han or result.raw_ocr_text)
+        if not text:
+            continue
+        votes.append({
+            "source": result.pipeline_name,
+            "text": text,
+            "confidence": float(result.confidence or 0.0),
+        })
+
+    if len(votes) < 2:
+        return None
+
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for vote in votes:
+        grouped.setdefault(vote["text"], []).append(vote)
+
+    winner_text, winner_votes = max(
+        grouped.items(),
+        key=lambda item: (len(item[1]), sum(v["confidence"] for v in item[1])),
+    )
+    if len(winner_votes) < 2:
+        return None
+
+    vote_count = len(winner_votes)
+    total_votes = len(votes)
+    avg_conf = sum(v["confidence"] for v in winner_votes) / max(vote_count, 1)
+    confidence = 0.93 if vote_count >= 3 else max(0.78, min(0.88, avg_conf + 0.10))
+    sources = [v["source"] for v in winner_votes]
+
+    return PipelineResult(
+        pipeline_name="text_vote",
+        status=PipelineStatus.SUCCESS,
+        confidence=confidence,
+        chu_han=winner_text,
+        raw_ocr_text=winner_text,
+        trieu_dai=_infer_dynasty_from_text(winner_text),
+        nien_hieu=_infer_reign_from_text(winner_text),
+        llm_explanation="Internal raw-character vote consensus.",
+        extra_data={
+            "source": "raw_text_vote",
+            "allow_partial_db_match": False,
+            "vote_count": vote_count,
+            "total_votes": total_votes,
+            "votes": votes,
+            "winning_sources": sources,
+        },
+    )
+
+
+def _infer_dynasty_from_text(text: str) -> str:
+    if "大清" in text:
+        return "Qing"
+    if "大明" in text:
+        return "Ming"
+    if "大南" in text or "內府" in text or "内府" in text:
+        return "Nguyen"
+    return ""
+
+
+def _infer_reign_from_text(text: str) -> str:
+    known = {
+        "宣德": "Tuyên Đức",
+        "成化": "Thành Hóa",
+        "嘉靖": "Gia Tĩnh",
+        "萬曆": "Vạn Lịch",
+        "万历": "Vạn Lịch",
+        "康熙": "Khang Hy",
+        "雍正": "Ung Chính",
+        "乾隆": "Càn Long",
+        "嘉慶": "Gia Khánh",
+        "嘉庆": "Gia Khánh",
+        "道光": "Đạo Quang",
+        "咸豐": "Hàm Phong",
+        "咸丰": "Hàm Phong",
+        "同治": "Đồng Trị",
+        "光緒": "Quang Tự",
+        "光绪": "Quang Tự",
+    }
+    for han, vi in known.items():
+        if han in text:
+            return vi
+    return ""
 
 
 async def _run_with_timeout(
@@ -301,14 +450,14 @@ async def analyze_quick(
     cancel_event: Optional[asyncio.Event] = None,
 ) -> Dict[str, Any]:
     """
-    Phân tích nhanh — chỉ chạy Pipeline 1 (OCR+LLM) + Pipeline 4 (ML).
-    Không tìm kiếm Google, nhanh hơn nhiều.
+    Phân tích nhanh — chạy OCR/vision/ML và web lookup để fallback khi DB không có.
     """
     return await analyze_image(
         image_bytes,
         database=database,
-        pipelines=["ocr_llm", "vision_read", "ml_match"],
-        timeout=60,
+        pipelines=["ocr_llm", "ocr_search", "vision_gemini", "vision_opencode", "img_search", "ml_match"],
+        timeout=210,
+        verify_with_web=True,
         cancel_event=cancel_event,
     )
 
@@ -325,7 +474,7 @@ async def analyze_deep(
     return await analyze_image(
         image_bytes,
         database=database,
-        pipelines=["ocr_llm", "vision_read", "img_search", "ml_match"],
-        timeout=120,
+        pipelines=["ocr_llm", "ocr_search", "vision_gemini", "vision_opencode", "img_search", "ml_match"],
+        timeout=240,
         cancel_event=cancel_event,
     )

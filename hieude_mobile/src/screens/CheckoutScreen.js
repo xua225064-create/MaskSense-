@@ -26,7 +26,9 @@ export default function CheckoutScreen({ user, credits, setScreen, checkoutPkg, 
   const [checking, setChecking] = useState(false);
   const [packages, setPackages] = useState(FALLBACK_PACKAGES);
   const [paymentData, setPaymentData] = useState(null);
+  const [qrSource, setQrSource] = useState(null);
   const [successDialog, setSuccessDialog] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('bank');
   const intervalRef = useRef(null);
 
   const pkgId = checkoutPkg || 'pro';
@@ -83,9 +85,10 @@ export default function CheckoutScreen({ user, credits, setScreen, checkoutPkg, 
     }
     setLoading(true);
     try {
-      const data = await apiCreatePayment(pkgId, user.token);
+      const data = await apiCreatePayment(pkgId, user.token, paymentMethod);
       if (data.success) {
         setPaymentData(data);
+        setQrSource(data.qr_url || data.vietqr_url || null);
         setStep(3);
         if (intervalRef.current) clearInterval(intervalRef.current);
         intervalRef.current = setInterval(() => checkStatus(data.payment_id), 5000);
@@ -152,22 +155,25 @@ export default function CheckoutScreen({ user, credits, setScreen, checkoutPkg, 
             </View>
 
             <PaymentOption
-              active
+              active={paymentMethod === 'bank'}
               title={L('Chuyển khoản ngân hàng', 'Chuyển khoản ngân hàng')}
               subtitle={L('Quét mã VietQR hoặc chuyển khoản 24/7', 'Quét mã VietQR hoặc chuyển khoản 24/7')}
               icon="grid"
+              onPress={() => setPaymentMethod('bank')}
             />
             <PaymentOption
+              active={paymentMethod === 'momo'}
               title={L('Ví điện tử MoMo', 'Ví điện tử MoMo')}
               subtitle={L('Thanh toán nhanh chóng qua ứng dụng MoMo', 'Thanh toán nhanh chóng qua ứng dụng MoMo')}
               icon="credit-card"
-              disabled
+              onPress={() => setPaymentMethod('momo')}
             />
             <PaymentOption
+              active={paymentMethod === 'atm'}
               title={L('ATM / Internet Banking', 'ATM / Internet Banking')}
               subtitle={L('Thanh toán qua thẻ ATM nội địa', 'Thanh toán qua thẻ ATM nội địa')}
               icon="briefcase"
-              disabled
+              onPress={() => setPaymentMethod('atm')}
             />
 
             <TouchableOpacity style={[s.continueBtn, loading && s.disabledBtn]} onPress={confirmPayment} disabled={loading}>
@@ -189,7 +195,22 @@ export default function CheckoutScreen({ user, credits, setScreen, checkoutPkg, 
             <Text style={s.refText}>REF: #{paymentData.hex_id || paymentData.payment_id}</Text>
 
             <View style={s.qrBox}>
-              <Image source={{ uri: paymentData.qr_url }} style={s.qrImg} resizeMode="contain" />
+              {qrSource ? (
+                <Image
+                  source={{ uri: qrSource }}
+                  style={s.qrImg}
+                  resizeMode="contain"
+                  onError={() => {
+                    if (paymentData.vietqr_url && qrSource !== paymentData.vietqr_url) {
+                      setQrSource(paymentData.vietqr_url);
+                    }
+                  }}
+                />
+              ) : (
+                <View style={s.qrFallback}>
+                  <Text style={s.qrFallbackText}>QR</Text>
+                </View>
+              )}
             </View>
             <Text style={s.verified}>VERIFIED BY SEPAY</Text>
 
@@ -239,9 +260,9 @@ function CornerMarks() {
   return null;
 }
 
-function PaymentOption({ title, subtitle, icon, active, disabled }) {
+function PaymentOption({ title, subtitle, icon, active, disabled, onPress }) {
   return (
-    <View style={[s.payOption, active && s.payOptionActive, disabled && s.payOptionDisabled]}>
+    <TouchableOpacity style={[s.payOption, active && s.payOptionActive, disabled && s.payOptionDisabled]} onPress={disabled ? undefined : onPress} activeOpacity={0.82}>
       {active && (
         <View style={s.recommendBadge}>
           <Text style={s.recommendText}>KHUYÊN DÙNG</Text>
@@ -257,7 +278,7 @@ function PaymentOption({ title, subtitle, icon, active, disabled }) {
         </View>
       </View>
       <View style={[s.radio, active && s.radioActive]}>{active && <View style={s.radioDot} />}</View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -329,6 +350,8 @@ const s = StyleSheet.create({
   refText: { color: '#a8a29e', fontSize: 10, fontFamily: 'monospace', textAlign: 'center', marginBottom: 8 },
   qrBox: { width: 166, height: 166, backgroundColor: '#fff', padding: 6, borderWidth: 2, borderColor: '#bbf7d0', borderRadius: 16, alignSelf: 'center', marginBottom: 6 },
   qrImg: { width: '100%', height: '100%' },
+  qrFallback: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f5f4', borderRadius: 10 },
+  qrFallbackText: { color: '#78716c', fontSize: 18, fontWeight: '900', letterSpacing: 1 },
   verified: { color: '#78716c', fontSize: 9, fontWeight: '900', letterSpacing: 0.9, textAlign: 'center', marginBottom: 8 },
   infoBlock: { marginBottom: 7, flex: 1 },
   infoLabel: { color: '#78716c', fontSize: 10, fontWeight: '900', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 3 },

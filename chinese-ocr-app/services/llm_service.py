@@ -113,6 +113,10 @@ async def call_gemini(prompt: str, temperature: float = 0.3, max_tokens: int = 2
             except Exception as e:
                 last_err = e
                 err_str = str(e)
+                err_lower = err_str.lower()
+                if "quota exceeded" in err_lower or "resource_exhausted" in err_lower:
+                    print(f"[LLM/Gemini] Quota exhausted: {e}")
+                    return None
                 if "503" in err_str or "429" in err_str or "UNAVAILABLE" in err_str:
                     wait = 3 * (attempt + 1)  # 3s, 6s, 9s, 12s
                     print(f"[LLM/Gemini] Retry {attempt+1}/3 sau {wait}s...")

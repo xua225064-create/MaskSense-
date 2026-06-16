@@ -1,83 +1,78 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, SafeAreaView, StatusBar } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import LegalLayout from './LegalLayout';
 import { uiText } from '../i18n';
 
 export default function TermsScreen({ setScreen, language }) {
   const L = (en, vi) => uiText(language, en, vi);
   const sections = [
     {
-      title: L('1. Acceptance of Terms', '1. Chấp nhận các Điều khoản'),
+      title: L('Acceptance of Terms', 'Chấp nhận điều khoản'),
       body: L(
-        'By accessing or using MarkSense AI, you agree to follow these Terms and Conditions. If you do not agree with these terms, please stop using the service.',
-        'Bằng việc truy cập hoặc sử dụng ứng dụng MarkSense AI, bạn đồng ý tuân thủ và bị ràng buộc bởi các Điều khoản và Điều kiện sử dụng này. Nếu bạn không đồng ý, vui lòng ngừng sử dụng dịch vụ.'
+        'By accessing or using MarkSense, you agree to these Terms of Service. If you do not agree, please stop using the app and website.',
+        'Khi truy cập hoặc sử dụng MarkSense, bạn đồng ý với Điều khoản sử dụng này. Nếu không đồng ý, vui lòng ngừng sử dụng ứng dụng và website.'
       ),
     },
     {
-      title: L('2. Service Provided', '2. Dịch vụ cung cấp'),
+      title: L('Service Description', 'Mô tả dịch vụ'),
       body: L(
-        'MarkSense AI provides AI-assisted recognition, analysis, and research support for antique ceramic reign marks. Results are research references and do not replace final expert appraisal.',
-        'MarkSense AI cung cấp nền tảng hỗ trợ nhận dạng, phân tích và giám định hiệu đề gốm sứ cổ bằng AI. Kết quả mang tính tham khảo và không thay thế quyết định giám định cuối cùng của chuyên gia.'
+        'MarkSense provides AI-assisted ceramic mark recognition, OCR, visual comparison, historical reference search, scan history, account management, support, and credit-based analysis packages.',
+        'MarkSense cung cấp nhận diện hiệu đề gốm bằng AI, OCR, so khớp hình ảnh, tra cứu tham khảo lịch sử, lịch sử phân tích, quản lý tài khoản, hỗ trợ và các gói phân tích theo lượt.'
       ),
     },
     {
-      title: L('3. Intellectual Property', '3. Quyền sở hữu trí tuệ'),
+      title: L('Accounts and Security', 'Tài khoản và bảo mật'),
       body: L(
-        'All system content, features, designs, software, analysis data, and images belong to the MarkSense AI Team unless otherwise stated.',
-        'Mọi nội dung, tính năng, thiết kế, phần mềm, dữ liệu phân tích và hình ảnh của hệ thống thuộc bản quyền của MarkSense AI Team trừ khi có ghi chú khác.'
+        'You are responsible for keeping your login information secure and for all activity under your account. You must provide accurate information and notify support if you suspect unauthorized access.',
+        'Bạn chịu trách nhiệm bảo mật thông tin đăng nhập và mọi hoạt động trong tài khoản. Bạn cần cung cấp thông tin chính xác và thông báo hỗ trợ nếu nghi ngờ truy cập trái phép.'
       ),
     },
     {
-      title: L('4. User Responsibility', '4. Trách nhiệm người dùng'),
+      title: L('Payments and Credits', 'Thanh toán và lượt phân tích'),
       body: L(
-        'You agree not to use the system for illegal activity, commercial fraud, or actions that may harm the service.',
-        'Bạn cam kết không sử dụng hệ thống vào mục đích trái pháp luật, gian lận thương mại hoặc gây tổn hại đến dịch vụ.'
+        'Paid credits are added after successful payment confirmation. Credits are used for analysis requests and are not redeemable for cash unless required by applicable law or a written refund policy.',
+        'Lượt phân tích trả phí được cộng sau khi thanh toán được xác nhận thành công. Lượt dùng cho yêu cầu phân tích và không quy đổi thành tiền mặt trừ khi pháp luật áp dụng hoặc chính sách hoàn tiền bằng văn bản yêu cầu.'
       ),
     },
     {
-      title: L('5. Credits', '5. Điểm tín dụng (Credits)'),
+      title: L('Prohibited Uses', 'Nội dung và hành vi bị cấm'),
       body: L(
-        'Scan credits are used for recognition requests. Purchased credits are added after successful payment and are not redeemable for cash.',
-        'Credits được sử dụng cho mỗi lượt nhận dạng. Credits đã mua được cộng sau khi thanh toán thành công và không quy đổi thành tiền mặt.'
+        'You must not upload illegal content, infringe intellectual property, attempt to bypass security, overload the service, use the system for fraud, or misrepresent AI results as certified expert appraisal.',
+        'Bạn không được tải nội dung trái pháp luật, xâm phạm sở hữu trí tuệ, cố vượt bảo mật, gây quá tải dịch vụ, dùng hệ thống để gian lận hoặc trình bày kết quả AI như giám định chuyên gia đã chứng nhận.'
       ),
+    },
+    {
+      title: L('AI and Research Disclaimer', 'Miễn trừ về AI và tham khảo'),
+      body: L(
+        'Recognition results are generated from OCR, vision models, machine matching, and reference data. They may contain errors and should be used as research support only. They do not guarantee authenticity, value, age, or legal ownership.',
+        'Kết quả nhận diện được tạo từ OCR, mô hình vision, máy học và dữ liệu tham khảo. Kết quả có thể có sai sót và chỉ nên dùng để hỗ trợ nghiên cứu. Kết quả không bảo đảm tính xác thực, giá trị, niên đại hoặc quyền sở hữu pháp lý.'
+      ),
+    },
+    {
+      title: L('Limitation of Liability', 'Giới hạn trách nhiệm'),
+      body: L(
+        'To the maximum extent permitted by law, MarkSense is not liable for indirect loss, business loss, valuation decisions, purchase decisions, or reliance on AI analysis without independent verification.',
+        'Trong phạm vi pháp luật cho phép, MarkSense không chịu trách nhiệm cho thiệt hại gián tiếp, thiệt hại kinh doanh, quyết định định giá, quyết định mua bán hoặc việc dựa vào phân tích AI mà không xác minh độc lập.'
+      ),
+    },
+    {
+      title: L('Termination', 'Chấm dứt tài khoản'),
+      body: L(
+        'We may suspend or terminate access if an account violates these Terms, abuses the service, creates security risk, or is required to be restricted by law.',
+        'Chúng tôi có thể tạm ngưng hoặc chấm dứt quyền truy cập nếu tài khoản vi phạm Điều khoản, lạm dụng dịch vụ, tạo rủi ro bảo mật hoặc phải bị hạn chế theo yêu cầu pháp luật.'
+      ),
+    },
+    {
+      title: L('Contact', 'Liên hệ'),
+      body: 'xuatruong30@gmail.com',
     },
   ];
 
   return (
-    <SafeAreaView style={s.container}>
-      <View style={s.topBar}>
-        <TouchableOpacity style={s.backBtn} onPress={() => setScreen('Home')}>
-          <Feather name="arrow-left" size={22} color="#1c1917" />
-        </TouchableOpacity>
-        <Text style={s.headerTitle}>{L('Terms of Service', 'Điều Khoản Dịch Vụ')}</Text>
-        <View style={{ width: 44 }} />
-      </View>
-
-      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <View style={s.contentCard}>
-          <Text style={s.title}>{L('Terms of Service', 'Điều khoản Dịch vụ')}</Text>
-          <Text style={s.lastUpdate}>{L('Last updated: April 2026', 'Cập nhật lần cuối: Tháng 4/2026')}</Text>
-          {sections.map((section) => (
-            <View key={section.title}>
-              <Text style={s.h2}>{section.title}</Text>
-              <Text style={s.body}>{section.body}</Text>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <LegalLayout
+      title={L('Terms of Service', 'Điều khoản sử dụng')}
+      subtitle={L('Last updated: June 15, 2026', 'Cập nhật lần cuối: 15/06/2026')}
+      sections={sections}
+      setScreen={setScreen}
+    />
   );
 }
-
-const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fdfbf7', paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#e7e5e4' },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#f5f5f4', justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#1c1917' },
-  scroll: { padding: 20, paddingBottom: 60 },
-  contentCard: { backgroundColor: '#fff', borderColor: '#e7e5e4', borderWidth: 1, borderRadius: 16, padding: 24, marginBottom: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 2 },
-  title: { fontSize: 24, fontWeight: '800', color: '#1c1917', marginBottom: 8 },
-  lastUpdate: { fontSize: 13, color: '#a8a29e', marginBottom: 24, fontStyle: 'italic' },
-  h2: { fontSize: 16, fontWeight: '700', color: '#065f46', marginTop: 24, marginBottom: 12 },
-  body: { fontSize: 14, color: '#57534e', lineHeight: 24 },
-});

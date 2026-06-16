@@ -1,0 +1,34 @@
+{
+  "name": "marksense",
+  "version": "1.0.0",
+  "description": "| Nhánh | Mục đích | |-------|----------| | `main` | Nhánh chính ổn định | | `thuc-tap` | Phiên bản cho báo cáo thực tập | | `nckh` | Phiên bản phát triển NCKH |",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xua225064-create/MaskSense-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/xua225064-create/MaskSense-/issues"
+  },
+  "homepage": "https://github.com/xua225064-create/MaskSense-#readme",
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.40.0",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "typescript": "^6.0.3"
+  }
+}

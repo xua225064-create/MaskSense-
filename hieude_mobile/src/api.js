@@ -55,6 +55,13 @@ async function apiFetch(path, options = {}) {
   throw new Error(`Không kết nối được backend. Đã thử: ${endpoints.join(', ')}. Hãy đảm bảo điện thoại cùng Wi-Fi và backend đang chạy.`);
 }
 
+function absoluteBackendUrl(url, baseUrl) {
+  if (!url || typeof url !== 'string') return url;
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith('/')) return `${baseUrl}${url}`;
+  return `${baseUrl}/${url}`;
+}
+
 export async function apiLogin(username, password) {
   const { resp } = await apiFetch('/login', {
     method: 'POST',
@@ -124,8 +131,26 @@ export async function apiOcr(imageUri, token, signal) {
 }
 
 export async function apiGetHistory(token) {
-  const { resp } = await apiFetch('/history', { headers: authHeaders(token) });
-  return resp.json();
+  const { resp } = await apiFetch(`/api/history?t=${Date.now()}`, {
+    headers: {
+      ...authHeaders(token),
+      Accept: 'application/json',
+      'Cache-Control': 'no-cache',
+    },
+    cache: 'no-store',
+  });
+  const text = await resp.text();
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch (e) {
+    return { success: false, history: [], message: 'History API did not return JSON.' };
+  }
+  if (Array.isArray(data)) return { success: true, history: data };
+  if (Array.isArray(data?.history)) return data;
+  if (Array.isArray(data?.items)) return { ...data, success: data.success !== false, history: data.items };
+  if (Array.isArray(data?.data)) return { ...data, success: data.success !== false, history: data.data };
+  return { ...data, history: [] };
 }
 
 export async function apiGetLibrary() {
@@ -155,13 +180,19 @@ export async function apiGetPackages() {
   return resp.json();
 }
 
-export async function apiCreatePayment(packageId, token) {
-  const { resp } = await apiFetch('/api/v1/payment/create', {
+export async function apiCreatePayment(packageId, token, paymentMethod = 'bank') {
+  const { resp, baseUrl } = await apiFetch('/api/v1/payment/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
-    body: JSON.stringify({ package: packageId }),
+    body: JSON.stringify({ package: packageId, payment_method: paymentMethod }),
   });
-  return resp.json();
+  const data = await resp.json();
+  if (!data?.success) return data;
+  return {
+    ...data,
+    qr_url: absoluteBackendUrl(data.qr_url || data.vietqr_url, baseUrl),
+    vietqr_url: absoluteBackendUrl(data.vietqr_url, baseUrl),
+  };
 }
 
 export async function apiCheckPaymentStatus(paymentId) {
@@ -187,5 +218,14 @@ export async function apiChat(message, language = 'en') {
     signal: controller.signal,
   });
   clearTimeout(timer);
+  return resp.json();
+}
+
+export async function apiSendContact({ name, email, subject, message }) {
+  const { resp } = await apiFetch('/contact/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, subject, message }),
+  });
   return resp.json();
 }

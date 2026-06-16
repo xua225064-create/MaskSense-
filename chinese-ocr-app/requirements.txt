@@ -98,7 +98,6 @@ pydantic==2.12.5
 pydantic-settings==2.13.1
 pydantic_core==2.41.5
 PyMuPDF==1.27.2.2
-PyMySQL==1.1.2
 pyparsing==3.3.2
 pyreadline3==3.5.4
 python-bidi==0.6.7

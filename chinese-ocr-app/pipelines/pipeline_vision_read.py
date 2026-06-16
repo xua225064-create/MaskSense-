@@ -7,16 +7,20 @@ not allowed to be the only proof for high-confidence final attribution.
 from typing import Any, Dict, Optional
 
 from pipelines.base import BasePipeline, PipelineResult, PipelineStatus
-from services.vision_service import analyze_mark_image
+from services.vision_service import analyze_mark_image, is_unknown_neifu_suffix
 
 
 class PipelineVisionRead(BasePipeline):
+    def __init__(self, provider: str = "", pipeline_name: str = "vision_read"):
+        self.provider = provider
+        self.pipeline_name = pipeline_name
+
     @property
     def name(self) -> str:
-        return "vision_read"
+        return self.pipeline_name
 
     async def _run(self, image_bytes: bytes, **kwargs) -> PipelineResult:
-        result = await analyze_mark_image(image_bytes)
+        result = await analyze_mark_image(image_bytes, provider=self.provider, allow_fallback=False)
         status = result.get("status")
         if status == "failed":
             errors = result.get("errors") or []
@@ -24,7 +28,7 @@ class PipelineVisionRead(BasePipeline):
             return PipelineResult(
                 pipeline_name=self.name,
                 status=PipelineStatus.FAILED,
-                error_message="AI Vision could not read the image: " + message,
+                error_message=f"{self.name} could not read the image: " + message,
                 extra_data=result,
             )
 
@@ -34,13 +38,18 @@ class PipelineVisionRead(BasePipeline):
                 pipeline_name=self.name,
                 status=PipelineStatus.PARTIAL,
                 confidence=0.25,
-                error_message="AI Vision could not clearly identify Chinese characters",
+                error_message=f"{self.name} could not clearly identify Chinese characters",
                 llm_explanation=result.get("notes", ""),
                 extra_data=result,
             )
 
         confidence = float(result.get("confidence") or 0.55)
-        if _is_generic_short_mark(chu_han):
+        unknown_neifu_suffix = bool(result.get("unknown_neifu_suffix")) or is_unknown_neifu_suffix(chu_han)
+        if unknown_neifu_suffix:
+            confidence = min(confidence, 0.42)
+            status = PipelineStatus.PARTIAL
+            error_message = "AI Vision read an unsupported or uncertain Noi Phu suffix"
+        elif _is_generic_short_mark(chu_han):
             confidence = min(confidence, 0.30)
             status = PipelineStatus.PARTIAL
             error_message = "AI Vision only read a dynasty fragment, not enough for a reign title"
@@ -60,8 +69,11 @@ class PipelineVisionRead(BasePipeline):
             error_message=error_message,
             extra_data={
                 **result,
-                "source": "ai_vision",
+                "source": self.name,
+                "provider": result.get("provider") or self.provider,
                 "vision_candidates": result.get("chu_han_candidates") or [],
+                "unknown_neifu_suffix": unknown_neifu_suffix,
+                "allow_partial_db_match": False if unknown_neifu_suffix else result.get("allow_partial_db_match", True),
             },
         )
 
@@ -96,6 +108,8 @@ def _is_generic_short_mark(text: str) -> bool:
 
 
 def _infer_nien_hieu(result: Dict[str, Any]) -> str:
+    if result.get("unknown_neifu_suffix") or is_unknown_neifu_suffix(result.get("chu_han", "")):
+        return ""
     explicit = result.get("nien_hieu") or result.get("reign") or ""
     if explicit:
         return explicit

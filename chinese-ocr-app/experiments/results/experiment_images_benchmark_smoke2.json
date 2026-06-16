@@ -1,0 +1,12 @@
+[
+  {
+    "image": "55ae3424-6f61-4e7f-a6c4-edee40f96797.png",
+    "relative_path": "ảnh thực nghiệm\\55ae3424-6f61-4e7f-a6c4-edee40f96797.png",
+    "gemini_text": "大明順天年製",
+    "gemini_confidence": 1.0,
+    "gemini_candidates": "大明順天年製",
+    "gemini_latency": 9.5288,
+    "gemini_status": "success",
+    "gemini_error": ""
+  }
+]

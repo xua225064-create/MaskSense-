@@ -1,0 +1,2 @@
+﻿image,relative_path,system_text,system_confidence,system_aggregated_confidence,system_primary_pipeline,system_valid_pipelines,system_num_valid_pipelines,system_latency,system_status,system_error
+55ae3424-6f61-4e7f-a6c4-edee40f96797.png,ảnh thực nghiệm\55ae3424-6f61-4e7f-a6c4-edee40f96797.png,大明順天年製,0.88,0.904,vision_gemini,ocr_llm;ocr_search;vision_gemini,3,88.236,success,Chuoi chu duoc doc bang voting OCR/Vision. He thong se tra cuu web; neu khong co nguon xac thuc thi khong hien thong tin chi tiet.

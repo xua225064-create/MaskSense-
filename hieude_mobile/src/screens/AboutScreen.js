@@ -9,7 +9,7 @@ const LINKS = {
   instagram: 'https://www.instagram.com/marksense.ai',
   facebook: 'https://www.facebook.com/marksense.ai',
   tiktok: 'https://www.tiktok.com/@marksense.ai',
-  email: 'mailto:support@marksense.ai?subject=MarkSense%20AI%20support',
+  email: 'mailto:xuatruong30@gmail.com?subject=MarkSense%20AI%20support',
 };
 
 const openLink = async (url, label, language) => {
@@ -103,6 +103,8 @@ export default function AboutScreen({ setScreen, language }) {
         <View style={s.card}>
           <InfoRow icon="file-text" title={t(language, 'terms')} subtitle={t(language, 'aboutTermsSub')} onPress={() => setScreen('Terms')} />
           <InfoRow icon="shield" title={t(language, 'privacy')} subtitle={t(language, 'aboutPrivacySub')} onPress={() => setScreen('Privacy')} />
+          <InfoRow icon="trash-2" title="Data Deletion" subtitle="Request account and data removal" onPress={() => setScreen('DataDeletion')} />
+          <InfoRow icon="help-circle" title="Support" subtitle="FAQ, account, credits, and payment help" onPress={() => setScreen('Support')} />
           <InfoRow icon="mail" title={t(language, 'aboutContact')} subtitle={t(language, 'aboutContactSub')} external onPress={() => openLink(LINKS.email, 'Email', language)} />
           <InfoRow icon="globe" title={t(language, 'aboutWebsite')} subtitle={t(language, 'aboutWebsiteSub')} external onPress={() => openLink(LINKS.website, 'Website', language)} />
         </View>

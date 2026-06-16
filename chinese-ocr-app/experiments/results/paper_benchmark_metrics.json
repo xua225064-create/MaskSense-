@@ -1,0 +1,156 @@
+{
+  "dataset": {
+    "name": "reference_library_available_data",
+    "n_images": 28,
+    "scope": "Labeled reference images available in the repository; not an external public benchmark."
+  },
+  "ocr_only": {
+    "relaxed_mark_accuracy": 0.5,
+    "candidate_recall": 0.6785714285714286,
+    "strict_exact_mark_accuracy": 0.39285714285714285,
+    "character_accuracy": 0.6283783783783784,
+    "latency_seconds": {
+      "avg": 68.09742500000002,
+      "median": 69.6839,
+      "p95": 77.6941,
+      "min": 54.4333,
+      "max": 79.3948
+    }
+  },
+  "ocr_plus_database_fuzzy": {
+    "relaxed_mark_accuracy": 0.8571428571428571,
+    "strict_exact_mark_accuracy": 0.6071428571428571,
+    "character_accuracy": 0.7567567567567568,
+    "macro_f1_strict_exact": 0.48769841269841274,
+    "latency_seconds": {
+      "avg": 0.026007142857142857,
+      "median": 0.002,
+      "p95": 0.2244,
+      "min": 0.0,
+      "max": 0.2438
+    }
+  },
+  "combined_offline_core": {
+    "relaxed_mark_accuracy": 0.8571428571428571,
+    "strict_exact_mark_accuracy": 0.6071428571428571,
+    "character_accuracy": 0.7567567567567568,
+    "macro_f1_strict_exact": 0.48769841269841274,
+    "latency_seconds": {
+      "avg": 68.31436428571429,
+      "median": 69.9069,
+      "p95": 78.1751,
+      "min": 54.4696,
+      "max": 79.6032
+    },
+    "family_breakdown": {
+      "Auspicious / studio marks": {
+        "n": 1,
+        "relaxed_accuracy": 1.0,
+        "strict_exact_accuracy": 1.0
+      },
+      "Chinese imperial marks": {
+        "n": 21,
+        "relaxed_accuracy": 0.8095238095238095,
+        "strict_exact_accuracy": 0.47619047619047616
+      },
+      "Vietnamese court marks": {
+        "n": 6,
+        "relaxed_accuracy": 1.0,
+        "strict_exact_accuracy": 1.0
+      }
+    }
+  },
+  "orb_leave_one_out": {
+    "relaxed_mark_accuracy": 0.03571428571428571,
+    "strict_exact_mark_accuracy": 0.03571428571428571,
+    "latency_seconds": {
+      "avg": 0.19092500000000004,
+      "median": 0.2222,
+      "p95": 0.2937,
+      "min": 0.0053,
+      "max": 0.3651
+    }
+  },
+  "confusion_matrix_strict_exact": [
+    {
+      "ground_truth": "大清康熙年製",
+      "prediction": "大清",
+      "count": 2
+    },
+    {
+      "ground_truth": "大明萬曆年製",
+      "prediction": "大明",
+      "count": 1
+    },
+    {
+      "ground_truth": "大明宣德年製",
+      "prediction": "贊普鐘年製",
+      "count": 1
+    },
+    {
+      "ground_truth": "大清雍正年製",
+      "prediction": "大清",
+      "count": 1
+    },
+    {
+      "ground_truth": "大明成化年製",
+      "prediction": "大明",
+      "count": 1
+    },
+    {
+      "ground_truth": "永樂年製",
+      "prediction": "大明永樂年製",
+      "count": 1
+    },
+    {
+      "ground_truth": "乾隆年製",
+      "prediction": "庚午年製",
+      "count": 1
+    },
+    {
+      "ground_truth": "大明弘治年製",
+      "prediction": "大明洪武年製",
+      "count": 1
+    },
+    {
+      "ground_truth": "大明萬曆年製",
+      "prediction": "贊普鐘年製",
+      "count": 1
+    },
+    {
+      "ground_truth": "康熙年製",
+      "prediction": "大清康熙年製",
+      "count": 1
+    }
+  ],
+  "failed_cases_relaxed": [
+    {
+      "image": "da_ming_xuan_de_nian_zhi_c7e94867.jpg",
+      "ground_truth": "大明宣德年製",
+      "ocr_prediction": "(empty)",
+      "final_prediction": "贊普鐘年製",
+      "detail": "fuzzy_tiedecision:年"
+    },
+    {
+      "image": "ä¹¾éš†å¹´è£½_40b1c803.jpg",
+      "ground_truth": "乾隆年製",
+      "ocr_prediction": "轮蓬年",
+      "final_prediction": "庚午年製",
+      "detail": "top1:轮蓬年"
+    },
+    {
+      "image": "å¤§æ˜Žå¼˜æ²»å¹´è£½_2d687f6b.jpg",
+      "ground_truth": "大明弘治年製",
+      "ocr_prediction": "(empty)",
+      "final_prediction": "大明洪武年製",
+      "detail": "top1:汤"
+    },
+    {
+      "image": "å¤§æ˜Žè¬æ›†å¹´è£½_79cdb9a5.jpg",
+      "ground_truth": "大明萬曆年製",
+      "ocr_prediction": "(empty)",
+      "final_prediction": "贊普鐘年製",
+      "detail": "fuzzy_tiedecision:年"
+    }
+  ]
+}

@@ -1,0 +1,902 @@
+[
+  {
+    "file_name": "020cf7bc-3d9c-4ea3-85c7-f7d2465e3e9b.png",
+    "text": "福羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '福羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "0233b3c9-fa18-4278-bf20-49f5a09ddd24.png",
+    "text": "福春",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '長春' (sai ký tự vị trí 0)?",
+    "error": null
+  },
+  {
+    "file_name": "05457ed0-bd1a-4907-b800-86224edbfd97.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "05b15107-41f8-4391-872a-b30bdfb9eeeb.png",
+    "text": "製景粘年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '製景粘年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "07a84c0f-d565-4451-9aa4-687f3025f560.png",
+    "text": "有十十中",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '有十十中' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "08bad83b-413d-4ea5-ba8b-ab2cb072a409.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "0921e7f9-ce98-40f3-a284-876c00747708.png",
+    "text": "戊年製製天戊年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '戊年製製天戊年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "09c05196-ef3c-4f3a-b5b7-b5781f04f0fa.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "0bf24c68-a0bf-44b2-b182-8d0196de2f79.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "0ce1b028-aea4-452a-b6aa-4869b8d47011.png",
+    "text": "穴本",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '穴本' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "0fac0b73-4a28-4437-801e-2bf01c251997.png",
+    "text": "化类淳年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '化类淳年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "11b3b142-ff74-4976-a9f3-8bf61d182d8e.png",
+    "text": "大日本九谷谴",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '大日本九谷造' (sai ký tự vị trí 5)?\n💡 Gợi ý: Có thể là '大日本九谷造' (score: 0.70)",
+    "error": null
+  },
+  {
+    "file_name": "169e1999-8a31-4909-8012-18f6006d065d.png",
+    "text": "太乎碎南羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '太乎碎南羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "19d71c3c-946d-4340-917f-4bb593439be2.png",
+    "text": "年製蔬年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '年製蔬年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "20d63cf2-c3a0-4ded-92ec-1424f062b13c.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "2123aa7a-5bfa-49e6-be2c-3fc1e69157bf.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "284e8f69-d922-4e90-afb8-d240769cffb8.png",
+    "text": "景興年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": true,
+    "warning": "Ảnh không giống bố cục hiệu đề chuẩn, hệ thống vẫn thử OCR vì có thể là ảnh crop cận cảnh hoặc screenshot.",
+    "error": null
+  },
+  {
+    "file_name": "285cbefb-5b94-4c90-b0db-84896337113e.png",
+    "text": "景盛年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": true,
+    "warning": "",
+    "error": null
+  },
+  {
+    "file_name": "28651260-1603-4288-b5b1-6e585fe3e5ae.png",
+    "text": "禧天年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '禧天年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "2b9512ff-cfa2-4e3a-833c-addd63364612.jpg",
+    "text": "福福",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '福福' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "312b5f12-ce27-494b-b505-1c0205bce483.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "359a4572-67b1-4077-8cb5-858b08a00bbc.png",
+    "text": "恶年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '恶年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "386e75f8-ec83-4f02-a991-05e59fb27786.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "42c4ce36-0047-4324-ab18-0234a3eef8f8.png",
+    "text": "全羊恶",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '全羊恶' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "453d0952-291a-4989-9de5-05f54c45c02b.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "45551500-5254-4466-8775-22889bcf6c92.png",
+    "text": "三麻年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '三麻年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "4a51591f-c0ca-4d65-943f-eb1e9a120635.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "50549ccb-173a-4430-ab94-38c5145ed363.png",
+    "text": "景盛羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '景盛羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "51ae5547-26c3-4c01-8c42-b3fc435408d5.png",
+    "text": "页磨干年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '页磨干年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "56c7b074-c46c-4494-846e-502b3569919e.jpg",
+    "text": "口製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '御製' (sai ký tự vị trí 0)?",
+    "error": null
+  },
+  {
+    "file_name": "576e3214-0824-40fc-abc1-58260e1b00ca.png",
+    "text": "戊年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '戊年製' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "5b64858d-84f8-4d1c-b753-77f08fbdb10f.jpg",
+    "text": "慶酥年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '慶曆年製' (sai ký tự vị trí 1)?\n💡 Gợi ý: Có thể là '慶元年製' (score: 0.70)",
+    "error": null
+  },
+  {
+    "file_name": "5cacb80e-7b4d-4097-8481-76de13532b07.png",
+    "text": "夷年製招成年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '夷年製招成年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "601c6c50-182b-4e73-874d-c1170d547e3a.png",
+    "text": "币東年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '币東年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "63645c1b-2e18-4b8a-b127-8f8a77a2d36d.png",
+    "text": "咸宜羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '咸宜羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "64c78f71-59a9-4299-af7f-eb9543c5c44b.png",
+    "text": "祥大年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '保大年製' (sai ký tự vị trí 0)?\n💡 Gợi ý: Có thể là '祥興年製' (score: 0.70)",
+    "error": null
+  },
+  {
+    "file_name": "66e030e0-0829-41ae-888b-123ccc84d17b.png",
+    "text": "協励和羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '協励和羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "68d502b9-661f-4a2e-8032-9818598e2a3e.jpg",
+    "text": "一三",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '一三' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "6d57171e-c35e-4651-9314-f477aef0e031.png",
+    "text": "德羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '德羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "72307967-5367-48e9-a085-fc055886ac42.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "725048a1-e350-4cc4-a8dc-9a6d47706239.png",
+    "text": "年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '御製' (sai ký tự vị trí 0)?",
+    "error": null
+  },
+  {
+    "file_name": "77f60da4-54dc-4f22-b4e8-47834f67487a.jpg",
+    "text": "明品",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '明品' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "789885d4-4e1a-4296-b609-2092f73dcd0a.png",
+    "text": "康庭羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '康庭羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "78e728cb-e7a9-43cb-a1dd-5a7ab7854594.png",
+    "text": "至正羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '至正羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "7e78b323-6ab8-4f31-867f-d84598da5e9e.jpg",
+    "text": "材製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '御製' (sai ký tự vị trí 0)?",
+    "error": null
+  },
+  {
+    "file_name": "7fa9f0b4-2c14-4f9b-b2c5-e83c8d966f06.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "7fcfb267-28c4-40a9-87e5-c2f8ea9479e3.png",
+    "text": "甄和羊愁",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '甄和羊愁' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "80c61452-4ccc-4682-8879-97ee6d9cab09.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "82015714-6d02-4721-b885-dfd3786ade5d.jpg",
+    "text": "一製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '御製' (sai ký tự vị trí 0)?",
+    "error": null
+  },
+  {
+    "file_name": "8361b7a8-9071-45fe-913c-5560dab42fb8.png",
+    "text": "本薩摩",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '本薩摩' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "838fe11a-5e8e-4154-a21a-1d81af649529.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "83bc6d8e-832e-4130-bc64-8c8b3d80a522.png",
+    "text": "年清道光贝",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '年清道光贝' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "8595d430-d7e1-49c6-b0ce-98cdb4e1e08b.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "88d6b7c9-5a18-4f29-b365-ae14522a428b.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "8e9d1d3f-3c7b-4955-a8a6-62c480025c29.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "8ea9d0d2-c42a-45e4-8bab-51de1d64bd30.png",
+    "text": "台年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '台年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "8ffb6d68-6b05-465e-bf93-a79afc47354e.png",
+    "text": "大保",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '大明' (sai ký tự vị trí 1)?\n💡 Gợi ý: Có thể là '大清' (score: 0.70)",
+    "error": null
+  },
+  {
+    "file_name": "94d161de-838e-44f8-92b3-ce84b254c8c7.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "956c6575-ebdd-4386-9d07-d7d22f600160.jpg",
+    "text": "双年锁崇明人",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '双年锁崇明人' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "99c0f2ef-02e4-4be0-92fb-9d2bf37c739f.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "9ceded68-6b5c-4d2f-9489-275d9961727a.jpg",
+    "text": "年元",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '年元' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "9fe9c1c2-4ae9-446f-9e65-a35f10b04535.png",
+    "text": "成羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '成羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "a351b7f4-4867-49fe-b15e-923bdc0117ca.png",
+    "text": "明绍年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '明绍年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "a5461dc2-e77c-4df5-8404-4c28c39c7817.png",
+    "text": "喜隆羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '喜隆羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "a8dc959f-8704-4700-9c6d-cb12c64ce3ef.png",
+    "text": "乾興年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": true,
+    "warning": "",
+    "error": null
+  },
+  {
+    "file_name": "aaf28442-5060-4fcc-8dd8-1c55b98820e5.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "ab17e8a6-496b-4fb6-b147-160881efb0ef.png",
+    "text": "大日本帝國梨帝",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '大日本帝國梨帝' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "acfc9a5f-6500-49e4-af6c-f8f46adc22b5.jpg",
+    "text": "百製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '御製' (sai ký tự vị trí 0)?",
+    "error": null
+  },
+  {
+    "file_name": "adc98c72-9fce-4e04-8f32-e1ae8c72506a.png",
+    "text": "建隆年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": true,
+    "warning": "",
+    "error": null
+  },
+  {
+    "file_name": "b28c90fe-7270-4bdf-b688-0ad39790e379.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "ba2964f1-ed31-41da-bb9e-0fbf31406024.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "bafd278b-b7b6-49c6-b298-66cda9ca2853.png",
+    "text": "洪德年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": true,
+    "warning": "",
+    "error": null
+  },
+  {
+    "file_name": "bdc9502e-73b6-4692-abba-f37c6d0e0504.png",
+    "text": "貂成年夷年製製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '貂成年夷年製製' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "c0185486-9655-4fb1-bf8f-ff6eeb451065.png",
+    "text": "成精羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '成精羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "c55ac88f-1e28-4149-89a8-61a43cd85171.png",
+    "text": "贝明",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '大明' (sai ký tự vị trí 0)?",
+    "error": null
+  },
+  {
+    "file_name": "c6150f27-6dbb-4e10-9403-6ab660cdce65.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "ca1d830e-fc25-4a97-933c-7675bdff66c5.png",
+    "text": "延羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '延羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "cbede2d6-ddbf-4843-8917-eca83ffc17ec.png",
+    "text": "維新羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '維新羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "ChatGPT Image 16_49_33 13 thg 6, 2026.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "d0037d23-d297-43d5-970e-ad177db77dd6.png",
+    "text": "福福",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '福福' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "d47da0b4-66ad-4320-b27f-3b0940ed36d2.jpg",
+    "text": "德年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '德化製' (sai ký tự vị trí 1)?",
+    "error": null
+  },
+  {
+    "file_name": "d4ad80f4-2e66-43de-b7ac-984e800c613e.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "d7781bbb-c8aa-4c34-9de1-c6730fadf236.png",
+    "text": "类王年黄年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '类王年黄年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "d9f084db-7e5c-43fd-b111-f5b048fd4494.png",
+    "text": "德景年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '德景年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "db20933b-378b-40a6-a100-c1d38c6d9719.png",
+    "text": "光中年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": true,
+    "warning": "",
+    "error": null
+  },
+  {
+    "file_name": "dc22a7c0-d1e7-49cd-b258-b15c6b29f011.jpg",
+    "text": "京年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '京燒' (sai ký tự vị trí 1)?",
+    "error": null
+  },
+  {
+    "file_name": "decb6aea-5e9a-45f1-b779-7e7db3f2157e.png",
+    "text": "天顺年梨",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '天顺年梨' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "df1972f0-ad82-4626-8ec4-2e481c3c596e.png",
+    "text": "康德年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '嗣德年製' (sai ký tự vị trí 0)?\n💡 Gợi ý: Có thể là '康熙年製' (score: 0.70)",
+    "error": null
+  },
+  {
+    "file_name": "e256c734-f731-4d0e-9813-cb4050fcf224.png",
+    "text": "至顺羊数",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '至顺羊数' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "e2b9c2e8-8625-41a8-907d-2eedccc5f0b3.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "e3798c38-f865-4ece-a69b-ab28d60a7d1e.png",
+    "text": "製天主水",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '製天主水' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "e43e2ee0-fec7-4c25-98c7-e321a57c8456.jpg",
+    "text": "福製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '御製' (sai ký tự vị trí 0)?",
+    "error": null
+  },
+  {
+    "file_name": "ed094e65-bdeb-4c79-9a3c-23e390f8a628.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "f1229a2e-4d93-4cbb-8ed2-ec3da44e3c28.png",
+    "text": "大明年製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": true,
+    "warning": "",
+    "error": null
+  },
+  {
+    "file_name": "f5d027a6-02b9-4a17-8ade-61feb3e769ca.png",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  },
+  {
+    "file_name": "f859fd8e-c7fa-4f11-b616-0ffd3843eef5.png",
+    "text": "成製",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Gợi ý: Có thể là '御製' (sai ký tự vị trí 0)?",
+    "error": null
+  },
+  {
+    "file_name": "fbd1968f-d223-4445-bfa4-89cb34d4df91.png",
+    "text": "明慈年",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '明慈年' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "fc828979-1cbe-49ad-88a6-707b179cf9c0.png",
+    "text": "貂只羊",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '貂只羊' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "fce17bb7-dba2-4706-b398-b487e3a9c3c7.png",
+    "text": "贝满膜治年葱",
+    "confidence": 0.99,
+    "words": [],
+    "database_valid": false,
+    "warning": "Hiệu đề '贝满膜治年葱' không tìm thấy trong cơ sở dữ liệu",
+    "error": null
+  },
+  {
+    "file_name": "fd1da37a-a9fe-43be-90e9-bc4b0b085358.jpg",
+    "text": "",
+    "confidence": 0,
+    "words": [],
+    "database_valid": false,
+    "warning": "OCR không đọc được chữ Hán rõ ràng từ ảnh.",
+    "error": null
+  }
+]

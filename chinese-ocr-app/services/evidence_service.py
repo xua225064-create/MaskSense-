@@ -19,10 +19,10 @@ from services.web_scraper import ArticleContent
 
 GENERIC_MARKS = {"大清", "大明", "大南", "年製", "年制", "年造"}
 MIN_EVIDENCE_CONFIDENCE = 0.62
-MAX_CANDIDATES_FOR_WEB = 5
-MAX_QUERIES_PER_CANDIDATE = 8
-MAX_RESULTS_PER_QUERY = 5
-MAX_ARTICLES_PER_CANDIDATE = 8
+MAX_CANDIDATES_FOR_WEB = 2
+MAX_QUERIES_PER_CANDIDATE = 3
+MAX_RESULTS_PER_QUERY = 3
+MAX_ARTICLES_PER_CANDIDATE = 4
 NEIFU_IMAGE_ONLY_CONFIDENCE_CAP = 0.44
 CJK_SOURCE_STOPWORDS = {"大", "清", "明", "南", "年", "製", "制", "造", "瓷", "陶"}
 SOCIAL_SOURCE_DOMAINS = (
@@ -242,8 +242,11 @@ def build_evidence_candidates(
         prior = float(getattr(result, "confidence", 0.0) or 0.0)
         source = getattr(result, "pipeline_name", "pipeline")
         web_sources = _pipeline_web_sources(result)
-        add_candidate(chu_han, source, prior, web_sources=web_sources)
         extra = getattr(result, "extra_data", None) or {}
+        if extra.get("source_only"):
+            continue
+        allow_partial_db_hint = extra.get("allow_partial_db_match", True) is not False
+        add_candidate(chu_han, source, prior, web_sources=web_sources)
         for item in extra.get("vision_candidates") or []:
             if isinstance(item, dict):
                 cand_text = item.get("text", "")
@@ -257,24 +260,26 @@ def build_evidence_candidates(
                 max(cand_prior, min(prior, 0.65)),
                 web_sources=web_sources,
             )
-            for score, entry, matched in _rank_database_candidates(cand_text, database, limit=2):
+            if allow_partial_db_hint:
+                for score, entry, matched in _rank_database_candidates(cand_text, database, limit=2):
+                    add_candidate(
+                        matched or entry.get("chu_han", ""),
+                        f"db_hint_from_{source}_candidate",
+                        max(score, cand_prior, prior),
+                        entry,
+                        matched,
+                        web_sources=web_sources,
+                    )
+        if allow_partial_db_hint:
+            for score, entry, matched in _rank_database_candidates(chu_han, database, limit=2):
                 add_candidate(
                     matched or entry.get("chu_han", ""),
-                    f"db_hint_from_{source}_candidate",
-                    max(score, cand_prior, prior),
+                    f"db_hint_from_{source}",
+                    max(score, prior),
                     entry,
                     matched,
                     web_sources=web_sources,
                 )
-        for score, entry, matched in _rank_database_candidates(chu_han, database, limit=2):
-            add_candidate(
-                matched or entry.get("chu_han", ""),
-                f"db_hint_from_{source}",
-                max(score, prior),
-                entry,
-                matched,
-                web_sources=web_sources,
-            )
 
     ordered = sorted(
         candidates.values(),
@@ -496,6 +501,40 @@ SOURCE_MATCH_STOPWORDS = {
     "hieu", "gom", "dai", "thanh", "trieu", "nha",
 }
 
+REIGN_ALIAS_TERMS = {
+    "\u5eb7\u7199": ["kangxi", "kang hsi", "khang hy"],
+    "\u96cd\u6b63": ["yongzheng", "yung cheng", "ung chinh"],
+    "\u4e7e\u9686": ["qianlong", "chien lung", "can long"],
+    "\u5609\u6176": ["jiaqing", "chia ching", "gia khanh"],
+    "\u9053\u5149": ["daoguang", "tao kuang", "dao quang"],
+    "\u54b8\u8c50": ["xianfeng", "hsien feng", "ham phong"],
+    "\u540c\u6cbb": ["tongzhi", "tung chih", "dong tri"],
+    "\u5149\u7dd2": ["guangxu", "kuang hsu", "quang tu"],
+    "\u5ba3\u7d71": ["xuantong", "hsuan tung", "tuyen thong"],
+    "\u5ba3\u5fb7": ["xuande", "hsuan te", "tuyen duc"],
+    "\u6210\u5316": ["chenghua", "cheng hua", "thanh hoa"],
+    "\u5609\u9756": ["jiajing", "chia ching", "gia tinh"],
+    "\u842c\u66c6": ["wanli", "wan li", "van lich"],
+    "\u6c38\u6a02": ["yongle", "yung lo", "vĩnh lạc", "vinh lac"],
+    "\u6d2a\u6b66": ["hongwu", "hung wu", "hong vu"],
+}
+
+
+def _extend_latin_terms_with_reign_aliases(
+    raw_values: Iterable[str],
+    latin_terms: List[str],
+    seen_latin: set,
+) -> None:
+    text_cjk = normalize_cjk(" ".join(str(value or "") for value in raw_values))
+    text_latin = _fold_phrase_text(" ".join(str(value or "") for value in raw_values))
+    for cjk, aliases in REIGN_ALIAS_TERMS.items():
+        alias_folded = [_fold_phrase_text(alias) for alias in aliases]
+        if cjk in text_cjk or any(alias and alias in text_latin for alias in alias_folded):
+            for alias in alias_folded:
+                if alias and alias not in seen_latin:
+                    latin_terms.append(alias)
+                    seen_latin.add(alias)
+
 
 def _is_specific_cjk_term(value: str) -> bool:
     term = normalize_cjk(value)
@@ -602,6 +641,7 @@ def _source_match_terms(
                     latin_terms.append(phrase)
                     seen_latin.add(phrase)
 
+    _extend_latin_terms_with_reign_aliases(raw_values, latin_terms, seen_latin)
     return cjk_terms, latin_terms
 
 
@@ -682,6 +722,11 @@ def _strict_candidate_identity_terms(
                 if len(token) >= 5 and token not in latin_terms:
                     latin_terms.append(token)
 
+    _extend_latin_terms_with_reign_aliases(
+        [str(value) for obj in (candidate or {}, final or {}) if isinstance(obj, dict) for value in obj.values()],
+        latin_terms,
+        set(latin_terms),
+    )
     return cjk_terms, latin_terms
 
 
@@ -922,7 +967,7 @@ async def verify_candidates_with_web(
         )
         if needs_more_sources:
             seen_urls = {src.get("url") for src in sources if src.get("url")}
-            min_queries_before_stop = 4 if _is_neifu_variant(candidate) else 1
+            min_queries_before_stop = 2 if _is_neifu_variant(candidate) else 1
             for query_index, query in enumerate(queries):
                 results = await search_google(
                     query,
@@ -1076,8 +1121,6 @@ def _collect_unverified_reference_sources(
             cjk_matches, latin_matches = _matched_strict_identity_terms(src, candidate)
             if not cjk_matches and not latin_matches:
                 continue
-            if source_quality == "low":
-                continue
             if _has_irrelevant_source_text(src):
                 continue
             if _is_social_source_url(url) or _is_low_trust_evidence_url(url):
@@ -1124,12 +1167,30 @@ def apply_evidence_to_final(
         if url and url not in sources:
             sources.append(url)
 
+    if not sources:
+        for src in best.get("sources") or []:
+            if not isinstance(src, dict) or _is_image_search_source(src):
+                continue
+            url = src.get("url") or src.get("source_url")
+            if not url or url in sources:
+                continue
+            if _is_social_source_url(url) or _is_low_trust_evidence_url(url):
+                continue
+            if _has_irrelevant_source_text(src):
+                continue
+            cjk_matches, latin_matches = _matched_source_terms(src, best_candidate, final)
+            strict_cjk, strict_latin = _matched_strict_identity_terms(src, best_candidate, final)
+            if cjk_matches or latin_matches or strict_cjk or strict_latin:
+                sources.append(url)
+            if len(sources) >= 4:
+                break
+
     final["candidate_evidence"] = evidence
     final["search_sources"] = sources
     final["cac_nguon_tham_khao"] = sources
     final["nguon_tham_khao"] = sources
-    final["google_query_links"] = []
     unverified_sources = _collect_unverified_reference_sources(evidence_report, sources)
+    final["google_query_links"] = []
     final["unverified_search_sources"] = unverified_sources
     final["image_search_sources"] = unverified_sources
 
@@ -1198,6 +1259,50 @@ def apply_evidence_to_final(
         final["tin_cay"] = round(final_score, 4)
         final["canh_bao"] = ""
     else:
+        if final.get("data_source") in {"visual_text_vote", "vision_conflict", "vision_read_no_db"}:
+            final.update({
+                "trieu_dai": "",
+                "triá»u_Ä‘áº¡i": "",
+                "nien_hieu": "",
+                "niÃªn_hiá»‡u": "",
+                "hoang_de": "",
+                "hoÃ ng_Ä‘áº¿": "",
+                "nam_bat_dau": None,
+                "nam_ket_thuc": None,
+                "nien_dai": "",
+                "niÃªn_Ä‘áº¡i": "",
+                "ten_viet": "",
+                "tÃªn_viá»‡t": "",
+                "ten_viet_ngan": "",
+                "tÃªn_viá»‡t_ngáº¯n": "",
+                "hien_thi_chinh": "",
+                "hieu_de_vi": "",
+                "phien_am": "",
+                "phiÃªn_Ã¢m": "",
+                "hieu_de_en": "",
+                "mo_ta": "",
+                "boi_canh": "",
+                "nghe_thuat": "",
+                "dac_diem_nghe_thuat": "",
+                "thu_phap": "",
+                "thu_phap_dac_biet": "",
+                "ghi_chu": "",
+                "ghi_chu_them": "",
+                "verification_status": "no_verified_information_found",
+                "web_verified": False,
+                "data_source": "visual_text_vote_no_info" if final.get("data_source") == "visual_text_vote" else ("vision_read_no_info" if final.get("data_source") == "vision_read_no_db" else "vision_conflict_no_info"),
+                "nguon_du_lieu": "Da tra cuu DB va web nhung chua co thong tin xac thuc",
+                "canh_bao": (
+                    "Da doc duoc chu tren anh bang OCR/Vision voting, nhung khong tim thay ban ghi DB "
+                    "hoac nguon web du ro. Khong hien thong tin chi tiet de tranh suy dien sai."
+                ),
+            })
+            old_conf = float(final.get("confidence") or final.get("tin_cay") or 0.0)
+            capped = min(old_conf, 0.70) if old_conf else 0.45
+            final["confidence"] = round(capped, 4)
+            final["tin_cay"] = round(capped, 4)
+            return final
+
         old_conf = float(final.get("confidence") or final.get("tin_cay") or 0.0)
         final_norm = normalize_cjk(final.get("chu_han") or final.get("hieu_de") or "")
         best_norm = normalize_cjk(best_candidate.get("chu_han") or "")
@@ -1307,7 +1412,7 @@ def apply_evidence_to_final(
                 "Không dùng kết quả tìm ảnh để kết luận chắc biến thể 侍左/侍右/侍東/侍從."
             )
         else:
-            if sources or unverified_sources or final.get("google_query_links"):
+            if sources or unverified_sources:
                 final["canh_bao"] = (
                     "Đã đính kèm nguồn/truy vấn tham khảo để đối chiếu. "
                     "Các nguồn hiện có chưa đủ mạnh để xác nhận chắc chắn."

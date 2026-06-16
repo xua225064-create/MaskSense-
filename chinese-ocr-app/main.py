@@ -8,9 +8,14 @@ import numpy as np
 from ocr_engine import read_chinese_mark
 import json
 import os
+import smtplib
+from email.message import EmailMessage
+from html import escape
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 import difflib
 import sys
+import unicodedata
 from reference_matcher import match_image, match_image_by_prefix, save_reference
 
 if sys.platform == "win32":
@@ -33,6 +38,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "hieu_de_database.json")
+REFERENCE_LIBRARY_PATH = os.path.join(os.path.dirname(__file__), "data", "reference_library")
 PAGE_OVERRIDES_PATH = os.path.join(os.path.dirname(__file__), "data", "page_overrides.json")
 WEB_PAGE_IDS = {
     "home",
@@ -49,6 +55,8 @@ WEB_PAGE_IDS = {
     "guide",
     "privacy",
     "terms",
+    "data-deletion",
+    "support",
     "faq",
 }
 MOBILE_SRC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "hieude_mobile", "src", "screens"))
@@ -74,14 +82,14 @@ APP_PAGE_FILES = {
 _last_analyzed_images: Dict[str, bytes] = {}
 
 
-from db import (fetch_all_marks, create_user, get_user_by_username, add_scan_history, 
+from db import (fetch_all_marks, create_user, get_user_by_username, get_user_by_id, add_scan_history, 
     get_scan_history, get_or_create_social_user, ensure_credits_column, get_user_credits, 
     deduct_credit, add_credits, create_payment, get_payment, get_user_payments, complete_payment,
     ensure_admin_columns, create_admin_account, admin_login, get_all_users_admin,
     toggle_user_lock, admin_update_credits, admin_reset_password, get_all_payments_admin, 
     admin_approve_payment, get_all_scan_history_admin, get_dashboard_stats,
     admin_add_mark, admin_update_mark, admin_delete_mark, get_system_settings, update_system_setting,
-    admin_delete_user)
+    admin_delete_user, SQLITE_DB_PATH, apply_free_credits_to_unpaid_users)
 from pydantic import BaseModel
 from passlib.context import CryptContext
 import httpx
@@ -101,14 +109,51 @@ def _load_database() -> List[Dict[str, Any]]:
     print("[DB] Loading database...")
     db_marks = fetch_all_marks()
     if db_marks and len(db_marks) > 0:
-        print(f"[DB] Successfully loaded {len(db_marks)} marks from MySQL.")
-        return db_marks
+        print(f"[DB] Successfully loaded {len(db_marks)} marks from SQLite.")
+        return _merge_reference_library_entries(db_marks)
         
-    print("[DB] MySQL unavailable or empty, falling back to JSON...")
+    print("[DB] SQLite unavailable or empty, falling back to JSON...")
     if not os.path.exists(DATA_PATH):
-        return []
+        return _merge_reference_library_entries([])
     with open(DATA_PATH, "r", encoding="utf-8") as file:
-        return json.load(file)
+        return _merge_reference_library_entries(json.load(file))
+
+
+def _merge_reference_library_entries(entries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    merged = list(entries or [])
+    seen = set()
+
+    def remember(entry: Dict[str, Any]) -> None:
+        for target in _get_targets(entry):
+            norm = _normalize_cjk(target)
+            if norm:
+                seen.add(norm)
+
+    for entry in merged:
+        remember(entry)
+
+    added = 0
+    if os.path.isdir(REFERENCE_LIBRARY_PATH):
+        for filename in os.listdir(REFERENCE_LIBRARY_PATH):
+            if not filename.lower().endswith(".json"):
+                continue
+            path = os.path.join(REFERENCE_LIBRARY_PATH, filename)
+            try:
+                with open(path, "r", encoding="utf-8") as file:
+                    ref_entry = json.load(file)
+            except Exception as exc:
+                print(f"[DB] Skip reference entry {filename}: {exc}")
+                continue
+            targets = [_normalize_cjk(target) for target in _get_targets(ref_entry)]
+            targets = [target for target in targets if target]
+            if not targets or any(target in seen for target in targets):
+                continue
+            merged.append(ref_entry)
+            remember(ref_entry)
+            added += 1
+    if added:
+        print(f"[DB] Merged {added} reference-library entries into runtime database.")
+    return merged
 
 
 def _normalize_cjk(value: Optional[str]) -> str:
@@ -139,12 +184,16 @@ print("[Admin] Admin system initialized.")
 try:
     settings = get_system_settings()
     import config
-    if settings.get("gemini_api_key"):
+    if not config.GEMINI_API_KEY and settings.get("gemini_api_key"):
         config.GEMINI_API_KEY = settings["gemini_api_key"]
-        print("[Startup] Synced GEMINI_API_KEY from database.")
-    if settings.get("openai_api_key"):
+        print("[Startup] Synced GEMINI_API_KEY from database because env is empty.")
+    elif config.GEMINI_API_KEY:
+        print("[Startup] Using GEMINI_API_KEY from environment.")
+    if not config.OPENAI_API_KEY and settings.get("openai_api_key"):
         config.OPENAI_API_KEY = settings["openai_api_key"]
-        print("[Startup] Synced OPENAI_API_KEY from database.")
+        print("[Startup] Synced OPENAI_API_KEY from database because env is empty.")
+    elif config.OPENAI_API_KEY:
+        print("[Startup] Using OPENAI_API_KEY from environment.")
 except Exception as e:
     print(f"[Startup] Error syncing API keys from DB: {e}")
 
@@ -1147,6 +1196,17 @@ def read_privacy_page():
 def read_history_page():
     return _render_index_page("history")
 
+@app.get("/admin")
+@app.get("/admin/")
+def read_admin_page():
+    admin_path = os.path.join(os.path.dirname(__file__), "admin.html")
+    return FileResponse(admin_path, headers={"Cache-Control": "no-store"})
+
+@app.get("/flow-test")
+def read_flow_test_page():
+    flow_test_path = os.path.join(os.path.dirname(__file__), "flow-test.html")
+    return FileResponse(flow_test_path, headers={"Cache-Control": "no-store"})
+
 @app.get("/logo.png")
 def read_logo():
     logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
@@ -1711,10 +1771,11 @@ def get_credits(request: Request):
         return JSONResponse(status_code=401, content={"success": False, "message": "Chưa đăng nhập."})
     user_id = auth_header.split("Bearer ")[1]
     credits = get_user_credits(int(user_id))
-    return {"success": True, "credits": credits}
+    return JSONResponse(content={"success": True, "credits": credits}, headers={"Cache-Control": "no-store"})
 
 class BuyCreditsRequest(BaseModel):
     package: str  # 'pro' or 'enterprise'
+    payment_method: str = "bank"  # bank, momo, atm
 
 def get_packages_config():
     settings = get_system_settings()
@@ -1733,17 +1794,78 @@ def get_packages_config():
 
 @app.get("/api/v1/packages")
 def api_get_packages():
-    return {"success": True, "packages": get_packages_config()}
+    return JSONResponse(
+        content={"success": True, "packages": get_packages_config()},
+        headers={"Cache-Control": "no-store"},
+    )
 
 # Cấu hình thanh toán SePay
 SEPAY_API_KEY = "YOUR_SEPAY_API_KEY"
 ACCOUNT_NUMBER = "0852641851"
 BANK_ID = "OCB"
+BANK_BIN = "970448"
+ACCOUNT_NAME = "TRUONG XUA"
 NAME_WEB = "HIEUDEAI"
 SECRET_XOR_KEY = 0x5EAFB
 
 def encode_payment_id(p_id: int) -> str:
     return hex(p_id ^ SECRET_XOR_KEY)[2:].upper()
+
+def _emv_field(field_id: str, value: str) -> str:
+    value = str(value or "")
+    return f"{field_id}{len(value):02d}{value}"
+
+def _crc16_ccitt_false(payload: str) -> str:
+    crc = 0xFFFF
+    for byte in payload.encode("ascii", errors="ignore"):
+        crc ^= byte << 8
+        for _ in range(8):
+            if crc & 0x8000:
+                crc = ((crc << 1) ^ 0x1021) & 0xFFFF
+            else:
+                crc = (crc << 1) & 0xFFFF
+    return f"{crc:04X}"
+
+def _build_vietqr_payload(amount: int, content: str) -> str:
+    beneficiary = _emv_field("00", BANK_BIN) + _emv_field("01", ACCOUNT_NUMBER)
+    merchant_account = (
+        _emv_field("00", "A000000727")
+        + _emv_field("01", beneficiary)
+        + _emv_field("02", "QRIBFTTA")
+    )
+    payload = (
+        _emv_field("00", "01")
+        + _emv_field("01", "12")
+        + _emv_field("38", merchant_account)
+        + _emv_field("53", "704")
+        + _emv_field("54", str(int(amount)))
+        + _emv_field("58", "VN")
+        + _emv_field("59", ACCOUNT_NAME[:25])
+        + _emv_field("60", "CAN THO")
+        + _emv_field("62", _emv_field("08", content[:99]))
+    )
+    payload_for_crc = payload + "6304"
+    return payload_for_crc + _crc16_ccitt_false(payload_for_crc)
+
+def _create_local_payment_qr(payment_id: int, amount: int, content: str) -> Optional[str]:
+    try:
+        qr_payload = _build_vietqr_payload(amount, content)
+        encoder = cv2.QRCodeEncoder_create()
+        qr = encoder.encode(qr_payload)
+        if qr is None or getattr(qr, "size", 0) == 0:
+            return None
+        qr = cv2.copyMakeBorder(qr, 16, 16, 16, 16, cv2.BORDER_CONSTANT, value=255)
+        qr = cv2.resize(qr, (620, 620), interpolation=cv2.INTER_NEAREST)
+        qr_dir = os.path.join("uploads", "payment_qr")
+        os.makedirs(qr_dir, exist_ok=True)
+        filename = f"payment_{payment_id}.png"
+        path = os.path.join(qr_dir, filename)
+        if not cv2.imwrite(path, qr):
+            return None
+        return f"/uploads/payment_qr/{filename}"
+    except Exception as exc:
+        print(f"[Payment] Could not create local VietQR: {exc}")
+        return None
 
 @app.post("/api/v1/payment/create")
 async def create_payment_api(req: BuyCreditsRequest, request: Request):
@@ -1751,6 +1873,15 @@ async def create_payment_api(req: BuyCreditsRequest, request: Request):
     if not auth_header or not auth_header.startswith("Bearer "):
         return JSONResponse(status_code=401, content={"success": False, "message": "Chưa đăng nhập."})
     user_id = int(auth_header.split("Bearer ")[1])
+    if not get_user_by_id(user_id):
+        return JSONResponse(
+            status_code=401,
+            content={
+                "success": False,
+                "session_expired": True,
+                "message": "Phiên đăng nhập cũ không còn tồn tại sau khi chuyển sang SQLite. Vui lòng đăng nhập lại.",
+            },
+        )
     
     packages = get_packages_config()
     pkg = packages.get(req.package)
@@ -1759,12 +1890,21 @@ async def create_payment_api(req: BuyCreditsRequest, request: Request):
     
     payment_id = create_payment(user_id, pkg["amount"], pkg["credits"])
     if payment_id is None:
-        return JSONResponse(status_code=500, content={"error": "Không thể lưu giao dịch vào CSDL. Vui lòng kiểm tra MySQL (XAMPP) đã bật chưa."})
+        return JSONResponse(status_code=500, content={"error": "Khong the luu giao dich vao SQLite database."})
     
     hex_id = encode_payment_id(payment_id)
     content = f"{NAME_WEB}NAPTOKEN{hex_id}"
+    method_labels = {
+        "bank": "Bank Transfer via SePay",
+        "momo": "MoMo QR via SePay",
+        "atm": "ATM / Internet Banking via SePay",
+    }
+    payment_method = (req.payment_method or "bank").lower().strip()
+    if payment_method not in method_labels:
+        payment_method = "bank"
     
-    qr_url = f"https://img.vietqr.io/image/{BANK_ID}-{ACCOUNT_NUMBER}-compact2.png?amount={pkg['amount']}&addInfo={content}"
+    vietqr_url = f"https://img.vietqr.io/image/{BANK_ID}-{ACCOUNT_NUMBER}-compact2.png?amount={pkg['amount']}&addInfo={content}"
+    qr_url = _create_local_payment_qr(payment_id, pkg["amount"], content) or vietqr_url
     
     return {
         "success": True,
@@ -1772,7 +1912,10 @@ async def create_payment_api(req: BuyCreditsRequest, request: Request):
         "hex_id": hex_id,
         "amount": pkg["amount"],
         "content": content,
-        "qr_url": qr_url
+        "qr_url": qr_url,
+        "vietqr_url": vietqr_url,
+        "payment_method": payment_method,
+        "payment_label": method_labels[payment_method]
     }
 
 @app.get("/api/v1/payment/status/{payment_id}")
@@ -1859,12 +2002,242 @@ def buy_credits(data: BuyCreditsRequest, request: Request):
 class ChatMessage(BaseModel):
     message: str
 
+class ContactMessage(BaseModel):
+    name: str
+    email: str
+    message: str
+
+def _chat_fold(text: str) -> str:
+    text = (text or "").lower().strip()
+    text = unicodedata.normalize("NFD", text)
+    return "".join(ch for ch in text if unicodedata.category(ch) != "Mn")
+
+def _fallback_chat_reply(msg: str) -> str:
+    words = msg.split()
+    if any(k in msg for k in ["hello", "xin chao", "chao"]) or "hi" in words:
+        return "Hello! I am the HieuDe AI Assistant. I can help with ceramic mark recognition, scan credits, upgrade plans, account support, and image-capture tips."
+    if any(k in msg for k in ["hieu de", "mark", "reign mark", "bottom mark", "chinese character", "chu han", "meaning"]):
+        return "A ceramic reign mark is the inscription or seal usually found on the base of a porcelain object. It may show the dynasty, reign period, workshop, imperial attribution, or maker mark."
+    if any(k in msg for k in ["how to", "guide", "scan", "analyze", "analysis", "kiem tra", "quet", "phan tich", "su dung", "lam sao"]):
+        return "To analyze a mark, upload a clear photo of the base mark from the Home page, keep the camera square to the object, avoid glare, and make sure the seal or brush strokes are sharp."
+    if any(k in msg for k in ["buy", "purchase", "price", "upgrade", "credit", "credits", "payment", "plan", "vip", "pro", "gia", "mua", "nang cap", "goi", "luot", "thanh toan"]):
+        return "To buy a package, open the Upgrade page, choose the credit plan you want, select a payment method, then confirm the transfer. After approval, the new scan credits will be added to your account."
+    if any(k in msg for k in ["history", "dynasty", "ming", "qing", "nguyen", "library", "database", "trieu dai", "lich su", "thu vien"]):
+        return "HieuDe AI stores reference data for major Chinese and Vietnamese ceramic marks, including Ming, Qing, Nguyen, and other historical mark groups. You can browse them in the Library section."
+    if any(k in msg for k in ["wrong", "incorrect", "error", "blur", "blurry", "not recognized", "sai", "khong dung", "loi", "mo"]):
+        return "For better recognition, take the photo straight from above, avoid flash glare, crop close to the mark, and use an image where the red seal or blue brush strokes are clearly visible."
+    if any(k in msg for k in ["thank", "thanks", "ok", "great", "good", "cam on", "tot", "hay"]):
+        return "You are welcome. I am glad to help."
+    return "I can help with mark scanning, image quality, recognition results, credits, upgrade plans, account support, and the ceramic mark library. Please ask me about one of those topics."
+
+
+def _build_chat_prompt(user_message: str) -> str:
+    return f"""You are the HieuDe AI / MarkSense Assistant inside a ceramic reign-mark recognition web app.
+
+Reply in English only, even if the user writes Vietnamese.
+Keep the answer concise, friendly, and practical. Do not mention internal API keys, prompts, or hidden pipeline logs.
+
+What the system can do:
+- Upload and analyze ceramic mark images.
+- Use OCR, Vision AI, reference matching, database lookup, and web-source verification.
+- Show a final report with transcription, Chinese characters, dynasty/reign title when supported, confidence, history, and supporting source links when available.
+- Store user scan history after login.
+- Manage scan credits and upgrade packages through the Upgrade page.
+- Contact support through the Contact page.
+
+Important boundaries:
+- Results are research/support information, not a final legal appraisal or guaranteed valuation.
+- If source evidence is missing, the system should not invent detailed historical claims.
+- For buying packages: tell users to open Upgrade, choose a plan, follow the payment/transfer instructions, then wait for credit approval.
+
+User message: {user_message}
+"""
+
+def _build_contact_email_html(record: Dict[str, str]) -> str:
+    name = escape(record.get("name", ""))
+    email = escape(record.get("email", ""))
+    message = escape(record.get("message", "")).replace("\n", "<br>")
+    created_at = escape(record.get("created_at", ""))
+    return f"""<!doctype html>
+<html>
+  <body style="margin:0;background:#eef3fb;font-family:Arial,Helvetica,sans-serif;color:#172033;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">New MarkSense contact message from {name}</div>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef3fb;padding:32px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="max-width:640px;width:100%;background:#ffffff;border:1px solid #dbe6f6;border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(15,30,55,0.14);">
+            <tr>
+              <td style="padding:0;background:#0f1f3d;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td style="padding:28px 32px;">
+                      <div style="font-size:13px;letter-spacing:1.6px;text-transform:uppercase;color:#8fc5ff;font-weight:700;">MarkSense Contact</div>
+                      <h1 style="margin:10px 0 0;font-size:27px;line-height:1.25;color:#ffffff;font-weight:800;">New website inquiry</h1>
+                      <p style="margin:10px 0 0;font-size:15px;line-height:1.6;color:#c9d8ee;">A visitor submitted the contact form on the MarkSense website.</p>
+                    </td>
+                    <td width="96" align="center" style="padding:24px 28px 24px 0;">
+                      <div style="width:56px;height:56px;border-radius:16px;background:#2563eb;color:#ffffff;font-size:24px;font-weight:800;line-height:56px;text-align:center;">M</div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px 32px 26px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td style="padding:18px 20px;background:#f6f9fe;border:1px solid #e0e9f7;border-radius:14px;">
+                      <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:800;">Contact details</div>
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:14px;">
+                        <tr>
+                          <td style="font-size:13px;color:#718096;width:90px;padding:4px 0;">Name</td>
+                          <td style="font-size:16px;color:#0f172a;font-weight:700;padding:4px 0;">{name}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size:13px;color:#718096;width:90px;padding:4px 0;">Email</td>
+                          <td style="font-size:15px;color:#2563eb;font-weight:700;padding:4px 0;"><a href="mailto:{email}" style="color:#2563eb;text-decoration:none;">{email}</a></td>
+                        </tr>
+                        <tr>
+                          <td style="font-size:13px;color:#718096;width:90px;padding:4px 0;">Received</td>
+                          <td style="font-size:14px;color:#334155;padding:4px 0;">{created_at}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr><td style="height:16px;"></td></tr>
+                  <tr>
+                    <td style="padding:20px 20px;background:#ffffff;border:1px solid #dbe6f6;border-radius:14px;">
+                      <div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:800;margin-bottom:12px;">Message</div>
+                      <div style="font-size:16px;line-height:1.7;color:#172033;">{message}</div>
+                    </td>
+                  </tr>
+                  <tr><td style="height:22px;"></td></tr>
+                  <tr>
+                    <td>
+                      <a href="mailto:{email}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:800;padding:13px 20px;border-radius:10px;">Reply to sender</a>
+                      <span style="display:inline-block;margin-left:12px;font-size:13px;color:#64748b;">Sent from the MarkSense contact form</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:18px 32px;background:#f8fafc;color:#64748b;font-size:12px;line-height:1.55;border-top:1px solid #e2e8f0;">
+                This automated email was generated by MarkSense. You can reply directly to the sender using the button above.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>"""
+
+
+def _send_contact_email(record: Dict[str, str]) -> None:
+    from config import (
+        CONTACT_FROM_EMAIL,
+        CONTACT_RECIPIENT,
+        CONTACT_SMTP_HOST,
+        CONTACT_SMTP_PASSWORD,
+        CONTACT_SMTP_PORT,
+        CONTACT_SMTP_USER,
+    )
+
+    if not CONTACT_SMTP_HOST or not CONTACT_SMTP_USER or not CONTACT_SMTP_PASSWORD:
+        raise RuntimeError("SMTP is not configured. Please check CONTACT_SMTP_* in .env.")
+
+    sender = CONTACT_FROM_EMAIL or CONTACT_SMTP_USER
+    subject_name = (record.get("name") or "Website visitor").strip()
+    msg = EmailMessage()
+    msg["Subject"] = f"HieuDe AI Contact Request - {subject_name}"
+    msg["From"] = f"HieuDe AI Contact <{sender}>"
+    msg["To"] = CONTACT_RECIPIENT
+    msg["Reply-To"] = record.get("email", "")
+    text_body = (
+        "New HieuDe AI contact message\n\n"
+        f"Name: {record.get('name', '')}\n"
+        f"Email: {record.get('email', '')}\n"
+        f"Received: {record.get('created_at', '')}\n\n"
+        f"{record.get('message', '')}\n"
+    )
+    msg.set_content(text_body)
+    msg.add_alternative(_build_contact_email_html(record), subtype="html")
+
+    with smtplib.SMTP(CONTACT_SMTP_HOST, CONTACT_SMTP_PORT, timeout=20) as smtp:
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.ehlo()
+        smtp.login(CONTACT_SMTP_USER, CONTACT_SMTP_PASSWORD)
+        smtp.send_message(msg)
+
 @app.post("/api/chat")
 async def chat_bot(data: ChatMessage):
+    msg = _chat_fold(data.message)
+    resp = None
+    try:
+        from services.llm_service import call_llm
+        resp = await call_llm(
+            _build_chat_prompt(data.message.strip()),
+            temperature=0.2,
+            max_tokens=220,
+            retry=0,
+        )
+    except Exception as exc:
+        print(f"[Chat] LLM unavailable, using fallback: {exc}")
+    if not resp:
+        resp = _fallback_chat_reply(msg)
+    return {"reply": resp}
+
+
+@app.post("/contact/send")
+async def send_contact_message(data: ContactMessage):
+    name = (data.name or "").strip()
+    email = (data.email or "").strip()
+    message = (data.message or "").strip()
+    if not name or not email or not message:
+        return JSONResponse(
+            status_code=400,
+            content={"success": False, "message": "Please fill in all contact fields."},
+        )
+
+    contact_path = os.path.join(os.path.dirname(__file__), "data", "contact_messages.jsonl")
+    os.makedirs(os.path.dirname(contact_path), exist_ok=True)
+    record = {
+        "created_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "name": name,
+        "email": email,
+        "message": message,
+        "to": "xuatruong30@gmail.com",
+    }
+    try:
+        with open(contact_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception as exc:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "message": f"Could not save message: {exc}"},
+        )
+
+    try:
+        _send_contact_email(record)
+    except Exception as exc:
+        return JSONResponse(
+            status_code=502,
+            content={
+                "success": False,
+                "message": f"Message was saved, but email delivery failed: {exc}",
+            },
+        )
+
+    return {"success": True, "message": "Message sent to xuatruong30@gmail.com."}
+
+
+async def _unused_old_chat_block():
     msg = data.message.lower().strip()
     words = msg.split()
     if any(k in msg for k in ["chào", "hello", "xin chào"]) or "hi" in words:
-        resp = "Chào bạn! Tôi là trợ lý MarkSense AI. Tôi có thể giúp bạn giải đáp các thông tin về nhận dạng hiệu đề gốm sứ và hỗ trợ sử dụng hệ thống."
+        resp = "Chào bạn! Tôi là trợ lý HieuDe AI. Tôi có thể giúp bạn giải đáp các thông tin về nhận dạng hiệu đề gốm sứ và hỗ trợ sử dụng hệ thống."
     elif any(k in msg for k in ["hiệu đề là gì", "hiệu đề", "đáy gốm", "chữ hán", "khái niệm", "ý nghĩa"]):
         resp = "Hiệu đề là dòng chữ nhỏ in dưới đáy các món đồ gốm sứ (thường gồm 4 hoặc 6 chữ Hán/Nôm), chỉ rõ niên hiệu của triều đại hoàng đế trị vì hoặc phiên hiệu xưởng sản xuất."
     elif any(k in msg for k in ["cách dùng", "hướng dẫn", "giám định", "kiểm tra", "quét", "phân tích", "chỉ tôi", "làm sao", "làm thế nào", "sử dụng", "tìm hiểu"]):
@@ -1872,7 +2245,7 @@ async def chat_bot(data: ChatMessage):
     elif any(k in msg for k in ["giá", "nâng cấp", "lượt", "bao nhiêu", "tiền", "mua", "vip", "pro", "thanh toán", "gói cước"]):
         resp = "Tài khoản mới sẽ có sẵn một số lượt phân tích. Nếu cần nhiều hơn, bạn có thể Nâng cấp tài khoản. Gói Chuyên Nghiệp (17$/tháng) tặng 200 lượt phân tích tốc độ cao. Gói Tối Đa (100$/tháng) cho phép quét không giới hạn."
     elif any(k in msg for k in ["lịch sử", "triều đại", "minh", "thanh", "nguyễn", "nhà minh", "nhà thanh", "thư viện", "dữ liệu"]):
-        resp = "Dữ liệu MarkSense lưu trữ lịch sử hàng trăm hiệu đề lớn nhỏ suốt các triều Đại Minh, Đại Thanh (Trung Quốc) lẫn dòng gốm ngự dụng nhà Nguyễn (Việt Nam). Bạn có thể bấm sang 'Thư viện' để xem bộ Bách Khoa Toàn Thư nhé."
+        resp = "Dữ liệu HieuDe AI lưu trữ lịch sử hàng trăm hiệu đề lớn nhỏ suốt các triều Đại Minh, Đại Thanh (Trung Quốc) lẫn dòng gốm ngự dụng nhà Nguyễn (Việt Nam). Bạn có thể bấm sang 'Thư viện' để xem bộ Bách Khoa Toàn Thư nhé."
     elif any(k in msg for k in ["sai", "không đúng", "lỗi", "mờ", "không nhận ra", "không dịch được"]):
         resp = "Để tăng tối đa độ chính xác (OCR), bạn vui lòng chụp ảnh căn góc từ trên xuống, hạn chế ánh đèn flash chiếu lóa bề mặt sứ và đảm bảo các vết mực rạn phải rõ nét nhất có thể."
     elif any(k in msg for k in ["cảm ơn", "thanks", "ok", "tuyệt", "hay", "tốt", "hiểu rồi"]):
@@ -1924,6 +2297,9 @@ class AdminMarkData(BaseModel):
 class AdminSettingUpdate(BaseModel):
     key: str
     value: str
+
+class AdminApplyFreeCredits(BaseModel):
+    amount: int
 
 class AdminPageOverridesUpdate(BaseModel):
     overrides: Dict[str, List[Dict[str, Any]]]
@@ -2248,6 +2624,29 @@ def admin_settings(request: Request):
     settings = get_system_settings()
     return {"success": True, "settings": settings}
 
+@app.get("/api/admin/database-info")
+def admin_database_info(request: Request):
+    admin = _verify_admin(request)
+    if not admin:
+        return JSONResponse(status_code=401, content={"success": False, "message": "Unauthorized"})
+    db_path = os.path.abspath(SQLITE_DB_PATH)
+    app_dir = os.path.dirname(__file__)
+    try:
+        display_path = os.path.relpath(db_path, app_dir)
+    except ValueError:
+        display_path = db_path
+    exists = os.path.exists(db_path)
+    return {
+        "success": True,
+        "engine": "SQLite",
+        "path": display_path.replace("\\", "/"),
+        "absolute_path": db_path,
+        "exists": exists,
+        "size_bytes": os.path.getsize(db_path) if exists else 0,
+        "xampp_required": False,
+        "mysql_required": False,
+    }
+
 def update_env_file(key: str, value: str):
     env_path = os.path.join(os.path.dirname(__file__), ".env")
     if not os.path.exists(env_path):
@@ -2293,6 +2692,18 @@ def admin_update_settings(data: AdminSettingUpdate, request: Request):
         apply_api_keys(data.key, data.value)
         update_env_file(data.key, data.value)
     return {"success": success, "message": "Đã cập nhật cài đặt" if success else "Lỗi"}
+
+@app.post("/api/admin/users/apply-free-credits")
+def admin_apply_free_credits(data: AdminApplyFreeCredits, request: Request):
+    admin = _verify_admin(request)
+    if not admin:
+        return JSONResponse(status_code=401, content={"success": False, "message": "Unauthorized"})
+    success, updated = apply_free_credits_to_unpaid_users(data.amount)
+    return {
+        "success": success,
+        "updated": updated,
+        "message": f"Applied free scan credits to {updated} unpaid users" if success else "Could not apply free credits",
+    }
 
 
 @app.post("/api/admin/page-overrides")
@@ -2343,6 +2754,247 @@ def admin_save_app_page(page_id: str, data: AdminAppPageUpdate, request: Request
 # ============================================================
 # NCKH Multi-Pipeline API Endpoints
 # ============================================================
+
+def _slug_json_filename_part(value: str) -> str:
+    safe = "".join(ch.lower() if ch.isalnum() else "-" for ch in str(value or "agent"))
+    safe = "-".join(part for part in safe.split("-") if part)
+    return safe or "agent"
+
+
+def _attach_pipeline_json_manifest(result: Dict[str, Any]) -> None:
+    """Expose one downloadable JSON payload per pipeline/agent in the API response."""
+    details = result.get("pipeline_details") or result.get("pipeline_results") or []
+    if not isinstance(details, list):
+        return
+
+    result["pipeline_results"] = details
+    files = []
+    for index, item in enumerate(details, start=1):
+        if not isinstance(item, dict):
+            continue
+        pipeline_name = item.get("pipeline_name") or item.get("name") or f"pipeline_{index}"
+        agent_name = item.get("agent_name") or item.get("agent") or pipeline_name
+        files.append({
+            "filename": f"marksense-{_slug_json_filename_part(agent_name)}.json",
+            "pipeline_name": pipeline_name,
+            "agent_name": agent_name,
+            "content": {
+                "pipeline_name": pipeline_name,
+                "agent_name": agent_name,
+                "result": item,
+            },
+        })
+
+    result["pipeline_json_files"] = files
+    result["agent_json_files"] = files
+
+
+def _save_crop_artifact(
+    image_bytes: bytes,
+    crop: Dict[str, Any],
+    run_id: str,
+    pipeline_name: str,
+) -> Optional[Dict[str, Any]]:
+    try:
+        artifact_dir = os.path.join("uploads", "nckh_artifacts")
+        os.makedirs(artifact_dir, exist_ok=True)
+        filename = f"{run_id}_{_slug_json_filename_part(pipeline_name)}_vision_crop.jpg"
+        path = os.path.join(artifact_dir, filename)
+
+        if crop.get("image_base64"):
+            import base64
+            with open(path, "wb") as f:
+                f.write(base64.b64decode(crop["image_base64"]))
+        else:
+            arr = np.frombuffer(image_bytes, np.uint8)
+            img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+            if img is None:
+                return None
+            h_img, w_img = img.shape[:2]
+            x = int(max(0, min(w_img - 1, int(crop.get("x", 0)))))
+            y = int(max(0, min(h_img - 1, int(crop.get("y", 0)))))
+            w = int(max(1, int(crop.get("w", w_img))))
+            h = int(max(1, int(crop.get("h", h_img))))
+            x2 = min(w_img, x + w)
+            y2 = min(h_img, y + h)
+            cropped = img[y:y2, x:x2]
+            if cropped.size == 0:
+                return None
+            scale = float(crop.get("scale") or 1.0)
+            if scale > 1.05:
+                cropped = cv2.resize(cropped, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+            if not cv2.imwrite(path, cropped):
+                return None
+
+        meta = {k: v for k, v in crop.items() if k != "image_base64"}
+        return {
+            "label": "Vision crop used for analysis",
+            "kind": "vision_crop",
+            "url": f"/uploads/nckh_artifacts/{filename}",
+            "meta": meta,
+        }
+    except Exception as exc:
+        print("Failed to save vision crop artifact:", exc)
+        return None
+
+
+def _copy_ocr_debug_artifacts(run_id: str, image_bytes: bytes) -> List[Dict[str, Any]]:
+    """Build OCR visual artifacts from the current request image only."""
+    artifact_dir = os.path.join("uploads", "nckh_artifacts")
+    os.makedirs(artifact_dir, exist_ok=True)
+    artifacts: List[Dict[str, Any]] = []
+
+    arr = np.frombuffer(image_bytes, np.uint8)
+    original = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+    if original is None:
+        return artifacts
+
+    def save_artifact(label: str, kind: str, base_name: str, img) -> Optional[str]:
+        if img is None or getattr(img, "size", 0) == 0:
+            return None
+        dest_name = f"{run_id}_{base_name}.jpg"
+        dest = os.path.join(artifact_dir, dest_name)
+        try:
+            if cv2.imwrite(dest, img):
+                artifacts.append({
+                    "label": label,
+                    "kind": kind,
+                    "url": f"/uploads/nckh_artifacts/{dest_name}",
+                })
+                return dest
+        except Exception as exc:
+            print("Failed to save OCR artifact:", base_name, exc)
+        return None
+
+    def add_processed_variants(img, base_name: str) -> None:
+        try:
+            if img is None or getattr(img, "size", 0) == 0:
+                return
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+            gray_boost = clahe.apply(gray)
+            blur = cv2.medianBlur(gray_boost, 3)
+            adapt = cv2.adaptiveThreshold(
+                blur,
+                255,
+                cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                cv2.THRESH_BINARY,
+                31,
+                8,
+            )
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (17, 17))
+            blackhat = cv2.morphologyEx(gray_boost, cv2.MORPH_BLACKHAT, kernel)
+            _, blackhat_bw = cv2.threshold(blackhat, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+            variants = {
+                "gray": gray_boost,
+                "adaptive_bw": adapt,
+                "blackhat_bw": blackhat_bw,
+            }
+            for variant_name, variant_img in variants.items():
+                dest_name = f"{run_id}_{base_name}_{variant_name}.jpg"
+                dest = os.path.join(artifact_dir, dest_name)
+                if cv2.imwrite(dest, variant_img):
+                    artifacts.append({
+                        "label": f"OCR {base_name} {variant_name}",
+                        "kind": "ocr_processed_bw",
+                        "url": f"/uploads/nckh_artifacts/{dest_name}",
+                    })
+        except Exception as exc:
+            print("Failed to create OCR processed variants:", base_name, exc)
+
+    save_artifact("OCR original image", "ocr_debug", "00_current_original", original)
+
+    try:
+        from ocr_engine import (
+            detect_yellow_mark_roi,
+            detect_inner_mark_circle_roi,
+            detect_center_square_roi,
+            detect_ink_text_roi,
+            extract_center_box_roi,
+        )
+
+        roi_builders = [
+            ("OCR ROI candidate", "01_current_roi_candidate", detect_yellow_mark_roi),
+            ("OCR circle ROI", "01_current_circle_roi", detect_inner_mark_circle_roi),
+            ("OCR square ROI", "01_current_square_roi", detect_center_square_roi),
+            ("OCR center box ROI", "01_current_center_box_roi", extract_center_box_roi),
+            ("OCR ink/mark ROI", "01_current_ink_roi", detect_ink_text_roi),
+        ]
+        seen_shapes = set()
+        for label, base_name, builder in roi_builders:
+            roi = builder(original)
+            if roi is None or getattr(roi, "size", 0) == 0:
+                continue
+            shape_key = (roi.shape[0], roi.shape[1], int(np.mean(roi)))
+            if shape_key in seen_shapes:
+                continue
+            seen_shapes.add(shape_key)
+            save_artifact(label, "ocr_debug", base_name, roi)
+            add_processed_variants(roi, base_name)
+    except Exception as exc:
+        print("Failed to build current OCR ROI artifacts:", exc)
+
+    return artifacts
+
+
+def _attach_pipeline_image_artifacts(
+    result: Dict[str, Any],
+    image_bytes: bytes,
+) -> None:
+    """Attach per-pipeline crop/ROI images that the test UI can render."""
+    import uuid
+
+    details = result.get("pipeline_details") or result.get("pipeline_results") or []
+    if not isinstance(details, list):
+        return
+
+    run_id = uuid.uuid4().hex[:10]
+    ocr_artifacts = _copy_ocr_debug_artifacts(run_id, image_bytes)
+    image_search_artifact = None
+
+    artifact_dir = os.path.join("uploads", "nckh_artifacts")
+    os.makedirs(artifact_dir, exist_ok=True)
+    search_filename = f"{run_id}_img_search_input.jpg"
+    search_path = os.path.join(artifact_dir, search_filename)
+    try:
+        with open(search_path, "wb") as f:
+            f.write(image_bytes)
+        image_search_artifact = {
+            "label": "Image search input",
+            "kind": "image_search_input",
+            "url": f"/uploads/nckh_artifacts/{search_filename}",
+        }
+    except Exception as exc:
+        print("Failed to save image search artifact:", exc)
+
+    for item in details:
+        if not isinstance(item, dict):
+            continue
+        pipeline_name = item.get("pipeline_name") or item.get("name") or "pipeline"
+        images: List[Dict[str, Any]] = []
+        extra = item.get("extra_data") if isinstance(item.get("extra_data"), dict) else {}
+
+        if pipeline_name in {"ocr_llm", "ocr_search", "ml_match", "text_vote"}:
+            images.extend(ocr_artifacts)
+
+        if pipeline_name.startswith("vision"):
+            crop = extra.get("crop")
+            if isinstance(crop, dict):
+                crop_artifact = _save_crop_artifact(image_bytes, crop, run_id, pipeline_name)
+                if crop_artifact:
+                    images.append(crop_artifact)
+
+        if pipeline_name == "img_search" and image_search_artifact:
+            images.append(image_search_artifact)
+
+        item["analysis_images"] = images
+        if extra is not item:
+            extra["analysis_images"] = images
+            item["extra_data"] = extra
+
+    result["pipeline_details"] = details
+    result["pipeline_results"] = details
 
 @app.post("/api/nckh/analyze")
 async def nckh_analyze_endpoint(
@@ -2438,6 +3090,7 @@ async def nckh_analyze_endpoint(
                 image_bytes,
                 database=REIGN_DATABASE,
                 pipelines=pipeline_list,
+                timeout=240,
             )
         elif mode == "deep":
             result = await analyze_deep(image_bytes, database=REIGN_DATABASE)
@@ -2447,6 +3100,8 @@ async def nckh_analyze_endpoint(
         new_credits = _save_nckh_history(image_bytes, result)
         if isinstance(result, dict):
             result.setdefault("success", True)
+            _attach_pipeline_image_artifacts(result, image_bytes)
+            _attach_pipeline_json_manifest(result)
             if new_credits is not None:
                 result["credits"] = new_credits
 
@@ -2464,7 +3119,7 @@ async def nckh_analyze_endpoint(
 @app.get("/api/nckh/status")
 async def nckh_status():
     """Kiểm tra trạng thái hệ thống Multi-Pipeline."""
-    from config import GEMINI_API_KEY, OPENAI_API_KEY, GOOGLE_CSE_API_KEY, PRIMARY_LLM
+    from config import GEMINI_API_KEY, OPENAI_API_KEY, GOOGLE_CSE_API_KEY, PRIMARY_LLM, OLLAMA_VISION_MODEL, OPENCODE_VISION_MODEL
     
     status = {
         "system": "NCKH Multi-Pipeline",
@@ -2473,7 +3128,9 @@ async def nckh_status():
         "gemini_configured": bool(GEMINI_API_KEY and GEMINI_API_KEY != "your_gemini_api_key_here"),
         "openai_configured": bool(OPENAI_API_KEY and OPENAI_API_KEY != "your_openai_api_key_here"),
         "google_cse_configured": bool(GOOGLE_CSE_API_KEY and GOOGLE_CSE_API_KEY != "your_google_cse_api_key_here"),
-        "pipelines": ["ocr_llm", "ocr_search", "img_search", "ml_match"],
+        "opencode_vision_model": OPENCODE_VISION_MODEL,
+        "ollama_vision_model": OLLAMA_VISION_MODEL,
+        "pipelines": ["ocr_llm", "ocr_search", "vision_gemini", "vision_opencode", "text_vote", "img_search", "ml_match"],
         "database_size": len(REIGN_DATABASE),
     }
     

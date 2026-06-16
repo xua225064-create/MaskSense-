@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MarkSense — Admin Panel</title>
-<link rel="icon" type="image/png" href="/uploads/favicon.png">
-<link rel="shortcut icon" type="image/png" href="/uploads/favicon.png">
+<link rel="icon" type="image/svg+xml" href="/uploads/marksense-mark.svg">
+<link rel="alternate icon" type="image/png" href="/uploads/favicon-marksense.png">
+<link rel="apple-touch-icon" href="/uploads/favicon-marksense.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 <style>
@@ -326,7 +327,11 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
       </div>
 
     </div>
-    <div style="text-align:right;margin-top:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:10px;color:var(--text2);font-size:13px;cursor:pointer;">
+        <input type="checkbox" id="apply_free_existing" style="width:auto;">
+        Apply initial free scans to existing users with no completed payments
+      </label>
       <button class="btn btn-primary" onclick="savePackages()"><i class="fas fa-save"></i> Update Packages</button>
     </div>
   </div>
@@ -464,7 +469,16 @@ padding:8px 12px;color:var(--text);font-size:14px;text-align:right;outline:none}
       <div class="info"><div class="name">Version</div><div class="desc">MarkSense AI Admin Panel v1.0</div></div>
     </div>
     <div class="setting-row">
-      <div class="info"><div class="name">Backend</div><div class="desc">FastAPI + PaddleOCR + MySQL</div></div>
+      <div class="info"><div class="name">Backend</div><div class="desc" id="backendInfo">FastAPI + PaddleOCR + SQLite</div></div>
+    </div>
+    <div class="setting-row">
+      <div class="info"><div class="name">Database engine</div><div class="desc" id="databaseEngineInfo">SQLite</div></div>
+    </div>
+    <div class="setting-row">
+      <div class="info"><div class="name">Database file</div><div class="desc" id="databasePathInfo">Loading...</div></div>
+    </div>
+    <div class="setting-row">
+      <div class="info"><div class="name">Storage status</div><div class="desc" id="databaseStatusInfo">Checking...</div></div>
     </div>
     <div class="setting-row">
       <div class="info"><div class="name">Total marks</div><div class="desc" id="totalMarksInfo">Loading...</div></div>
@@ -767,6 +781,7 @@ function renderUsers(users) {
       <td style="font-size:12px">${u.created_at || ''}</td>
       <td>
         <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-ghost" onclick="openCreditModal(${u.id})" title="Update scans"><i class="fas fa-coins"></i></button>
           ${u.role === 'admin' ? '<span class="badge badge-yellow">Admin</span>' : `<button class="btn btn-sm btn-red" onclick="deleteUser(${u.id})" title="Delete"><i class="fas fa-trash"></i></button>`}
         </div>
       </td>
@@ -792,7 +807,12 @@ async function submitCredits() {
   try {
     const r = await fetch(API + '/api/admin/users/credits', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ user_id: parseInt(uid), amount, action }) });
     const d = await r.json();
-    if (d.success) { toast('Credits updated successfully!', 'success'); closeModal('creditModal'); loadUsers(); }
+    if (d.success) {
+      toast('Credits updated and synced to website', 'success');
+      closeModal('creditModal');
+      notifyWebsiteSync();
+      loadUsers();
+    }
     else toast(d.message || 'Error', 'error');
   } catch (e) { toast('Connection error', 'error'); }
 }
@@ -806,13 +826,13 @@ async function lockUser(id) {
   if (!ok) return;
   const r = await fetch(API + `/api/admin/users/lock/${id}`, { method: 'POST', headers: authHeaders() });
   const d = await r.json();
-  if (d.success) { toast('Account locked', 'success'); loadUsers(); } else toast('Error', 'error');
+  if (d.success) { toast('Account locked', 'success'); notifyWebsiteSync(); loadUsers(); } else toast('Error', 'error');
 }
 
 async function unlockUser(id) {
   const r = await fetch(API + `/api/admin/users/unlock/${id}`, { method: 'POST', headers: authHeaders() });
   const d = await r.json();
-  if (d.success) { toast('Account unlocked', 'success'); loadUsers(); } else toast('Error', 'error');
+  if (d.success) { toast('Account unlocked', 'success'); notifyWebsiteSync(); loadUsers(); } else toast('Error', 'error');
 }
 
 function openResetPwd(userId) {
@@ -865,7 +885,32 @@ async function savePackages() {
       return fetch(API + '/api/admin/settings', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ key, value: val }) });
     });
     const results = await Promise.all(promises);
-    toast('Packages updated successfully!', 'success');
+    const payloads = await Promise.all(results.map(r => r.json().catch(() => ({}))));
+    const failed = results.findIndex((r, index) => !r.ok || !payloads[index].success);
+    if (failed >= 0) {
+      if (results[failed].status === 401) clearInvalidAdminSession();
+      toast(payloads[failed].message || 'Could not update packages', 'error');
+      return;
+    }
+    const applyExisting = document.getElementById('apply_free_existing')?.checked;
+    let appliedCount = null;
+    if (applyExisting) {
+      const freeAmount = parseInt(document.getElementById('package_free_credits').value) || 0;
+      const applyResp = await fetch(API + '/api/admin/users/apply-free-credits', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ amount: freeAmount })
+      });
+      const applyData = await applyResp.json().catch(() => ({}));
+      if (!applyResp.ok || !applyData.success) {
+        toast(applyData.message || 'Packages saved, but could not apply free scans to existing users', 'error');
+        return;
+      }
+      appliedCount = applyData.updated || 0;
+    }
+    await loadSettings();
+    notifyWebsiteSync();
+    toast(appliedCount === null ? 'Packages updated and synced to website' : `Packages updated. Applied free scans to ${appliedCount} users`, 'success');
   } catch (e) { toast('Connection error while saving packages', 'error'); }
 }
 
@@ -879,7 +924,7 @@ async function deleteUser(id) {
   try {
     const r = await fetch(API + `/api/admin/users/${id}`, { method: 'DELETE', headers: authHeaders() });
     const d = await r.json();
-    if (d.success) { toast(d.message || 'User deleted', 'success'); loadUsers(); loadDashboard(); }
+    if (d.success) { toast(d.message || 'User deleted', 'success'); notifyWebsiteSync(); loadUsers(); loadDashboard(); }
     else toast(d.message || 'Error deleting user', 'error');
   } catch (e) { toast('Connection error', 'error'); }
 }
@@ -1004,7 +1049,7 @@ async function submitMark() {
       r = await fetch(API + '/api/admin/marks', { method: 'POST', headers: authHeaders(), body: JSON.stringify(data) });
     }
     const d = await r.json();
-    if (d.success) { toast(d.message, 'success'); closeModal('markModal'); loadMarks(); }
+    if (d.success) { toast(d.message, 'success'); notifyWebsiteSync(); closeModal('markModal'); loadMarks(); }
     else toast(d.message || 'Error', 'error');
   } catch (e) { toast('Connection error', 'error'); }
 }
@@ -1018,7 +1063,7 @@ async function deleteMark(id) {
   if (!ok) return;
   const r = await fetch(API + `/api/admin/marks/${id}`, { method: 'DELETE', headers: authHeaders() });
   const d = await r.json();
-  if (d.success) { toast('Mark deleted', 'success'); loadMarks(); } else toast('Error', 'error');
+  if (d.success) { toast('Mark deleted', 'success'); notifyWebsiteSync(); loadMarks(); } else toast('Error', 'error');
 }
 
 // ===== SCANS =====
@@ -1073,25 +1118,29 @@ const PAGE_ROOTS = {
   guide: '#pg-guide',
   privacy: '#pg-privacy',
   terms: '#pg-terms',
+  'data-deletion': '#pg-data-deletion',
+  support: '#pg-support',
   faq: '#pg-faq',
   header: 'body > nav',
   footer: '.site-footer',
 };
 const WEB_PAGES = [
-  { id: 'home', name: 'Home', slug: '/home', root: '#pg-home' },
-  { id: 'auth', name: 'Login / Register', slug: '/login, /register', root: '#pg-auth' },
-  { id: 'history', name: 'Analysis History', slug: '/history', root: '#pg-history' },
-  { id: 'library', name: 'Mark Library', slug: '/library', root: '#pg-library' },
-  { id: 'pricing', name: 'Pricing', slug: '/pricing', root: '#pg-pricing' },
-  { id: 'checkout', name: 'Checkout', slug: '/checkout', root: '#pg-checkout' },
-  { id: 'profile', name: 'User Profile', slug: '/profile', root: '#pg-profile' },
-  { id: 'tx-history', name: 'Transaction History', slug: '/tx-history', root: '#pg-tx-history' },
-  { id: 'about', name: 'About Us', slug: '/about', root: '#pg-about' },
+  { id: 'home', name: 'Home', slug: '/', root: '#pg-home' },
+  { id: 'history', name: 'History', slug: '/history', root: '#pg-history' },
+  { id: 'library', name: 'Library', slug: '/library', root: '#pg-library' },
+  { id: 'about', name: 'About', slug: '/about', root: '#pg-about' },
   { id: 'contact', name: 'Contact', slug: '/contact', root: '#pg-contact' },
+  { id: 'pricing', name: 'Upgrade / Pricing', slug: '/pricing', root: '#pg-pricing' },
+  { id: 'auth', name: 'Sign In / Register', slug: '/login, /register', root: '#pg-auth' },
+  { id: 'profile', name: 'Profile', slug: '/profile', root: '#pg-profile' },
+  { id: 'tx-history', name: 'Transaction History', slug: '/tx-history', root: '#pg-tx-history' },
+  { id: 'checkout', name: 'Checkout', slug: '/checkout', root: '#pg-checkout' },
   { id: 'guide', name: 'Guide', slug: '/guide', root: '#pg-guide' },
+  { id: 'support', name: 'Support', slug: '/support', root: '#pg-support' },
+  { id: 'faq', name: 'FAQ', slug: '/faq', root: '#pg-faq' },
   { id: 'privacy', name: 'Privacy Policy', slug: '/privacy', root: '#pg-privacy' },
   { id: 'terms', name: 'Terms of Service', slug: '/terms', root: '#pg-terms' },
-  { id: 'faq', name: 'FAQ', slug: '/faq', root: '#pg-faq' },
+  { id: 'data-deletion', name: 'Data Deletion', slug: '/data-deletion', root: '#pg-data-deletion' },
   { id: 'header', name: 'Header', slug: '/header', root: 'body > nav' },
   { id: 'footer', name: 'Footer', slug: '/footer', root: '.site-footer' },
 ];
@@ -1127,6 +1176,10 @@ function setPageOverrides(overrides) {
   localStorage.setItem('admin_page_overrides', JSON.stringify(overrides));
 }
 
+function notifyWebsiteSync() {
+  localStorage.setItem('marksense_admin_settings_updated', String(Date.now()));
+}
+
 async function loadPageOverridesFromServer() {
   try {
     const r = await fetch(API + '/api/page-overrides?t=' + Date.now(), { cache: 'no-store' });
@@ -1144,7 +1197,15 @@ async function savePageOverridesToServer(overrides) {
     body: JSON.stringify({ overrides })
   });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok || !d.success) throw new Error(d.message || 'Loi luu noi dung page');
+  if (r.status === 401) {
+    clearInvalidAdminSession();
+    throw new Error('Admin session expired. Please sign in again.');
+  }
+  if (!r.ok || !d.success) throw new Error(d.message || 'Could not save page changes');
+  const verify = await fetch(API + '/api/page-overrides?t=' + Date.now(), { cache: 'no-store' });
+  const verifyData = await verify.json().catch(() => ({}));
+  if (!verify.ok || !verifyData.success) throw new Error('Saved, but could not verify page changes');
+  setPageOverrides(verifyData.overrides || {});
 }
 
 async function loadPageManager() {
@@ -1174,7 +1235,7 @@ function renderPageCatalog() {
     const status = count ? `<span class="badge badge-yellow">${count} items</span>` : '<span style="color:var(--text3)">Default</span>';
     const action = pageSource === 'web'
       ? `<button class="btn btn-sm btn-ghost" onclick="editCatalogPage('${page.id}')">Edit</button>
-         <button class="btn btn-sm btn-red" onclick="clearCatalogPage('${page.id}')">Delete</button>`
+         ${count ? `<button class="btn btn-sm btn-red" onclick="clearCatalogPage('${page.id}')">Clear</button>` : ''}`
       : `<button class="btn btn-sm btn-ghost" onclick="editAppCatalogPage('${page.id}')">Edit</button>`;
     return `
       <tr>
@@ -1415,12 +1476,19 @@ async function savePageFieldOverrides() {
     if (value === field.value) return null;
     return { type: field.type, rootSelector: field.rootSelector, path: field.path, value };
   }).filter(Boolean);
+  if (!edited.length && !retained.length) {
+    toast('No page changes to save', 'info');
+    return;
+  }
   overrides[selectedPageId] = [...retained, ...edited];
   if (!overrides[selectedPageId].length) delete overrides[selectedPageId];
-  setPageOverrides(overrides);
-  await savePageOverridesToServer(overrides);
-  renderPageCatalog();
-  toast('Page changes saved', 'success');
+  try {
+    await savePageOverridesToServer(overrides);
+    renderPageCatalog();
+    toast('Page changes saved and synced to website', 'success');
+  } catch (e) {
+    toast(e.message || 'Could not save page changes', 'error');
+  }
 }
 
 async function clearSelectedPageOverrides() {
@@ -1458,6 +1526,19 @@ async function loadSettings() {
     const r2 = await fetch(API + '/api/admin/dashboard', { headers: authHeaders() });
     const d2 = await r2.json();
     if (d2.success) document.getElementById('totalMarksInfo').textContent = `${d2.stats.total_marks || 0} marks in the system`;
+
+    const r3 = await fetch(API + '/api/admin/database-info', { headers: authHeaders() });
+    const d3 = await r3.json();
+    if (d3.success) {
+      document.getElementById('backendInfo').textContent = 'FastAPI + PaddleOCR + SQLite';
+      document.getElementById('databaseEngineInfo').textContent = d3.engine || 'SQLite';
+      document.getElementById('databasePathInfo').textContent = d3.path || 'data/marksense.sqlite3';
+      const size = typeof d3.size_bytes === 'number' ? `, ${formatBytes(d3.size_bytes)}` : '';
+      const noXampp = !d3.xampp_required && !d3.mysql_required;
+      document.getElementById('databaseStatusInfo').textContent = d3.exists
+        ? `Connected${size}${noXampp ? ' - no XAMPP/MySQL required' : ''}`
+        : 'SQLite file not found';
+    }
   } catch (e) { console.error(e); }
 }
 
@@ -1466,9 +1547,107 @@ async function saveSetting(key) {
   try {
     const r = await fetch(API + '/api/admin/settings', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ key, value }) });
     const d = await r.json();
-    if (d.success) toast('Settings saved!', 'success'); else toast('Error', 'error');
+    if (r.status === 401) { clearInvalidAdminSession(); return; }
+    if (d.success) {
+      await loadSettings();
+      notifyWebsiteSync();
+      toast(key.includes('api_key') ? 'API key saved and applied to backend' : 'Settings saved and synced', 'success');
+    } else toast(d.message || 'Error', 'error');
   } catch (e) { toast('Connection error', 'error'); }
 }
+
+function formatBytes(bytes) {
+  if (!bytes) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit++;
+  }
+  return `${value.toFixed(unit ? 1 : 0)} ${units[unit]}`;
+}
+
+function decodeMojibakeText(text) {
+  if (!/[ÃÂâ]/.test(text || '')) return text;
+  const cp1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
+  let out = text;
+  for (let pass = 0; pass < 3; pass++) {
+    const bytes = [];
+    for (const ch of out) {
+      const code = ch.charCodeAt(0);
+      if (code <= 0xFF) bytes.push(code);
+      else if (cp1252[code]) bytes.push(cp1252[code]);
+      else return out;
+    }
+    try {
+      const next = new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(bytes));
+      if (next === out) break;
+      out = next;
+    } catch (e) { break; }
+  }
+  return out;
+}
+
+function sanitizeVisibleText() {
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+  const nodes = [];
+  while (walker.nextNode()) if (/[ÃÂâ]/.test(walker.currentNode.nodeValue || '')) nodes.push(walker.currentNode);
+  nodes.forEach(node => { node.nodeValue = decodeMojibakeText(node.nodeValue); });
+  document.querySelectorAll('input[placeholder], textarea[placeholder], [title]').forEach(el => {
+    if (el.placeholder) el.placeholder = decodeMojibakeText(el.placeholder);
+    if (el.title) el.title = decodeMojibakeText(el.title);
+  });
+}
+
+function looksMojibake(text) {
+  return /[\u00c2\u00c3\u00e2\u20ac\u201a\u201c\u201d]/.test(text || '');
+}
+
+function decodeMojibakeTextLoose(text) {
+  if (!looksMojibake(text)) return text;
+  const cp1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
+  let out = text;
+  for (let pass = 0; pass < 3; pass++) {
+    const bytes = [];
+    for (const ch of out) {
+      const code = ch.charCodeAt(0);
+      if (code <= 0xFF) bytes.push(code);
+      else if (cp1252[code]) bytes.push(cp1252[code]);
+      else return out;
+    }
+    try {
+      const next = new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(bytes));
+      if (next === out) break;
+      out = next;
+    } catch (e) { break; }
+  }
+  return out;
+}
+
+function sanitizeVisibleTextLoose() {
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+  const nodes = [];
+  while (walker.nextNode()) if (looksMojibake(walker.currentNode.nodeValue)) nodes.push(walker.currentNode);
+  nodes.forEach(node => { node.nodeValue = decodeMojibakeTextLoose(node.nodeValue); });
+  document.querySelectorAll('input[placeholder], textarea[placeholder], [title]').forEach(el => {
+    if (el.placeholder && looksMojibake(el.placeholder)) el.placeholder = decodeMojibakeTextLoose(el.placeholder);
+    if (el.title && looksMojibake(el.title)) el.title = decodeMojibakeTextLoose(el.title);
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  sanitizeVisibleTextLoose();
+  let sanitizeQueued = false;
+  new MutationObserver(() => {
+    if (sanitizeQueued) return;
+    sanitizeQueued = true;
+    requestAnimationFrame(() => {
+      sanitizeQueued = false;
+      sanitizeVisibleTextLoose();
+    });
+  }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder', 'title'] });
+});
 </script>
 </body>
 </html>

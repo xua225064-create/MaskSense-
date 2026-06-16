@@ -111,7 +111,16 @@ class PipelineImgSearch(BasePipeline):
             if not search_results:
                 return PipelineResult(
                     pipeline_name=self.name,
-                    status=PipelineStatus.FAILED,
+                    status=PipelineStatus.PARTIAL,
+                    confidence=0.05,
+                    extra_data={
+                        "search_type": search_type,
+                        "fallback_ocr_text": fallback_ocr_text,
+                        "fallback_terms": fallback_terms,
+                        "fallback_queries": fallback_queries,
+                        "source_only": True,
+                        "allow_partial_db_match": False,
+                    },
                     error_message="Google Image/Text Search không tìm thấy link nguồn phù hợp",
                 )
             
@@ -124,14 +133,17 @@ class PipelineImgSearch(BasePipeline):
             articles = []
             web_sources = self._build_web_sources(search_results[:5], articles, search_type=search_type)
             source_urls = self._source_urls(search_results[:5])
+            source_only = True
+            result_label = ""
 
             # Keep source discovery fast. The evidence layer evaluates these
             # links together with OCR/DB/ML candidates for final voting.
             return PipelineResult(
                 pipeline_name=self.name,
                 status=PipelineStatus.PARTIAL,
-                confidence=0.45,
-                chu_han=fallback_label or "",
+                confidence=0.20,
+                chu_han=result_label,
+                raw_ocr_text="",
                 search_sources=source_urls,
                 llm_explanation="Đã tìm được link nguồn; kiểm chứng chi tiết ở evidence/voting.",
                 extra_data={
@@ -139,6 +151,8 @@ class PipelineImgSearch(BasePipeline):
                     "num_articles_scraped": len(articles) if articles else 0,
                     "web_sources": web_sources,
                     "fallback_queries": fallback_queries,
+                    "source_only": source_only,
+                    "allow_partial_db_match": False if source_only else True,
                 },
             )
         
@@ -156,8 +170,9 @@ class PipelineImgSearch(BasePipeline):
         if not queries:
             return results
 
-        # Slide flow C must use Selenium as the primary search path, not CSE/API.
-        prefer_method = "selenium_only"
+        # Use Selenium first, then allow configured fallbacks so the pipeline
+        # still returns diagnostics when the browser path is slow or blocked.
+        prefer_method = "selenium"
         for query in queries[:6]:
             try:
                 batch = await search_google(query, num_results=limit, prefer_method=prefer_method)
@@ -267,6 +282,11 @@ class PipelineImgSearch(BasePipeline):
     def _normalize_cjk(value: str) -> str:
         trans = str.maketrans({"绪": "緒", "制": "製", "内": "內"})
         return "".join(ch for ch in (value or "") if "\u4e00" <= ch <= "\u9fff").translate(trans)
+
+    @staticmethod
+    def _is_source_only_label(value: str) -> bool:
+        norm = PipelineImgSearch._normalize_cjk(value)
+        return norm in {"內府", "內府侍"} or (0 < len(norm) < 4)
 
     @staticmethod
     def _fold_latin(value: str) -> str:

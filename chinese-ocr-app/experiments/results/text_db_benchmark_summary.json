@@ -1,0 +1,182 @@
+{
+  "dataset": {
+    "database_records": 690,
+    "known_cases": 2226,
+    "unknown_fake_cases": 100,
+    "note": "Text-only database retrieval benchmark. This evaluates mark normalization/fuzzy matching, not image OCR or Vision AI."
+  },
+  "known_retrieval": {
+    "top1_accuracy": 0.7686433063791555,
+    "top3_accuracy": 0.894429469901168
+  },
+  "unknown_rejection": {
+    "false_positive_rate": 1.0,
+    "rejection_rate": 0.0
+  },
+  "latency_seconds": {
+    "avg": 0.1918103822012034,
+    "p95": 0.294815,
+    "max": 0.415446
+  },
+  "by_variant": {
+    "drop_first_char": {
+      "n": 609,
+      "top1_accuracy": 0.4400656814449918,
+      "top3_accuracy": 0.6650246305418719
+    },
+    "drop_last_char": {
+      "n": 613,
+      "top1_accuracy": 0.9086460032626428,
+      "top3_accuracy": 0.9885807504078303
+    },
+    "exact_full": {
+      "n": 690,
+      "top1_accuracy": 0.9927536231884058,
+      "top3_accuracy": 1.0
+    },
+    "short_mark": {
+      "n": 87,
+      "top1_accuracy": 1.0,
+      "top3_accuracy": 1.0
+    },
+    "single_confusion": {
+      "n": 158,
+      "top1_accuracy": 0.3227848101265823,
+      "top3_accuracy": 0.8481012658227848
+    },
+    "wrong_order_pair": {
+      "n": 69,
+      "top1_accuracy": 0.9130434782608695,
+      "top3_accuracy": 1.0
+    }
+  },
+  "by_group": {
+    "China": {
+      "n": 189,
+      "top1_accuracy": 0.8888888888888888,
+      "top3_accuracy": 0.9841269841269841
+    },
+    "Japan": {
+      "n": 47,
+      "top1_accuracy": 0.9361702127659575,
+      "top3_accuracy": 1.0
+    },
+    "Korea": {
+      "n": 83,
+      "top1_accuracy": 0.8072289156626506,
+      "top3_accuracy": 0.9518072289156626
+    },
+    "Other": {
+      "n": 1682,
+      "top1_accuracy": 0.7473246135552913,
+      "top3_accuracy": 0.8787158145065398
+    },
+    "Vietnam": {
+      "n": 225,
+      "top1_accuracy": 0.7777777777777778,
+      "top3_accuracy": 0.8933333333333333
+    }
+  },
+  "top_confusions": [
+    {
+      "ground_truth": "嘉靖年造",
+      "prediction": "大明嘉靖年製",
+      "count": 4
+    },
+    {
+      "ground_truth": "成化年造",
+      "prediction": "大明成化年製",
+      "count": 4
+    },
+    {
+      "ground_truth": "乾道年製",
+      "prediction": "至道年製",
+      "count": 4
+    },
+    {
+      "ground_truth": "乾祐年製",
+      "prediction": "景祐年製",
+      "count": 4
+    },
+    {
+      "ground_truth": "大慶年製",
+      "prediction": "大明隆慶年製",
+      "count": 4
+    },
+    {
+      "ground_truth": "正德年製",
+      "prediction": "大明宣德年製",
+      "count": 4
+    },
+    {
+      "ground_truth": "治平龍應年製",
+      "prediction": "龍",
+      "count": 4
+    },
+    {
+      "ground_truth": "萬曆年造",
+      "prediction": "大明萬曆年製",
+      "count": 3
+    },
+    {
+      "ground_truth": "福聖承道年製",
+      "prediction": "福",
+      "count": 3
+    },
+    {
+      "ground_truth": "龍符元化年製",
+      "prediction": "龍",
+      "count": 3
+    },
+    {
+      "ground_truth": "天符慶壽年製",
+      "prediction": "壽",
+      "count": 3
+    },
+    {
+      "ground_truth": "同慶年製",
+      "prediction": "大明隆慶年製",
+      "count": 2
+    },
+    {
+      "ground_truth": "成泰年製",
+      "prediction": "大明景泰年製",
+      "count": 2
+    },
+    {
+      "ground_truth": "御用",
+      "prediction": "御製",
+      "count": 2
+    },
+    {
+      "ground_truth": "福壽康寧",
+      "prediction": "福",
+      "count": 2
+    },
+    {
+      "ground_truth": "宣化年製",
+      "prediction": "大明成化年製",
+      "count": 2
+    },
+    {
+      "ground_truth": "康熙年製",
+      "prediction": "大明洪熙年製",
+      "count": 2
+    },
+    {
+      "ground_truth": "內府侍旨",
+      "prediction": "內府",
+      "count": 2
+    },
+    {
+      "ground_truth": "內府侍右",
+      "prediction": "內府",
+      "count": 2
+    },
+    {
+      "ground_truth": "泰德年製",
+      "prediction": "大明宣德年製",
+      "count": 2
+    }
+  ]
+}

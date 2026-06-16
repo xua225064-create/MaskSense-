@@ -163,6 +163,41 @@ def aggregate_results(results: List[PipelineResult], database: Optional[List[dic
         ]
         fields.extend([bt for bt in (entry.get("bien_the") or []) if bt])
         return [field for field in fields if field]
+
+    def _find_exact_db_entry(text: str) -> Optional[dict]:
+        text_norm = _norm_cjk(text)
+        if not database or not text_norm:
+            return None
+        for entry in database:
+            for field_val in _entry_targets(entry):
+                if field_val and _norm_cjk(field_val) == text_norm:
+                    return entry
+        return None
+
+    best_norm_pre = _norm_cjk(best_result.chu_han)
+    if (
+        best_result.pipeline_name in {"vision_gemini", "vision_opencode", "vision_ollama", "vision_read"}
+        and len(best_norm_pre) < 4
+        and database
+    ):
+        exact_challengers = [
+            (score, r, _find_exact_db_entry(r.chu_han))
+            for score, r in scored
+            if r is not best_result
+            and r.confidence >= 0.70
+            and len(_norm_cjk(r.chu_han)) >= 4
+            and _find_exact_db_entry(r.chu_han)
+        ]
+        if exact_challengers:
+            exact_challengers.sort(key=lambda item: (item[1].confidence, item[0]), reverse=True)
+            best_score, best_result, db_entry = exact_challengers[0]
+            db_match_type = "exact"
+            db_matched_text = best_result.chu_han
+            best_chu_han = best_result.chu_han
+            print(
+                "[Voting] Short vision override: "
+                f"{best_norm_pre} -> {best_result.pipeline_name}/{best_result.chu_han}"
+            )
     
     if database and best_result.chu_han:
         ocr_norm = _norm_cjk(best_result.chu_han)
@@ -188,7 +223,8 @@ def aggregate_results(results: List[PipelineResult], database: Optional[List[dic
             if db_entry:
                 break
 
-        if not db_entry and len(ocr_norm) >= 2:
+        allow_partial_db_match = best_result.extra_data.get("allow_partial_db_match", True) is not False
+        if allow_partial_db_match and not db_entry and len(ocr_norm) >= 2:
             generic_partials = {"年製", "年制", "年造", "大清", "大明", "大南"}
             if ocr_norm not in generic_partials:
                 partial_matches = []
@@ -231,6 +267,43 @@ def aggregate_results(results: List[PipelineResult], database: Optional[List[dic
             print(f"[Voting] 📚 Database match found: {db_entry.get('ten_viet', '')} "
                   f"(id={db_entry.get('id')})")
     
+    strong_vision_texts = {
+        r.pipeline_name: _norm_cjk(r.chu_han)
+        for r in valid_results
+        if r.pipeline_name in {"vision_gemini", "vision_opencode", "vision_ollama"}
+        and r.confidence >= 0.80
+        and _norm_cjk(r.chu_han)
+    }
+    vision_conflict_without_vote = (
+        len(strong_vision_texts) >= 2
+        and len(set(strong_vision_texts.values())) >= 2
+        and not any(r.pipeline_name == "text_vote" for r in valid_results)
+    )
+    db_target_norms = {_norm_cjk(target) for target in _entry_targets(db_entry or {})}
+    db_target_norms.discard("")
+    strong_disagreeing_vision_texts = {
+        name: text
+        for name, text in strong_vision_texts.items()
+        if len(text) >= 4
+    }
+    vision_db_disagreement = (
+        bool(db_entry)
+        and bool(strong_disagreeing_vision_texts)
+        and not any(
+            vision_text == target
+            or vision_text in target
+            or target in vision_text
+            for vision_text in strong_disagreeing_vision_texts.values()
+            for target in db_target_norms
+        )
+    )
+    if vision_conflict_without_vote or vision_db_disagreement:
+        reason = "vision_conflict" if vision_conflict_without_vote else "vision_db_disagreement"
+        print(f"[Voting] {reason}: {strong_vision_texts}; blocking DB/detail conclusion")
+        db_entry = None
+        db_match_type = f"blocked_by_{reason}"
+        best_chu_han = " / ".join(strong_vision_texts.values())
+
     # ================================================================
     # 5. Xây dựng kết quả cuối cùng
     # NGUYÊN TẮC: Database là nguồn ưu tiên cao nhất cho thông tin lịch sử.
@@ -249,13 +322,24 @@ def aggregate_results(results: List[PipelineResult], database: Optional[List[dic
         return default
     
     # Lấy thông tin ưu tiên từ DB
-    final_trieu_dai = _db_or_pipeline("trieu_dai", best_result.trieu_dai, voted_dynasty)
+    text_vote_without_db = best_result.pipeline_name == "text_vote" and not db_entry
+    vision_read_without_db = best_result.pipeline_name in {"vision_gemini", "vision_opencode", "vision_ollama", "vision_read"} and not db_entry
+    uncertain_visual_without_db = text_vote_without_db or vision_read_without_db or vision_conflict_without_vote or vision_db_disagreement
+    unknown_detail = "" if uncertain_visual_without_db else "Dang cap nhat..."
+    final_trieu_dai = _db_or_pipeline(
+        "trieu_dai",
+        best_result.trieu_dai,
+        "" if uncertain_visual_without_db else voted_dynasty,
+    )
     final_nien_hieu = _db_or_pipeline("nien_hieu", best_result.nien_hieu, "")
     final_hoang_de = _db_or_pipeline("hoang_de", best_result.hoang_de, "")
     final_phien_am = _db_or_pipeline("phien_am", best_result.phien_am, "")
-    final_ten_viet_short = _db_or_pipeline("ten_viet", "", "")
-    final_hien_thi_chinh = _db_or_pipeline("hien_thi_chinh", "", "")
-    final_hieu_de_vi = _db_or_pipeline("hieu_de_vi", "", "")
+    best_extra = best_result.extra_data or {}
+    final_ten_viet_short = _db_or_pipeline("ten_viet", best_extra.get("ten_viet", ""), "")
+    final_hien_thi_chinh = _db_or_pipeline("hien_thi_chinh", best_extra.get("hien_thi_chinh", ""), "")
+    final_hieu_de_vi = _db_or_pipeline("hieu_de_vi", best_extra.get("hieu_de_vi", ""), "")
+    if not (final_ten_viet_short or final_hien_thi_chinh or final_hieu_de_vi):
+        final_ten_viet_short = best_result.phien_am or best_result.nien_hieu
     if len(_norm_cjk(best_chu_han)) >= 6:
         final_ten_viet = final_hien_thi_chinh or final_hieu_de_vi or final_ten_viet_short
     else:
@@ -337,12 +421,61 @@ def aggregate_results(results: List[PipelineResult], database: Optional[List[dic
         "giai_thich_llm": best_result.llm_explanation,  # Giải thích LLM (Vietnamese)
         
         # Nguồn dữ liệu chính
-        "data_source": "database" if db_entry else "llm_pipeline",
-        "nguon_du_lieu": "Cơ sở dữ liệu hiệu đề" if db_entry else "Phân tích AI",
+        "data_source": "database" if db_entry else ("visual_text_vote" if text_vote_without_db else ("vision_read_no_db" if vision_read_without_db else ("vision_conflict" if (vision_conflict_without_vote or vision_db_disagreement) else "llm_pipeline"))),
+        "nguon_du_lieu": "Cơ sở dữ liệu hiệu đề" if db_entry else (
+            "AI Vision text vote; chua khop co so du lieu noi bo"
+            if text_vote_without_db else "Phân tích AI"
+        ),
+        "canh_bao": (
+            "Chuoi chu duoc doc bang voting OCR/Vision nhung chua co ban ghi khop chinh xac trong database noi bo."
+            if text_vote_without_db else ""
+        ),
         
         # Chi tiết từng pipeline
         "pipeline_details": all_results_dict,
     }
+
+    if uncertain_visual_without_db:
+        final.update({
+            "trieu_dai": "",
+            "triá»u_Ä‘áº¡i": "",
+            "nien_hieu": "",
+            "niÃªn_hiá»‡u": "",
+            "hoang_de": "",
+            "hoÃ ng_Ä‘áº¿": "",
+            "nam_bat_dau": None,
+            "nam_bat_dau_vn": "",
+            "nam_ket_thuc": None,
+            "nam_ket_thuc_vn": "",
+            "nien_dai": "",
+            "niÃªn_Ä‘áº¡i": "",
+            "ten_viet": "",
+            "tÃªn_viá»‡t": "",
+            "ten_viet_ngan": "",
+            "tÃªn_viá»‡t_ngáº¯n": "",
+            "hien_thi_chinh": "",
+            "hieu_de_vi": "",
+            "phien_am": "",
+            "phiÃªn_Ã¢m": "",
+            "y_nghia": "",
+            "Ã½_nghÄ©a": "",
+            "hieu_de_en": "",
+            "mo_ta": "",
+            "boi_canh": "",
+            "nghe_thuat": "",
+            "dac_diem_nghe_thuat": "",
+            "thu_phap": "",
+            "thu_phap_dac_biet": "",
+            "ghi_chu": "",
+            "ghi_chu_them": "",
+            "verification_status": "pending_web_lookup" if (text_vote_without_db or vision_read_without_db) else ("vision_db_disagreement" if vision_db_disagreement else "vision_conflict"),
+            "canh_bao": (
+                "Chuoi chu duoc doc bang voting OCR/Vision. He thong se tra cuu web; "
+                "neu khong co nguon xac thuc thi khong hien thong tin chi tiet."
+                if (text_vote_without_db or vision_read_without_db)
+                else "Vision AI doc khac ket qua database gan nhat, nen he thong khong ket luan day la hieu de that hay khop DB."
+            ),
+        })
     
     # Collect search_sources from the best result first
     if best_result.search_sources:
@@ -350,7 +483,7 @@ def aggregate_results(results: List[PipelineResult], database: Optional[List[dic
         final["cac_nguon_tham_khao"].extend(best_result.search_sources)
 
     # Cross-reference: bổ sung thông tin thiếu từ pipeline khác
-    for _, r in scored[1:]:
+    for _, r in ([] if uncertain_visual_without_db else scored[1:]):
         if not final["hoang_de"] and r.hoang_de:
             final["hoang_de"] = r.hoang_de
             final["hoàng_đế"] = r.hoang_de
