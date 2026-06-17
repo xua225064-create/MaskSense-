@@ -1,5 +1,8 @@
 FROM python:3.10-bullseye
 
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
@@ -8,12 +11,10 @@ RUN apt-get update && apt-get install -y \
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir paddlepaddle==3.0.0
-RUN pip install --no-cache-dir paddleocr==2.7.3
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
 EXPOSE 10000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-10000}"]

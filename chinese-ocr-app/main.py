@@ -2222,15 +2222,14 @@ async def send_contact_message(data: ContactMessage):
     try:
         _send_contact_email(record)
     except Exception as exc:
-        return JSONResponse(
-            status_code=502,
-            content={
-                "success": False,
-                "message": f"Message was saved, but email delivery failed: {exc}",
-            },
-        )
+        print(f"[Contact] Message saved, but email delivery failed: {exc}")
+        return {
+            "success": True,
+            "message": "Message received. Email delivery is not available on this deployment.",
+            "email_delivered": False,
+        }
 
-    return {"success": True, "message": "Message sent to xuatruong30@gmail.com."}
+    return {"success": True, "message": "Message sent to xuatruong30@gmail.com.", "email_delivered": True}
 
 
 async def _unused_old_chat_block():

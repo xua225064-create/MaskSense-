@@ -1020,6 +1020,7 @@
       display: none;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       padding: 18px 24px 22px;
+      min-width: 0;
     }
 
     .upload-file-item {
@@ -1027,6 +1028,8 @@
       grid-template-columns: auto minmax(0, 1fr);
       gap: 12px;
       align-items: center;
+      width: 100%;
+      min-width: 0;
     }
 
     .upload-file-ext {
@@ -1049,6 +1052,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
     }
 
     .upload-file-meta {
@@ -1146,18 +1150,24 @@
     .selected-upload-footer {
       display: none;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      flex-direction: column;
       gap: 18px;
       margin-top: 20px;
       padding: 20px 30px 26px;
       border-top: 1px solid rgba(255, 255, 255, 0.09);
     }
 
+    .selected-upload-footer .upload-file-list {
+      width: 100%;
+    }
+
     .selected-upload-actions {
       display: flex;
       gap: 12px;
       align-items: center;
-      flex: 0 0 auto;
+      justify-content: center;
+      width: 100%;
     }
 
     .selected-upload-actions .btn-uc {
@@ -2345,8 +2355,9 @@
 
       .selected-upload-actions {
         width: 100%;
-        display: grid;
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         margin-left: 0 !important;
       }
 
@@ -7116,7 +7127,7 @@
 
           <div class="u-foot selected-upload-footer" id="u-foot">
             <span class="u-status" id="us" style="display:none;"></span>
-            <div id="upload-file-list" class="upload-file-list" style="display:block; flex:1; padding:0; border:0;"></div>
+            <div id="upload-file-list" class="upload-file-list" style="display:block; padding:0; border:0;"></div>
             <div class="selected-upload-actions">
               <button class="btn-uc btn-uc-dark" onclick="event.stopPropagation(); resetUpload()">Remove</button>
               <button class="btn-uc btn-uc-primary" id="baz" disabled
@@ -7721,7 +7732,7 @@
                 style="background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; width: 100%; color: #fff; height: 100px; margin-bottom: 15px; font-family: 'Inter', sans-serif; resize: vertical;"></textarea>
             </div>
             <button type="submit" class="sp-form-btn" data-i18n="contact-send"
-              style="background: linear-gradient(135deg, #d4d4d8, #f5f5f5); color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s;">Send
+              style="background: linear-gradient(135deg, #d4d4d8, #f5f5f5); color: #111827; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s;">Send
               Information</button>
           </form>
         </div>
@@ -9339,7 +9350,7 @@
             <div class="upload-file-name">${_escapeHtml(file.name || 'Selected image')}</div>
             <div class="upload-file-meta">
               <span>${formatUploadFileSize(file.size || 0)}</span>
-              <span>â€¢</span>
+              <span>&bull;</span>
               <span>Completed</span>
             </div>
             <div class="upload-progress"><div class="upload-progress-bar"></div></div>
