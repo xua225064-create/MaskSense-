@@ -9079,7 +9079,7 @@
           setTimeout(function () {
             updUI();
             loadCredits();
-            refreshActivePageData();
+            if (typeof refreshActivePageData === 'function') refreshActivePageData();
           }, 0);
         }
       }
@@ -12314,7 +12314,8 @@
     function applyLang(lang) {
       currentLang = lang;
       localStorage.setItem('marksense_lang', lang);
-      document.getElementById('langLabel').textContent = lang.toUpperCase();
+      var langLabel = document.getElementById('langLabel');
+      if (langLabel) langLabel.textContent = lang.toUpperCase();
 
       var map = (lang === 'en') ? viToEn : enToVi;
       walkTextNodes(document.body, map);

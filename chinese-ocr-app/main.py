@@ -24,9 +24,24 @@ if sys.platform == "win32":
 
 app = FastAPI(title="Chinese Porcelain Reign Mark OCR")
 
+DEFAULT_CORS_ORIGINS = [
+    "http://localhost:8001",
+    "http://127.0.0.1:8001",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://marksense-ai.onrender.com",
+    "https://marksense-frontend.onrender.com",
+]
+
+cors_origins = [
+    origin.strip().rstrip("/")
+    for origin in os.getenv("MARKSENSE_CORS_ORIGINS", ",".join(DEFAULT_CORS_ORIGINS)).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
