@@ -4,6 +4,13 @@ import sqlite3
 from datetime import datetime, timedelta
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+try:
+    import pymysql
+    from pymysql.cursors import DictCursor
+except Exception:  # pragma: no cover - PyMySQL is only required for MySQL deployments.
+    pymysql = None
+    DictCursor = None
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -11,6 +18,19 @@ SQLITE_DB_PATH = os.getenv("MARKSENSE_SQLITE_PATH", os.path.join(DATA_DIR, "mark
 DEFAULT_FREE_CREDITS = 10
 
 _DB_READY = False
+
+
+def _db_backend() -> str:
+    configured = os.getenv("MARKSENSE_DB_BACKEND", "").strip().lower()
+    if configured:
+        return configured
+    if os.getenv("AIVEN_MYSQL_HOST") or os.getenv("MYSQL_HOST") or os.getenv("DATABASE_URL", "").startswith("mysql"):
+        return "mysql"
+    return "sqlite"
+
+
+def _using_mysql() -> bool:
+    return _db_backend() in {"mysql", "aiven-mysql", "mariadb"}
 
 
 def _dict_factory(cursor: sqlite3.Cursor, row: Tuple[Any, ...]) -> Dict[str, Any]:
@@ -63,6 +83,19 @@ class SQLiteCompatConnection:
     def __init__(self, conn: sqlite3.Connection):
         self._conn = conn
 
+    def execute(self, sql: str, params: Iterable[Any] = ()):
+        cursor = self.cursor()
+        cursor.execute(sql, params)
+        return cursor
+
+    def executemany(self, sql: str, seq_of_params: Iterable[Iterable[Any]]):
+        cursor = self.cursor()
+        cursor.executemany(sql, seq_of_params)
+        return cursor
+
+    def executescript(self, sql_script: str):
+        return self._conn.executescript(sql_script)
+
     def cursor(self):
         return SQLiteCompatCursor(self._conn.cursor())
 
@@ -76,21 +109,152 @@ class SQLiteCompatConnection:
         self._conn.close()
 
 
-def _raw_connection() -> sqlite3.Connection:
+class MySQLCompatCursor:
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
+
+    @staticmethod
+    def _sql(sql: str) -> str:
+        sql = sql.replace("INSERT OR IGNORE INTO", "INSERT IGNORE INTO")
+        sql = sql.replace("INSERT OR REPLACE INTO", "REPLACE INTO")
+        sql = sql.replace("MAX(0, COALESCE(scan_credits, 0) - ?)", "GREATEST(0, COALESCE(scan_credits, 0) - ?)")
+        sql = sql.replace("strftime('%Y-%m', created_at) = ?", "DATE_FORMAT(created_at, '%%Y-%%m') = ?")
+        sql = sql.replace(
+            "ON CONFLICT(setting_key) DO UPDATE SET\n"
+            "                setting_value = excluded.setting_value,\n"
+            "                updated_at = CURRENT_TIMESTAMP",
+            "ON DUPLICATE KEY UPDATE\n"
+            "                setting_value = VALUES(setting_value),\n"
+            "                updated_at = CURRENT_TIMESTAMP",
+        )
+        return sql.replace("?", "%s")
+
+    def execute(self, sql: str, params: Iterable[Any] = ()):
+        if params is None:
+            params = ()
+        return self._cursor.execute(self._sql(sql), tuple(params))
+
+    def executemany(self, sql: str, seq_of_params: Iterable[Iterable[Any]]):
+        return self._cursor.executemany(self._sql(sql), seq_of_params)
+
+    def fetchone(self):
+        return self._cursor.fetchone()
+
+    def fetchall(self):
+        return list(self._cursor.fetchall())
+
+    @property
+    def lastrowid(self):
+        return self._cursor.lastrowid
+
+    @property
+    def rowcount(self):
+        return self._cursor.rowcount
+
+    def close(self):
+        self._cursor.close()
+
+
+class MySQLCompatConnection:
+    def __init__(self, conn):
+        self._conn = conn
+
+    def execute(self, sql: str, params: Iterable[Any] = ()):
+        cursor = self.cursor()
+        cursor.execute(sql, params)
+        return cursor
+
+    def executemany(self, sql: str, seq_of_params: Iterable[Iterable[Any]]):
+        cursor = self.cursor()
+        cursor.executemany(sql, seq_of_params)
+        return cursor
+
+    def executescript(self, sql_script: str):
+        cursor = self.cursor()
+        for statement in sql_script.split(";"):
+            statement = statement.strip()
+            if statement:
+                cursor.execute(statement)
+        return cursor
+
+    def cursor(self):
+        return MySQLCompatCursor(self._conn.cursor())
+
+    def commit(self):
+        self._conn.commit()
+
+    def rollback(self):
+        self._conn.rollback()
+
+    def close(self):
+        self._conn.close()
+
+
+def _raw_sqlite_connection() -> SQLiteCompatConnection:
     os.makedirs(os.path.dirname(SQLITE_DB_PATH), exist_ok=True)
     conn = sqlite3.connect(SQLITE_DB_PATH, timeout=30)
     conn.row_factory = _dict_factory
     conn.execute("PRAGMA foreign_keys = ON")
     conn.execute("PRAGMA journal_mode = WAL")
-    return conn
+    return SQLiteCompatConnection(conn)
+
+
+def _mysql_ssl_options() -> Optional[Dict[str, Any]]:
+    ssl_ca = os.getenv("AIVEN_MYSQL_SSL_CA") or os.getenv("MYSQL_SSL_CA")
+    ssl_disabled = os.getenv("MYSQL_SSL_DISABLED", "").strip().lower() in {"1", "true", "yes"}
+    if ssl_disabled:
+        return None
+    if ssl_ca:
+        return {"ca": ssl_ca}
+    if os.getenv("AIVEN_MYSQL_HOST") or os.getenv("MYSQL_SSL_MODE", "").strip().upper() == "REQUIRED":
+        return {"check_hostname": False}
+    return None
+
+
+def _raw_mysql_connection() -> MySQLCompatConnection:
+    if pymysql is None or DictCursor is None:
+        raise RuntimeError("PyMySQL is required for MARKSENSE_DB_BACKEND=mysql")
+
+    host = os.getenv("AIVEN_MYSQL_HOST") or os.getenv("MYSQL_HOST")
+    port = int(os.getenv("AIVEN_MYSQL_PORT") or os.getenv("MYSQL_PORT") or "3306")
+    user = os.getenv("AIVEN_MYSQL_USER") or os.getenv("MYSQL_USER")
+    password = os.getenv("AIVEN_MYSQL_PASSWORD") or os.getenv("MYSQL_PASSWORD")
+    database = os.getenv("AIVEN_MYSQL_DATABASE") or os.getenv("MYSQL_DATABASE") or "defaultdb"
+    if not all([host, user, password, database]):
+        raise RuntimeError("Missing Aiven/MySQL environment variables")
+
+    conn = pymysql.connect(
+        host=host,
+        port=port,
+        user=user,
+        password=password,
+        database=database,
+        charset="utf8mb4",
+        cursorclass=DictCursor,
+        autocommit=False,
+        ssl=_mysql_ssl_options(),
+    )
+    return MySQLCompatConnection(conn)
+
+
+def _raw_connection():
+    if _using_mysql():
+        return _raw_mysql_connection()
+    return _raw_sqlite_connection()
 
 
 def get_db_connection():
     try:
         ensure_database()
-        return SQLiteCompatConnection(_raw_connection())
+        return _raw_connection()
     except Exception as e:
-        print(f"[DB] Cannot open SQLite database: {e}")
+        print(f"[DB] Cannot open database: {e}")
         return None
 
 
@@ -111,6 +275,10 @@ def ensure_database() -> None:
 
 
 def _create_schema(conn: sqlite3.Connection) -> None:
+    if _using_mysql():
+        _create_mysql_schema(conn)
+        return
+
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS users (
@@ -184,7 +352,100 @@ def _create_schema(conn: sqlite3.Connection) -> None:
     _ensure_column(conn, "users", "locked", "INTEGER DEFAULT 0")
 
 
+def _create_mysql_schema(conn) -> None:
+    conn.executescript(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL UNIQUE,
+            password_hash VARCHAR(255) NOT NULL DEFAULT '',
+            display_name VARCHAR(255),
+            provider VARCHAR(64),
+            scan_credits INT DEFAULT 10,
+            role VARCHAR(32) DEFAULT 'user',
+            locked TINYINT DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+        CREATE TABLE IF NOT EXISTS marks (
+            id INT PRIMARY KEY,
+            chu_han VARCHAR(100),
+            chu_han_4 VARCHAR(100),
+            chu_han_6 VARCHAR(100),
+            bien_the JSON,
+            phien_am VARCHAR(255),
+            ten_viet VARCHAR(255),
+            hoang_de VARCHAR(255),
+            trieu_dai VARCHAR(255),
+            nam_bat_dau INT,
+            nam_ket_thuc INT,
+            ghi_chu TEXT,
+            hien_thi_chinh VARCHAR(255),
+            nien_hieu VARCHAR(255),
+            nien_dai VARCHAR(255),
+            hieu_de_en VARCHAR(255),
+            mo_ta TEXT,
+            hieu_de_vi VARCHAR(255),
+            thu_phap TEXT,
+            nghe_thuat TEXT
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+        CREATE TABLE IF NOT EXISTS scan_history (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT,
+            username VARCHAR(255),
+            image_path VARCHAR(500),
+            ocr_text TEXT,
+            match_result JSON,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_scan_history_user_id (user_id),
+            CONSTRAINT fk_scan_history_user
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+        CREATE TABLE IF NOT EXISTS payments (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            amount_vnd INT NOT NULL,
+            credits INT NOT NULL,
+            status VARCHAR(32) DEFAULT 'pending',
+            sepay_tx_id INT UNIQUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_payments_user_id (user_id),
+            CONSTRAINT fk_payments_user
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+        CREATE TABLE IF NOT EXISTS system_settings (
+            setting_key VARCHAR(100) PRIMARY KEY,
+            setting_value TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        """
+    )
+    _ensure_column(conn, "users", "display_name", "VARCHAR(255)")
+    _ensure_column(conn, "users", "provider", "VARCHAR(64)")
+    _ensure_column(conn, "users", "scan_credits", f"INT DEFAULT {DEFAULT_FREE_CREDITS}")
+    _ensure_column(conn, "users", "role", "VARCHAR(32) DEFAULT 'user'")
+    _ensure_column(conn, "users", "locked", "TINYINT DEFAULT 0")
+
+
 def _ensure_column(conn: sqlite3.Connection, table: str, column: str, definition: str) -> None:
+    if _using_mysql():
+        row = conn.execute(
+            """
+            SELECT COUNT(*) AS cnt
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = ?
+              AND COLUMN_NAME = ?
+            """,
+            (table, column),
+        ).fetchone()
+        if not row or not row.get("cnt"):
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+        return
+
     cols = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
     if column not in cols:
         conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
@@ -219,7 +480,7 @@ def _seed_marks_from_json_if_empty(conn: sqlite3.Connection) -> None:
         marks = json.load(f)
     for mark in marks:
         _insert_mark(conn, mark, replace=True)
-    print(f"[DB] Seeded {len(marks)} marks into SQLite.")
+    print(f"[DB] Seeded {len(marks)} marks into {_db_backend()}.")
 
 
 def _insert_mark(conn: sqlite3.Connection, mark_data: Dict[str, Any], replace: bool = False) -> int:

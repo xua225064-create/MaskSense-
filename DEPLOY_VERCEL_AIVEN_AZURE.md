@@ -72,7 +72,19 @@ AIVEN_MYSQL_PASSWORD=...
 AIVEN_MYSQL_SSL_CA=...
 ```
 
-The current backend still uses SQLite by default. Do not point production traffic at Aiven until the DB adapter migration is completed and tested.
+Set these variables on Azure to enable Aiven MySQL:
+
+```text
+MARKSENSE_DB_BACKEND=mysql
+AIVEN_MYSQL_HOST=...
+AIVEN_MYSQL_PORT=...
+AIVEN_MYSQL_DATABASE=defaultdb
+AIVEN_MYSQL_USER=avnadmin
+AIVEN_MYSQL_PASSWORD=...
+MYSQL_SSL_MODE=REQUIRED
+```
+
+Local development still uses SQLite unless `MARKSENSE_DB_BACKEND=mysql` is set.
 
 ## 4. Deploy Order
 
