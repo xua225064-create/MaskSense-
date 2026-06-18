@@ -32,6 +32,7 @@ DEFAULT_CORS_ORIGINS = [
     "https://marksense-ai.onrender.com",
     "https://marksense-frontend.onrender.com",
 ]
+CORS_ORIGIN_REGEX = os.getenv("MARKSENSE_CORS_ORIGIN_REGEX", r"https://.*\.vercel\.app").strip() or None
 
 cors_origins = [
     origin.strip().rstrip("/")
@@ -42,6 +43,7 @@ cors_origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
+    allow_origin_regex=CORS_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

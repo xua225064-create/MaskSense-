@@ -1,8 +1,12 @@
 (function () {
-  var DEFAULT_API_BASE_URL = "https://marksense-backend.onrender.com";
+  var DEFAULT_API_BASE_URL = "";
   var rawBase = window.MARKSENSE_API_BASE_URL || DEFAULT_API_BASE_URL;
   var apiBase = String(rawBase).trim().replace(/\/+$/, "");
   window.MARKSENSE_API_BASE_URL = apiBase;
+
+  if (!apiBase && window.console && typeof window.console.warn === "function") {
+    window.console.warn("MARKSENSE_API_BASE_URL is not configured. API requests will stay on the frontend origin.");
+  }
 
   var backendPaths = [
     "/api/",

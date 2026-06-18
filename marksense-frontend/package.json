@@ -1,0 +1,8 @@
+{
+  "name": "marksense-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node scripts/write-config.js"
+  }
+}
