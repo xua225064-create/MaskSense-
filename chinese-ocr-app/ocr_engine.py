@@ -3,25 +3,34 @@ import numpy as np
 import re
 import os
 import json
-from paddleocr import PaddleOCR
 from typing import List, Tuple
 from ocr_corrections import correct_ocr_text, is_valid_char, get_correction_stats
 
 DEBUG_DIR = "debug"
 os.makedirs(DEBUG_DIR, exist_ok=True)
 
-print("Loading PaddleOCR...")
-ocr = PaddleOCR(
-    use_angle_cls=True,
-    lang="ch",
-    use_gpu=False,
-    show_log=False,
-    det_limit_side_len=2048,
-    det_db_unclip_ratio=1.6,
-    det_db_thresh=0.3,
-    det_db_box_thresh=0.5,
-)
-print("PaddleOCR ready!")
+_OCR = None
+
+
+def _get_ocr():
+    global _OCR
+    if os.getenv("MARKSENSE_DISABLE_PADDLE_OCR", "false").lower() == "true":
+        raise RuntimeError("PaddleOCR is disabled for this deployment.")
+    if _OCR is None:
+        print("Loading PaddleOCR...")
+        from paddleocr import PaddleOCR
+        _OCR = PaddleOCR(
+            use_angle_cls=True,
+            lang="ch",
+            use_gpu=False,
+            show_log=False,
+            det_limit_side_len=2048,
+            det_db_unclip_ratio=1.6,
+            det_db_thresh=0.3,
+            det_db_box_thresh=0.5,
+        )
+        print("PaddleOCR ready!")
+    return _OCR
 
 MAX_OCR_DIM = 1600
 MIN_CONF = 0.35  # Lowered: base threshold to capture all characters (was 0.55)
@@ -1243,6 +1252,7 @@ def run_ocr(img: np.ndarray, name: str = "") -> Tuple[str, float]:
         quality_score = tổng conf * len → ưu tiên kết quả nhiều chữ VÀ tin cậy cao
     """
     try:
+        ocr = _get_ocr()
         safe_img = _safe_resize(img)
         h, w = safe_img.shape[:2]
         use_tiny_det = min(h, w) < 280 or name == "tiny_upscale"
