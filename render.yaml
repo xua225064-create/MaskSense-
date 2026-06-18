@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: marksense-web
+    name: marksense-backend
     runtime: docker
     dockerfilePath: ./chinese-ocr-app/Dockerfile
     dockerContext: ./chinese-ocr-app
@@ -36,3 +36,12 @@ services:
         sync: false
       - key: CONTACT_SMTP_PASSWORD
         sync: false
+  - type: web
+    name: marksense-frontend
+    runtime: static
+    rootDir: marksense-frontend
+    buildCommand: 'printf "window.MARKSENSE_API_BASE_URL = \"%s\";\n" "${MARKSENSE_API_BASE_URL:-https://marksense-backend.onrender.com}" > frontend-config.js'
+    staticPublishPath: .
+    envVars:
+      - key: MARKSENSE_API_BASE_URL
+        value: https://marksense-backend.onrender.com
