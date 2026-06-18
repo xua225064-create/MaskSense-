@@ -1,5 +1,6 @@
 (function () {
-  var rawBase = window.MARKSENSE_API_BASE_URL || "";
+  var DEFAULT_API_BASE_URL = "https://marksense-backend.onrender.com";
+  var rawBase = window.MARKSENSE_API_BASE_URL || DEFAULT_API_BASE_URL;
   var apiBase = String(rawBase).trim().replace(/\/+$/, "");
   window.MARKSENSE_API_BASE_URL = apiBase;
 
