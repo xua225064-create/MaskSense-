@@ -29,8 +29,6 @@ DEFAULT_CORS_ORIGINS = [
     "http://127.0.0.1:8001",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://marksense-ai.onrender.com",
-    "https://marksense-frontend.onrender.com",
 ]
 CORS_ORIGIN_REGEX = os.getenv("MARKSENSE_CORS_ORIGIN_REGEX", r"https://.*\.vercel\.app").strip() or None
 
